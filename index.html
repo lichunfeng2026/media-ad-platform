@@ -1,0 +1,2164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自媒体广告系统 - 专业企业版</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* 侧边栏样式 */
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(180deg, #2c3e50 0%, #1a252f 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .sidebar.collapsed {
+            width: 80px;
+        }
+        
+        .sidebar-header {
+            padding: 25px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .sidebar-header h1 {
+            font-size: 1.5rem;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        
+        .sidebar.collapsed .sidebar-header h1 {
+            display: none;
+        }
+        
+        .logo {
+            font-size: 2rem;
+            color: #3498db;
+        }
+        
+        .toggle-sidebar {
+            position: absolute;
+            right: -15px;
+            top: 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        
+        .user-profile {
+            padding: 25px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #3498db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .user-info {
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .user-role {
+            font-size: 0.85rem;
+            color: #bdc3c7;
+            padding: 3px 10px;
+            background: rgba(52, 152, 219, 0.2);
+            border-radius: 20px;
+            display: inline-block;
+        }
+        
+        .sidebar.collapsed .user-info {
+            display: none;
+        }
+        
+        .sidebar.collapsed .user-profile {
+            justify-content: center;
+        }
+        
+        .nav-menu {
+            flex: 1;
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+        
+        .nav-item {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #bdc3c7;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+        
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+        
+        .nav-item.active {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+            border-left: 3px solid #3498db;
+        }
+        
+        .nav-item i {
+            font-size: 1.2rem;
+            min-width: 24px;
+        }
+        
+        .nav-text {
+            white-space: nowrap;
+        }
+        
+        .sidebar.collapsed .nav-text {
+            display: none;
+        }
+        
+        .nav-submenu {
+            padding-left: 50px;
+            display: none;
+        }
+        
+        .nav-item.has-submenu.active + .nav-submenu {
+            display: block;
+        }
+        
+        .nav-subitem {
+            padding: 10px 20px;
+            color: #95a5a6;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .nav-subitem:hover {
+            color: white;
+        }
+        
+        .nav-subitem.active {
+            color: #3498db;
+        }
+        
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 20px;
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(231, 76, 60, 0.2);
+        }
+        
+        .sidebar.collapsed .logout-btn span {
+            display: none;
+        }
+        
+        /* 主内容区样式 */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .top-nav {
+            height: 70px;
+            background: white;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .page-title {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .top-nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .notification-icon, .help-icon {
+            position: relative;
+            font-size: 1.2rem;
+            color: #7f8c8d;
+            cursor: pointer;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #e74c3c;
+            color: white;
+            font-size: 0.7rem;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+        
+        /* 仪表板样式 */
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+        
+        .stat-icon.articles {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+        }
+        
+        .stat-icon.ads {
+            background: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+        }
+        
+        .stat-icon.earnings {
+            background: rgba(155, 89, 182, 0.1);
+            color: #9b59b6;
+        }
+        
+        .stat-icon.users {
+            background: rgba(241, 196, 15, 0.1);
+            color: #f1c40f;
+        }
+        
+        .stat-info h3 {
+            font-size: 2.2rem;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .stat-info p {
+            color: #7f8c8d;
+            font-size: 0.95rem;
+        }
+        
+        .dashboard-charts {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .chart-title {
+            font-size: 1.2rem;
+            color: #2c3e50;
+        }
+        
+        .chart-container {
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .chart-placeholder {
+            width: 100%;
+            height: 100%;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #95a5a6;
+        }
+        
+        /* 用户管理样式 */
+        .user-management-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .user-search {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .user-search input {
+            width: 300px;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        
+        .users-table-container {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .users-table th {
+            background: #f8f9fa;
+            padding: 18px 20px;
+            text-align: left;
+            font-weight: 600;
+            color: #2c3e50;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .users-table td {
+            padding: 18px 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .user-avatar-small {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #3498db;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-name-cell {
+            font-weight: 600;
+        }
+        
+        .user-email {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .role-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .role-super-admin {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+        
+        .role-admin {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+        }
+        
+        .role-editor {
+            background: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+        }
+        
+        .role-user {
+            background: rgba(149, 165, 166, 0.1);
+            color: #95a5a6;
+        }
+        
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .status-active {
+            background: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+        }
+        
+        .status-inactive {
+            background: rgba(149, 165, 166, 0.1);
+            color: #95a5a6;
+        }
+        
+        .user-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .action-btn:hover {
+            background: #f8f9fa;
+        }
+        
+        .action-btn.edit {
+            color: #3498db;
+        }
+        
+        .action-btn.delete {
+            color: #e74c3c;
+        }
+        
+        .action-btn.lock {
+            color: #f1c40f;
+        }
+        
+        .table-footer {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+        }
+        
+        /* 我的中心样式 */
+        .profile-container {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .profile-sidebar {
+            width: 300px;
+        }
+        
+        .profile-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .profile-avatar-large {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498db, #2ecc71);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: 600;
+            margin: 0 auto 20px;
+        }
+        
+        .profile-name {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .profile-email {
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+        
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .profile-stat {
+            text-align: center;
+        }
+        
+        .profile-stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #3498db;
+            margin-bottom: 5px;
+        }
+        
+        .profile-stat-label {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .profile-main {
+            flex: 1;
+        }
+        
+        .profile-tabs {
+            display: flex;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 25px;
+        }
+        
+        .profile-tab {
+            padding: 15px 25px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            font-size: 1rem;
+            color: #7f8c8d;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .profile-tab.active {
+            color: #3498db;
+            border-bottom: 3px solid #3498db;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .settings-form {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        /* 广告管理样式 */
+        .ad-templates {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        
+        .template-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+        }
+        
+        .template-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .template-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .template-title {
+            font-size: 1.2rem;
+            color: #2c3e50;
+        }
+        
+        .template-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .template-type-image {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+        }
+        
+        .template-type-text {
+            background: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+        }
+        
+        .template-content {
+            margin-bottom: 20px;
+            color: #7f8c8d;
+        }
+        
+        .template-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .template-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            color: #2c3e50;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+        
+        .modal-footer {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        /* 按钮样式 */
+        .btn {
+            padding: 12px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #3498db, #2ecc71);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(to right, #2980b9, #27ae60);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(to right, #9b59b6, #e74c3c);
+        }
+        
+        .btn-secondary:hover {
+            background: linear-gradient(to right, #8e44ad, #c0392b);
+        }
+        
+        .btn-success {
+            background: #2ecc71;
+        }
+        
+        .btn-success:hover {
+            background: #27ae60;
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        
+        /* 通知样式 */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #2ecc71;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 1001;
+            font-weight: 600;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .dashboard-charts {
+                grid-template-columns: 1fr;
+            }
+            
+            .profile-container {
+                flex-direction: column;
+            }
+            
+            .profile-sidebar {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                z-index: 100;
+                height: 100vh;
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .top-nav {
+                padding: 0 15px;
+            }
+            
+            .content-area {
+                padding: 20px;
+            }
+            
+            .user-search {
+                flex-direction: column;
+            }
+            
+            .user-search input {
+                width: 100%;
+            }
+            
+            .users-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+        
+        /* 其他页面共用样式 */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .page-actions {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 侧边栏 -->
+        <div class="sidebar" id="sidebar">
+            <button class="toggle-sidebar" id="toggleSidebar">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-ad"></i>
+                </div>
+                <h1>自媒体广告系统</h1>
+            </div>
+            
+            <div class="user-profile">
+                <div class="user-avatar" id="userAvatar">A</div>
+                <div class="user-info">
+                    <div class="user-name" id="userName">管理员</div>
+                    <div class="user-role" id="userRole">超级管理员</div>
+                </div>
+            </div>
+            
+            <div class="nav-menu">
+                <div class="nav-item active" data-page="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span class="nav-text">控制面板</span>
+                </div>
+                
+                <div class="nav-item" data-page="ad-management">
+                    <i class="fas fa-ad"></i>
+                    <span class="nav-text">广告管理</span>
+                </div>
+                
+                <div class="nav-item" data-page="article-management">
+                    <i class="fas fa-newspaper"></i>
+                    <span class="nav-text">文章管理</span>
+                </div>
+                
+                <div class="nav-item has-submenu" data-page="user-management">
+                    <i class="fas fa-users"></i>
+                    <span class="nav-text">用户管理</span>
+                    <i class="fas fa-chevron-right ml-auto"></i>
+                </div>
+                
+                <div class="nav-submenu">
+                    <div class="nav-subitem active" data-page="user-list">用户列表</div>
+                    <div class="nav-subitem" data-page="role-management">角色权限</div>
+                    <div class="nav-subitem" data-page="team-management">团队管理</div>
+                </div>
+                
+                <div class="nav-item" data-page="my-center">
+                    <i class="fas fa-user-circle"></i>
+                    <span class="nav-text">我的中心</span>
+                </div>
+                
+                <div class="nav-item" data-page="statistics">
+                    <i class="fas fa-chart-bar"></i>
+                    <span class="nav-text">数据统计</span>
+                </div>
+                
+                <div class="nav-item" data-page="settings">
+                    <i class="fas fa-cog"></i>
+                    <span class="nav-text">系统设置</span>
+                </div>
+            </div>
+            
+            <div class="sidebar-footer">
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>退出登录</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <!-- 顶部导航 -->
+            <div class="top-nav">
+                <div class="mobile-menu-toggle" id="mobileMenuToggle">
+                    <i class="fas fa-bars"></i>
+                </div>
+                
+                <div class="page-title">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span id="currentPageTitle">控制面板</span>
+                </div>
+                
+                <div class="top-nav-actions">
+                    <div class="notification-icon" id="notificationIcon">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </div>
+                    
+                    <div class="help-icon" id="helpIcon">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 内容区域 -->
+            <div class="content-area" id="contentArea">
+                <!-- 页面内容将通过JavaScript动态加载 -->
+                <div id="pageContent">
+                    <!-- 默认显示控制面板 -->
+                    <div class="dashboard-stats">
+                        <div class="stat-card">
+                            <div class="stat-icon articles">
+                                <i class="fas fa-newspaper"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="totalArticlesCount">0</h3>
+                                <p>总文章数</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon ads">
+                                <i class="fas fa-ad"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="totalAdsCount">0</h3>
+                                <p>总广告数</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon earnings">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="totalEarnings">¥0</h3>
+                                <p>总收益</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon users">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="totalUsersCount">0</h3>
+                                <p>总用户数</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-charts">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title">文章与广告数据趋势</h3>
+                            </div>
+                            <div class="chart-container">
+                                <div class="chart-placeholder">
+                                    <i class="fas fa-chart-line"></i>
+                                    <span> 数据图表区域</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title">用户活跃度</h3>
+                            </div>
+                            <div class="chart-container">
+                                <div class="chart-placeholder">
+                                    <i class="fas fa-chart-pie"></i>
+                                    <span> 饼图区域</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">最近活动</h3>
+                        </div>
+                        <div id="recentActivities">
+                            <!-- 最近活动将动态生成 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 模态框容器 -->
+    <div id="modalContainer"></div>
+
+    <script>
+        // 系统数据初始化
+        const systemData = {
+            // 当前登录用户
+            currentUser: {
+                id: 1,
+                username: "admin",
+                name: "管理员",
+                email: "admin@example.com",
+                role: "super_admin",
+                avatar: "A",
+                joinDate: "2023-01-15",
+                lastLogin: "2023-10-20 14:30:00"
+            },
+            
+            // 用户角色定义
+            roles: {
+                super_admin: {
+                    name: "超级管理员",
+                    permissions: ["all"]
+                },
+                admin: {
+                    name: "管理员",
+                    permissions: ["user_manage", "article_manage", "ad_manage", "view_reports"]
+                },
+                editor: {
+                    name: "编辑",
+                    permissions: ["article_manage", "ad_manage"]
+                },
+                user: {
+                    name: "普通用户",
+                    permissions: ["article_view", "ad_view"]
+                }
+            },
+            
+            // 用户列表
+            users: [
+                {
+                    id: 1,
+                    username: "admin",
+                    name: "管理员",
+                    email: "admin@example.com",
+                    role: "super_admin",
+                    status: "active",
+                    joinDate: "2023-01-15",
+                    lastLogin: "2023-10-20 14:30:00"
+                },
+                {
+                    id: 2,
+                    username: "manager1",
+                    name: "张经理",
+                    email: "manager1@example.com",
+                    role: "admin",
+                    status: "active",
+                    joinDate: "2023-02-20",
+                    lastLogin: "2023-10-19 09:15:00"
+                },
+                {
+                    id: 3,
+                    username: "editor1",
+                    name: "李编辑",
+                    email: "editor1@example.com",
+                    role: "editor",
+                    status: "active",
+                    joinDate: "2023-03-10",
+                    lastLogin: "2023-10-20 10:45:00"
+                },
+                {
+                    id: 4,
+                    username: "writer1",
+                    name: "王作者",
+                    email: "writer1@example.com",
+                    role: "user",
+                    status: "active",
+                    joinDate: "2023-04-05",
+                    lastLogin: "2023-10-18 16:20:00"
+                },
+                {
+                    id: 5,
+                    username: "writer2",
+                    name: "赵作者",
+                    email: "writer2@example.com",
+                    role: "user",
+                    status: "inactive",
+                    joinDate: "2023-05-12",
+                    lastLogin: "2023-10-10 11:30:00"
+                }
+            ],
+            
+            // 文章数据
+            articles: [],
+            
+            // 广告模板
+            adTemplates: [
+                {
+                    id: 1,
+                    name: "会员推广模板",
+                    type: "image",
+                    content: "限时特惠！加入我们的高级会员计划，享受独家内容和无广告体验。",
+                    title: "独家会员福利",
+                    link: "https://example.com/premium",
+                    createdBy: 1,
+                    createdAt: "2023-10-15"
+                },
+                {
+                    id: 2,
+                    name: "产品推荐模板",
+                    type: "product",
+                    content: "发现我们的新产品系列，专为像您这样的用户设计。",
+                    title: "新品推荐",
+                    link: "https://example.com/products",
+                    createdBy: 2,
+                    createdAt: "2023-10-10"
+                },
+                {
+                    id: 3,
+                    name: "活动推广模板",
+                    type: "text",
+                    content: "参加我们的线上活动，赢取丰厚奖品！",
+                    title: "限时活动",
+                    link: "https://example.com/event",
+                    createdBy: 1,
+                    createdAt: "2023-10-05"
+                }
+            ],
+            
+            // 系统设置
+            settings: {
+                siteName: "自媒体广告系统",
+                siteUrl: "https://ad.example.com",
+                adFrequency: 4,
+                defaultAdType: "image"
+            },
+            
+            // 统计数据
+            statistics: {
+                totalArticles: 0,
+                totalAds: 0,
+                totalEarnings: 0,
+                totalUsers: 0,
+                recentActivities: []
+            }
+        };
+        
+        // DOM元素
+        const sidebar = document.getElementById("sidebar");
+        const toggleSidebarBtn = document.getElementById("toggleSidebar");
+        const mobileMenuToggle = document.getElementById("mobileMenuToggle");
+        const contentArea = document.getElementById("contentArea");
+        const pageContent = document.getElementById("pageContent");
+        const currentPageTitle = document.getElementById("currentPageTitle");
+        const userAvatar = document.getElementById("userAvatar");
+        const userName = document.getElementById("userName");
+        const userRole = document.getElementById("userRole");
+        const logoutBtn = document.getElementById("logoutBtn");
+        const navItems = document.querySelectorAll(".nav-item");
+        const navSubitems = document.querySelectorAll(".nav-subitem");
+        const modalContainer = document.getElementById("modalContainer");
+        
+        // 当前页面状态
+        let currentPage = "dashboard";
+        let isSidebarCollapsed = false;
+        
+        // 初始化页面
+        function initPage() {
+            // 加载用户数据
+            updateUserInfo();
+            
+            // 初始化事件监听
+            initEventListeners();
+            
+            // 加载初始页面
+            loadPage(currentPage);
+            
+            // 更新统计数据
+            updateStatistics();
+        }
+        
+        // 更新用户信息
+        function updateUserInfo() {
+            const user = systemData.currentUser;
+            userAvatar.textContent = user.avatar;
+            userName.textContent = user.name;
+            userRole.textContent = systemData.roles[user.role].name;
+        }
+        
+        // 初始化事件监听
+        function initEventListeners() {
+            // 侧边栏折叠/展开
+            toggleSidebarBtn.addEventListener("click", function() {
+                isSidebarCollapsed = !isSidebarCollapsed;
+                sidebar.classList.toggle("collapsed", isSidebarCollapsed);
+                
+                const icon = this.querySelector("i");
+                icon.classList.toggle("fa-chevron-left", !isSidebarCollapsed);
+                icon.classList.toggle("fa-chevron-right", isSidebarCollapsed);
+            });
+            
+            // 移动端菜单切换
+            mobileMenuToggle.addEventListener("click", function() {
+                sidebar.classList.toggle("active");
+            });
+            
+            // 导航菜单点击
+            navItems.forEach(item => {
+                item.addEventListener("click", function() {
+                    const page = this.dataset.page;
+                    
+                    // 更新导航状态
+                    navItems.forEach(nav => nav.classList.remove("active"));
+                    this.classList.add("active");
+                    
+                    // 如果是子菜单项，处理展开/收起
+                    if (this.classList.contains("has-submenu")) {
+                        this.classList.toggle("active");
+                        return; // 不切换页面，只展开子菜单
+                    }
+                    
+                    // 加载页面
+                    loadPage(page);
+                    
+                    // 移动端点击后关闭侧边栏
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove("active");
+                    }
+                });
+            });
+            
+            // 子菜单项点击
+            navSubitems.forEach(item => {
+                item.addEventListener("click", function() {
+                    const page = this.dataset.page;
+                    
+                    // 更新子菜单状态
+                    navSubitems.forEach(subitem => subitem.classList.remove("active"));
+                    this.classList.add("active");
+                    
+                    // 加载页面
+                    loadPage(page);
+                    
+                    // 移动端点击后关闭侧边栏
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove("active");
+                    }
+                });
+            });
+            
+            // 退出登录
+            logoutBtn.addEventListener("click", function() {
+                if (confirm("确定要退出登录吗？")) {
+                    // 在实际应用中，这里应该清除登录状态并跳转到登录页
+                    showNotification("已退出登录");
+                    // 模拟跳转到登录页
+                    setTimeout(() => {
+                        window.location.href = "login.html";
+                    }, 1000);
+                }
+            });
+            
+            // 通知图标点击
+            document.getElementById("notificationIcon").addEventListener("click", function() {
+                showNotificationsModal();
+            });
+            
+            // 帮助图标点击
+            document.getElementById("helpIcon").addEventListener("click", function() {
+                showHelpModal();
+            });
+        }
+        
+        // 加载页面
+        function loadPage(page) {
+            currentPage = page;
+            
+            // 更新页面标题
+            updatePageTitle(page);
+            
+            // 清空内容区域
+            pageContent.innerHTML = "";
+            
+            // 根据页面加载不同内容
+            switch(page) {
+                case "dashboard":
+                    loadDashboard();
+                    break;
+                case "ad-management":
+                    loadAdManagement();
+                    break;
+                case "article-management":
+                    loadArticleManagement();
+                    break;
+                case "user-list":
+                    loadUserList();
+                    break;
+                case "role-management":
+                    loadRoleManagement();
+                    break;
+                case "team-management":
+                    loadTeamManagement();
+                    break;
+                case "my-center":
+                    loadMyCenter();
+                    break;
+                case "statistics":
+                    loadStatistics();
+                    break;
+                case "settings":
+                    loadSettings();
+                    break;
+                default:
+                    loadDashboard();
+            }
+            
+            // 更新URL（不刷新页面）
+            history.pushState({ page }, "", `?page=${page}`);
+        }
+        
+        // 更新页面标题
+        function updatePageTitle(page) {
+            const titles = {
+                "dashboard": "控制面板",
+                "ad-management": "广告管理",
+                "article-management": "文章管理",
+                "user-list": "用户列表",
+                "role-management": "角色权限管理",
+                "team-management": "团队管理",
+                "my-center": "我的中心",
+                "statistics": "数据统计",
+                "settings": "系统设置"
+            };
+            
+            currentPageTitle.textContent = titles[page] || "控制面板";
+        }
+        
+        // 加载控制面板
+        function loadDashboard() {
+            pageContent.innerHTML = `
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon articles">
+                            <i class="fas fa-newspaper"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalArticlesCount">0</h3>
+                            <p>总文章数</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon ads">
+                            <i class="fas fa-ad"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalAdsCount">0</h3>
+                            <p>总广告数</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon earnings">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalEarnings">¥0</h3>
+                            <p>总收益</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon users">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalUsersCount">0</h3>
+                            <p>总用户数</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dashboard-charts">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3 class="chart-title">文章与广告数据趋势</h3>
+                        </div>
+                        <div class="chart-container">
+                            <div class="chart-placeholder">
+                                <i class="fas fa-chart-line"></i>
+                                <span> 数据图表区域</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3 class="chart-title">用户活跃度</h3>
+                        </div>
+                        <div class="chart-container">
+                            <div class="chart-placeholder">
+                                <i class="fas fa-chart-pie"></i>
+                                <span> 饼图区域</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">最近活动</h3>
+                    </div>
+                    <div id="recentActivities">
+                        <!-- 最近活动将动态生成 -->
+                    </div>
+                </div>
+            `;
+            
+            updateStatistics();
+        }
+        
+        // 加载用户列表
+        function loadUserList() {
+            pageContent.innerHTML = `
+                <div class="user-management-header">
+                    <h2 class="page-title">用户管理</h2>
+                    <div class="page-actions">
+                        <div class="user-search">
+                            <input type="text" id="userSearch" placeholder="搜索用户...">
+                            <button class="btn btn-primary" id="searchUserBtn">
+                                <i class="fas fa-search"></i> 搜索
+                            </button>
+                        </div>
+                        <button class="btn btn-success" id="addUserBtn">
+                            <i class="fas fa-plus"></i> 添加用户
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="users-table-container">
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>用户</th>
+                                <th>角色</th>
+                                <th>状态</th>
+                                <th>加入时间</th>
+                                <th>最后登录</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <!-- 用户数据将动态生成 -->
+                        </tbody>
+                    </table>
+                    <div class="table-footer">
+                        <div>共 <span id="totalUsers">0</span> 个用户</div>
+                        <div class="pagination">
+                            <button class="btn" id="prevPage">上一页</button>
+                            <span>第 <span id="currentPage">1</span> 页</span>
+                            <button class="btn" id="nextPage">下一页</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // 填充用户数据
+            renderUsersTable();
+            
+            // 添加事件监听
+            document.getElementById("addUserBtn").addEventListener("click", showAddUserModal);
+            document.getElementById("searchUserBtn").addEventListener("click", searchUsers);
+            document.getElementById("userSearch").addEventListener("keypress", function(e) {
+                if (e.key === "Enter") searchUsers();
+            });
+        }
+        
+        // 渲染用户表格
+        function renderUsersTable(filteredUsers = null) {
+            const users = filteredUsers || systemData.users;
+            const tableBody = document.getElementById("usersTableBody");
+            
+            tableBody.innerHTML = "";
+            
+            users.forEach(user => {
+                const roleClass = `role-${user.role.replace("_", "-")}`;
+                const roleName = systemData.roles[user.role].name;
+                const statusClass = user.status === "active" ? "status-active" : "status-inactive";
+                const statusText = user.status === "active" ? "活跃" : "禁用";
+                
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>
+                        <div class="user-cell">
+                            <div class="user-avatar-small">${user.name.charAt(0)}</div>
+                            <div>
+                                <div class="user-name-cell">${user.name}</div>
+                                <div class="user-email">${user.email}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="role-badge ${roleClass}">${roleName}</span></td>
+                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                    <td>${user.joinDate}</td>
+                    <td>${user.lastLogin}</td>
+                    <td>
+                        <div class="user-actions">
+                            <button class="action-btn edit" data-user-id="${user.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            ${user.id !== 1 ? `
+                                <button class="action-btn lock" data-user-id="${user.id}">
+                                    <i class="fas fa-lock${user.status === 'active' ? '' : '-open'}"></i>
+                                </button>
+                                <button class="action-btn delete" data-user-id="${user.id}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+            
+            // 更新统计
+            document.getElementById("totalUsers").textContent = users.length;
+            
+            // 添加操作按钮事件
+            document.querySelectorAll(".action-btn.edit").forEach(btn => {
+                btn.addEventListener("click", function() {
+                    const userId = parseInt(this.dataset.userId);
+                    showEditUserModal(userId);
+                });
+            });
+            
+            document.querySelectorAll(".action-btn.lock").forEach(btn => {
+                btn.addEventListener("click", function() {
+                    const userId = parseInt(this.dataset.userId);
+                    toggleUserStatus(userId);
+                });
+            });
+            
+            document.querySelectorAll(".action-btn.delete").forEach(btn => {
+                btn.addEventListener("click", function() {
+                    const userId = parseInt(this.dataset.userId);
+                    deleteUser(userId);
+                });
+            });
+        }
+        
+        // 加载我的中心
+        function loadMyCenter() {
+            const user = systemData.currentUser;
+            const roleName = systemData.roles[user.role].name;
+            
+            pageContent.innerHTML = `
+                <div class="profile-container">
+                    <div class="profile-sidebar">
+                        <div class="profile-card">
+                            <div class="profile-avatar-large">${user.avatar}</div>
+                            <h2 class="profile-name">${user.name}</h2>
+                            <p class="profile-email">${user.email}</p>
+                            <div class="profile-stats">
+                                <div class="profile-stat">
+                                    <div class="profile-stat-value" id="myArticlesCount">0</div>
+                                    <div class="profile-stat-label">我的文章</div>
+                                </div>
+                                <div class="profile-stat">
+                                    <div class="profile-stat-value" id="myAdsCount">0</div>
+                                    <div class="profile-stat-label">我的广告</div>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" id="editProfileBtn" style="width: 100%;">
+                                <i class="fas fa-edit"></i> 编辑资料
+                            </button>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">账户信息</h3>
+                            </div>
+                            <div class="profile-info">
+                                <p><strong>用户名：</strong> ${user.username}</p>
+                                <p><strong>角色：</strong> ${roleName}</p>
+                                <p><strong>加入时间：</strong> ${user.joinDate}</p>
+                                <p><strong>最后登录：</strong> ${user.lastLogin}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-main">
+                        <div class="profile-tabs">
+                            <button class="profile-tab active" data-tab="my-articles">我的文章</button>
+                            <button class="profile-tab" data-tab="my-ads">我的广告</button>
+                            <button class="profile-tab" data-tab="account-settings">账户设置</button>
+                            <button class="profile-tab" data-tab="security">安全设置</button>
+                        </div>
+                        
+                        <div id="my-articles" class="tab-content active">
+                            <div class="page-actions" style="margin-bottom: 20px;">
+                                <button class="btn btn-primary" id="addMyArticleBtn">
+                                    <i class="fas fa-plus"></i> 添加文章
+                                </button>
+                            </div>
+                            <div id="myArticlesList">
+                                <!-- 我的文章将动态生成 -->
+                            </div>
+                        </div>
+                        
+                        <div id="my-ads" class="tab-content">
+                            <div class="page-actions" style="margin-bottom: 20px;">
+                                <button class="btn btn-primary" id="addMyAdBtn">
+                                    <i class="fas fa-plus"></i> 创建广告模板
+                                </button>
+                            </div>
+                            <div class="ad-templates" id="myAdTemplates">
+                                <!-- 我的广告模板将动态生成 -->
+                            </div>
+                        </div>
+                        
+                        <div id="account-settings" class="tab-content">
+                            <div class="settings-form">
+                                <div class="form-group">
+                                    <label class="form-label">显示名称</label>
+                                    <input type="text" class="form-control" id="displayName" value="${user.name}">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">邮箱地址</label>
+                                    <input type="email" class="form-control" id="email" value="${user.email}">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">个人简介</label>
+                                    <textarea class="form-control" id="bio" rows="4" placeholder="介绍一下你自己..."></textarea>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">时区</label>
+                                    <select class="form-control" id="timezone">
+                                        <option value="Asia/Shanghai" selected>中国标准时间 (UTC+8)</option>
+                                        <option value="America/New_York">美国东部时间 (UTC-5)</option>
+                                        <option value="Europe/London">伦敦时间 (UTC+0)</option>
+                                    </select>
+                                </div>
+                                
+                                <button class="btn btn-primary" id="saveAccountSettings">
+                                    <i class="fas fa-save"></i> 保存设置
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="security" class="tab-content">
+                            <div class="settings-form">
+                                <div class="form-group">
+                                    <label class="form-label">当前密码</label>
+                                    <input type="password" class="form-control" id="currentPassword" placeholder="输入当前密码">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">新密码</label>
+                                    <input type="password" class="form-control" id="newPassword" placeholder="输入新密码">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">确认新密码</label>
+                                    <input type="password" class="form-control" id="confirmPassword" placeholder="再次输入新密码">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">两步验证</label>
+                                    <div style="display: flex; align-items: center; gap: 15px;">
+                                        <span>当前状态: 未启用</span>
+                                        <button class="btn" id="enable2FA">
+                                            <i class="fas fa-shield-alt"></i> 启用两步验证
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <button class="btn btn-primary" id="saveSecuritySettings">
+                                    <i class="fas fa-save"></i> 更新安全设置
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // 初始化标签页
+            initProfileTabs();
+            
+            // 加载我的文章
+            loadMyArticles();
+            
+            // 加载我的广告模板
+            loadMyAdTemplates();
+            
+            // 添加事件监听
+            document.getElementById("editProfileBtn").addEventListener("click", showEditProfileModal);
+            document.getElementById("addMyArticleBtn").addEventListener("click", showAddArticleModal);
+            document.getElementById("addMyAdBtn").addEventListener("click", showAddAdTemplateModal);
+            document.getElementById("saveAccountSettings").addEventListener("click", saveAccountSettings);
+            document.getElementById("saveSecuritySettings").addEventListener("click", saveSecuritySettings);
+        }
+        
+        // 初始化我的中心标签页
+        function initProfileTabs() {
+            const tabs = document.querySelectorAll(".profile-tab");
+            const tabContents = document.querySelectorAll(".tab-content");
+            
+            tabs.forEach(tab => {
+                tab.addEventListener("click", function() {
+                    const tabId = this.dataset.tab;
+                    
+                    // 更新标签页状态
+                    tabs.forEach(t => t.classList.remove("active"));
+                    this.classList.add("active");
+                    
+                    // 显示对应的内容
+                    tabContents.forEach(content => {
+                        content.classList.remove("active");
+                        if (content.id === tabId) {
+                            content.classList.add("active");
+                        }
+                    });
+                });
+            });
+        }
+        
+        // 加载我的文章
+        function loadMyArticles() {
+            const myArticles = systemData.articles.filter(article => article.createdBy === systemData.currentUser.id);
+            const container = document.getElementById("myArticlesList");
+            
+            if (myArticles.length === 0) {
+                container.innerHTML = `
+                    <div class="card" style="text-align: center; padding: 50px;">
+                        <i class="fas fa-newspaper" style="font-size: 3rem; color: #bdc3c7; margin-bottom: 20px;"></i>
+                        <h3 style="margin-bottom: 10px;">暂无文章</h3>
+                        <p style="color: #7f8c8d; margin-bottom: 20px;">您还没有创建任何文章</p>
+                        <button class="btn btn-primary" id="createFirstArticle">
+                            <i class="fas fa-plus"></i> 创建第一篇文章
+                        </button>
+                    </div>
+                `;
+                
+                document.getElementById("createFirstArticle").addEventListener("click", showAddArticleModal);
+            } else {
+                container.innerHTML = `
+                    <div class="card-grid">
+                        ${myArticles.map(article => `
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">${article.title}</h3>
+                                    <span class="status-badge ${article.status === 'published' ? 'status-active' : 'status-inactive'}">
+                                        ${article.status === 'published' ? '已发布' : '草稿'}
+                                    </span>
+                                </div>
+                                <p style="color: #7f8c8d; margin-bottom: 20px;">${article.content.substring(0, 100)}...</p>
+                                <div class="template-footer">
+                                    <span style="color: #95a5a6; font-size: 0.9rem;">创建于: ${article.createdAt}</span>
+                                    <div class="template-actions">
+                                        <button class="action-btn edit" data-article-id="${article.id}">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete" data-article-id="${article.id}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+            
+            // 更新统计
+            document.getElementById("myArticlesCount").textContent = myArticles.length;
+        }
+        
+        // 加载我的广告模板
+        function loadMyAdTemplates() {
+            const myTemplates = systemData.adTemplates.filter(template => template.createdBy === systemData.currentUser.id);
+            const container = document.getElementById("myAdTemplates");
+            
+            if (myTemplates.length === 0) {
+                container.innerHTML = `
+                    <div class="card" style="text-align: center; padding: 50px;">
+                        <i class="fas fa-ad" style="font-size: 3rem; color: #bdc3c7; margin-bottom: 20px;"></i>
+                        <h3 style="margin-bottom: 10px;">暂无广告模板</h3>
+                        <p style="color: #7f8c8d; margin-bottom: 20px;">您还没有创建任何广告模板</p>
+                        <button class="btn btn-primary" id="createFirstAdTemplate">
+                            <i class="fas fa-plus"></i> 创建第一个广告模板
+                        </button>
+                    </div>
+                `;
+                
+                document.getElementById("createFirstAdTemplate").addEventListener("click", showAddAdTemplateModal);
+            } else {
+                container.innerHTML = `
+                    ${myTemplates.map(template => `
+                        <div class="template-card">
+                            <div class="template-header">
+                                <h3 class="template-title">${template.name}</h3>
+                                <span class="template-badge template-type-${template.type}">${template.type === 'image' ? '图片广告' : template.type === 'text' ? '文字广告' : '产品推荐'}</span>
+                            </div>
+                            <div class="template-content">
+                                <p>${template.content}</p>
+                            </div>
+                            <div class="template-footer">
+                                <span style="color: #95a5a6; font-size: 0.9rem;">创建于: ${template.createdAt}</span>
+                                <div class="template-actions">
+                                    <button class="action-btn edit" data-template-id="${template.id}">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn delete" data-template-id="${template.id}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                `;
+            }
+            
+            // 更新统计
+            document.getElementById("myAdsCount").textContent = myTemplates.length;
+        }
+        
+        // 加载角色权限管理
+        function loadRoleManagement() {
+            pageContent.innerHTML = `
+                <div class="page-header">
+                    <h2 class="page-title">角色权限管理</h2>
+                    <div class="page-actions">
+                        <button class="btn btn-success" id="addRoleBtn">
+                            <i class="fas fa-plus"></i> 添加角色
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="card-grid">
+                    ${Object.entries(systemData.roles).map(([roleKey, role]) => `
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">${role.name}</h3>
+                                ${roleKey === 'super_admin' ? '<span class="role-badge role-super-admin">系统内置</span>' : ''}
+                            </div>
+                            <div style="margin-bottom: 20px;">
+                                <p><strong>权限列表：</strong></p>
+                                <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;">
+                                    ${role.permissions.map(perm => `
+                                        <span style="background: #f8f9fa; padding: 5px 10px; border-radius: 20px; font-size: 0.85rem;">
+                                            ${getPermissionName(perm)}
+                                        </span>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            <div class="template-footer">
+                                <span style="color: #95a5a6; font-size: 0.9rem;">角色标识: ${roleKey}</span>
+                                ${roleKey !== 'super_admin' ? `
+                                    <div class="template-actions">
+                                        <button class="action-btn edit" data-role="${roleKey}">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete" data-role="${roleKey}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+        
+        // 加载团队管理
+        function loadTeamManagement() {
+            pageContent.innerHTML = `
+                <div class="page-header">
+                    <h2 class="page-title">团队管理</h2>
+                    <div class="page-actions">
+                        <button class="btn btn-success" id="createTeamBtn">
+                            <i class="fas fa-plus"></i> 创建团队
+                        </button>
+</div>
+</div>
+                
+<div class="card" style="text-align:center；padding:50px；">
+<i class="fas fa-users" style="font-size:3rem； color:#bdc3c7； margin-bottom:20px；"></i>
+                    <h3 style="margin-bottom: 10px;">团队功能</h3>
+<p style=“颜色:#7f8c8d；margin-bottom: 20px;”>团队管理功能正在开发中...</p>
+<p style="color：#7f8c8d；">您可以将用户组织成团队，并为团队分配项目和权限。</p>
+</div>
+            `;
+        }
+        
+        // 加载数据统计
+        功能 负载统计() {
+            页面内容.InnerHTML = `
+<div class=“页面标题”>
+《H2类=页面标题》数据统计
+<div class="page-actions">
+<select class="form-control" style="width:200px；">
+                            <option>最近7天</option>
+                            <option>最近30天</option>
+                            <option>最近90天</option>
+所有时间<选项>
+</选择>
+</div>
+</div>
+                
+<div class="card" style="text-align:center；padding:50px；">
+<i class="fas fa-chart-bar" style="font-size:3rem； color:#bdc3c7； margin-bottom:20px；"></i>
+<h3样式="边缘底部：10像素">数据统计功能</h3>
+<p样式=颜色：#7 f8c8d；边缘底部：20像素；“>数据统计功能正在开发中...</p>
+<p style="color：#7f8c8d；">这里将展示详细的文章、广告、用户等数据统计图表。</p>
+</div>
+            `;
+        }
+        
+        // 加载系统设置
+        功能 加载设置() {
+            常量 设定 = 系统数据.设定;
+            
+            页面内容.InnerHTML = `
+<div class=“页面标题”>
+页面标题》系统设置
+</div>
+                
+<div class=“card”>
+<div class="settings-form">
+<div class="form-group">
+<标签类=形式标签>系统名称</标签>
+<input type="text" class="form-control" id="siteName" value="${设定.站点名称}">
+设定
+${
+<div class="form-group">
+</div>
+输入类型=“网址”类=“表单控制”标识=“网站网址”值=“${设定。网站地址}“>
+设定
+${
+<输入类型=“范围”标识=“频率”最小值=”2“ 最大值=”8“ 值=”
+}
+默认广告插入频率</标签>
+<div class="滑块容器">
+<输入类型=“范围”标识=“频率”最小值=”2“ 最大值=”8“ 值=“${设定.广告频率}”类=”滑块“>
+设定
+${
+<选项值="图像"
+广告频率
+}
+广告频率
+设定
+<选项值="图像"${设定.默认广告类型 === "图像" ? "已选定" : ''}>图片广告</option>
+默认广告类型
+>图片广告</option>
+}
+''
+"已选定"
+"产品"
+''
+<标签类=形式标签>系统描述</标签>
+输入系统描述...输入系统描述...输入系统描述“>自媒体文章自动广告插入系统，支持多用户管理和层级权限控制。</text一种re一种>
+</d我v>
+                        
+<d我v cl一种的的=“模态页脚”
+按钮类保存系统设置
+                                <我cl一种的的=“fas fa-保存””></i> 保存设置
+</按钮>
+<按钮 cl一种的的=按钮id="重置系统设置">
+                                <我 cl一种的的=法斯法雷多></i> 恢复默认
+</按钮>
+</d我v>
+</d我v>
+</d我v>
+            `;
+        }
+        
+        // 更新统计数据
+函数更新统计数据{
+            // 在实际应用中，这里应该从一种P我获取数据
+的y的temD一种t一种.的t一种t我的t我c的.小孩一种l一种rt我cle=
+的y的temD一种t一种.的t一种t我的t我c的.小孩一种l一种d的=156；
+的y的temD一种t一种.的t一种t我的t我c的.总收益=2450.50；的t一种t我的t我c的.总收益=2450.50；
+的y的temD一种t一种.的t一种t我的t我c的.小孩一种路的尔的=系统数据。用户。长度；
+            
+            // 更新显示
+文件。由我d（“托特一种l一种我的伯爵”）.文本内容=系统数据。统计数字.总文章数；
+总文章数；
+系统数据。统计数字
+文本内容
+            
+            // 更新最近活动
+常量活动 = [
+{ 用户:“管理员”, 动作：“创建了新用户”, 时间：“10分钟前” },
+{ 用户:“张经理”, 动作：“发布了新文章”, 时间：“1小时前” },
+,
+}
+}
+            ];
+            
+常量活动容器=文件。
+如果（活动容器）{
+活动容器.#ee；显示：柔性；对齐项目：中心；间隙：15=<ul的样式="列表"-样式:无;填充：0;”>
+<ul的样式=“列表样式：无；填充：0；”>
+“列表样式：无；填充：0；”
+<l我 #ee；显示：柔性；对齐项目：中心；间隙：15px实心#ee；显示：柔性；对齐项目：中心；间隙：15 px；">
+<迪我v的样式="宽度：40像素；高度：40像素；边缘半径：50%；背景：#3498 db；颜色：白色；显示：柔性；对齐项：中心；论证
