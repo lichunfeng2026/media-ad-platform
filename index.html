@@ -816,40 +816,27 @@
         
         .btn:hover {
             background: #2980b9;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
         }
         
         .btn-primary {
-            background: linear-gradient(to right, #3498db, #2ecc71);
-        }
-        
-        .btn-primary:hover {
-            background: linear-gradient(to right, #2980b9, #27ae60);
+            background: #3498db;
         }
         
         .btn-secondary {
-            background: linear-gradient(to right, #9b59b6, #e74c3c);
-        }
-        
-        .btn-secondary:hover {
-            background: linear-gradient(to right, #8e44ad, #c0392b);
+            background: #95a5a6;
         }
         
         .btn-success {
             background: #2ecc71;
         }
         
-        .btn-success:hover {
-            background: #27ae60;
-        }
-        
         .btn-danger {
             background: #e74c3c;
         }
         
-        .btn-danger:hover {
-            background: #c0392b;
+        .btn-sm {
+            padding: 8px 15px;
+            font-size: 0.9rem;
         }
         
         /* 通知样式 */
@@ -857,24 +844,48 @@
             position: fixed;
             top: 20px;
             right: 20px;
-            background: #2ecc71;
-            color: white;
             padding: 15px 20px;
+            background: white;
             border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
             z-index: 1001;
-            font-weight: 600;
-            animation: slideIn 0.3s ease;
         }
         
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+        .notification.show {
+            transform: translateX(0);
         }
         
-        @keyframes slideOut {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(100%); opacity: 0; }
+        .notification-icon {
+            font-size: 1.5rem;
+        }
+        
+        .notification-success .notification-icon {
+            color: #2ecc71;
+        }
+        
+        .notification-error .notification-icon {
+            color: #e74c3c;
+        }
+        
+        .notification-info .notification-icon {
+            color: #3498db;
+        }
+        
+        .notification-message {
+            flex: 1;
+        }
+        
+        .notification-close {
+            background: none;
+            border: none;
+            color: #7f8c8d;
+            cursor: pointer;
+            font-size: 1.2rem;
         }
         
         /* 响应式设计 */
@@ -882,7 +893,9 @@
             .dashboard-charts {
                 grid-template-columns: 1fr;
             }
-            
+        }
+        
+        @media (max-width: 992px) {
             .profile-container {
                 flex-direction: column;
             }
@@ -895,25 +908,22 @@
         @media (max-width: 768px) {
             .sidebar {
                 position: fixed;
+                left: -260px;
                 z-index: 100;
-                height: 100vh;
-                transform: translateX(-100%);
             }
             
             .sidebar.active {
-                transform: translateX(0);
+                left: 0;
             }
             
-            .top-nav {
-                padding: 0 15px;
+            .main-content {
+                width: 100%;
             }
             
-            .content-area {
-                padding: 20px;
-            }
-            
-            .user-search {
+            .user-management-header {
                 flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
             }
             
             .user-search input {
@@ -925,110 +935,65 @@
                 overflow-x: auto;
             }
         }
-        
-        /* 其他页面共用样式 */
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-        
-        .page-actions {
-            display: flex;
-            gap: 15px;
-        }
-        
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 25px;
-        }
-        
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        }
-        
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .card-title {
-            font-size: 1.2rem;
-            color: #2c3e50;
-        }
     </style>
 </head>
 <body>
     <div class="app-container">
         <!-- 侧边栏 -->
         <div class="sidebar" id="sidebar">
-            <button class="toggle-sidebar" id="toggleSidebar">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            
             <div class="sidebar-header">
                 <div class="logo">
                     <i class="fas fa-ad"></i>
                 </div>
-                <h1>自媒体广告系统</h1>
+                <h1>广告系统</h1>
             </div>
             
+            <button class="toggle-sidebar" id="toggleSidebar">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            
             <div class="user-profile">
-                <div class="user-avatar" id="userAvatar">A</div>
+                <div class="user-avatar">李</div>
                 <div class="user-info">
-                    <div class="user-name" id="userName">管理员</div>
-                    <div class="user-role" id="userRole">超级管理员</div>
+                    <div class="user-name">李春峰</div>
+                    <div class="user-role">超级管理员</div>
                 </div>
             </div>
             
             <div class="nav-menu">
                 <div class="nav-item active" data-page="dashboard">
                     <i class="fas fa-tachometer-alt"></i>
-                    <span class="nav-text">控制面板</span>
+                    <span class="nav-text">仪表板</span>
                 </div>
                 
-                <div class="nav-item" data-page="ad-management">
-                    <i class="fas fa-ad"></i>
-                    <span class="nav-text">广告管理</span>
-                </div>
-                
-                <div class="nav-item" data-page="article-management">
+                <div class="nav-item" data-page="articles">
                     <i class="fas fa-newspaper"></i>
                     <span class="nav-text">文章管理</span>
                 </div>
                 
-                <div class="nav-item has-submenu" data-page="user-management">
+                <div class="nav-item" data-page="ads">
+                    <i class="fas fa-ad"></i>
+                    <span class="nav-text">广告管理</span>
+                </div>
+                
+                <div class="nav-item" data-page="users">
                     <i class="fas fa-users"></i>
                     <span class="nav-text">用户管理</span>
-                    <i class="fas fa-chevron-right ml-auto"></i>
                 </div>
                 
-                <div class="nav-submenu">
-                    <div class="nav-subitem active" data-page="user-list">用户列表</div>
-                    <div class="nav-subitem" data-page="role-management">角色权限</div>
-                    <div class="nav-subitem" data-page="team-management">团队管理</div>
-                </div>
-                
-                <div class="nav-item" data-page="my-center">
-                    <i class="fas fa-user-circle"></i>
-                    <span class="nav-text">我的中心</span>
-                </div>
-                
-                <div class="nav-item" data-page="statistics">
-                    <i class="fas fa-chart-bar"></i>
-                    <span class="nav-text">数据统计</span>
+                <div class="nav-item" data-page="analytics">
+                    <i class="fas fa-chart-line"></i>
+                    <span class="nav-text">数据分析</span>
                 </div>
                 
                 <div class="nav-item" data-page="settings">
                     <i class="fas fa-cog"></i>
                     <span class="nav-text">系统设置</span>
+                </div>
+                
+                <div class="nav-item" data-page="profile">
+                    <i class="fas fa-user-circle"></i>
+                    <span class="nav-text">个人中心</span>
                 </div>
             </div>
             
@@ -1044,22 +1009,18 @@
         <div class="main-content">
             <!-- 顶部导航 -->
             <div class="top-nav">
-                <div class="mobile-menu-toggle" id="mobileMenuToggle">
-                    <i class="fas fa-bars"></i>
-                </div>
-                
                 <div class="page-title">
                     <i class="fas fa-tachometer-alt"></i>
-                    <span id="currentPageTitle">控制面板</span>
+                    <span id="currentPageTitle">仪表板</span>
                 </div>
                 
                 <div class="top-nav-actions">
-                    <div class="notification-icon" id="notificationIcon">
+                    <div class="notification-icon">
                         <i class="fas fa-bell"></i>
                         <span class="notification-badge">3</span>
                     </div>
                     
-                    <div class="help-icon" id="helpIcon">
+                    <div class="help-icon">
                         <i class="fas fa-question-circle"></i>
                     </div>
                 </div>
@@ -1067,17 +1028,16 @@
             
             <!-- 内容区域 -->
             <div class="content-area" id="contentArea">
-                <!-- 页面内容将通过JavaScript动态加载 -->
-                <div id="pageContent">
-                    <!-- 默认显示控制面板 -->
+                <!-- 仪表板页面 -->
+                <div class="page-content active" id="dashboardPage">
                     <div class="dashboard-stats">
                         <div class="stat-card">
                             <div class="stat-icon articles">
                                 <i class="fas fa-newspaper"></i>
                             </div>
                             <div class="stat-info">
-                                <h3 id="totalArticlesCount">0</h3>
-                                <p>总文章数</p>
+                                <h3>128</h3>
+                                <p>文章总数</p>
                             </div>
                         </div>
                         
@@ -1086,8 +1046,8 @@
                                 <i class="fas fa-ad"></i>
                             </div>
                             <div class="stat-info">
-                                <h3 id="totalAdsCount">0</h3>
-                                <p>总广告数</p>
+                                <h3>56</h3>
+                                <p>广告总数</p>
                             </div>
                         </div>
                         
@@ -1096,8 +1056,8 @@
                                 <i class="fas fa-dollar-sign"></i>
                             </div>
                             <div class="stat-info">
-                                <h3 id="totalEarnings">¥0</h3>
-                                <p>总收益</p>
+                                <h3>¥12,580</h3>
+                                <p>本月收入</p>
                             </div>
                         </div>
                         
@@ -1106,8 +1066,8 @@
                                 <i class="fas fa-users"></i>
                             </div>
                             <div class="stat-info">
-                                <h3 id="totalUsersCount">0</h3>
-                                <p>总用户数</p>
+                                <h3>1,258</h3>
+                                <p>用户总数</p>
                             </div>
                         </div>
                     </div>
@@ -1115,35 +1075,663 @@
                     <div class="dashboard-charts">
                         <div class="chart-card">
                             <div class="chart-header">
-                                <h3 class="chart-title">文章与广告数据趋势</h3>
+                                <h3 class="chart-title">收入趋势</h3>
+                                <div class="chart-actions">
+                                    <button class="btn btn-sm btn-primary">本周</button>
+                                    <button class="btn btn-sm btn-secondary">本月</button>
+                                    <button class="btn btn-sm btn-secondary">本年</button>
+                                </div>
                             </div>
                             <div class="chart-container">
                                 <div class="chart-placeholder">
-                                    <i class="fas fa-chart-line"></i>
-                                    <span> 数据图表区域</span>
+                                    <i class="fas fa-chart-line fa-3x"></i>
+                                    <p>收入趋势图表</p>
                                 </div>
                             </div>
                         </div>
                         
                         <div class="chart-card">
                             <div class="chart-header">
-                                <h3 class="chart-title">用户活跃度</h3>
+                                <h3 class="chart-title">广告点击率</h3>
                             </div>
                             <div class="chart-container">
                                 <div class="chart-placeholder">
-                                    <i class="fas fa-chart-pie"></i>
-                                    <span> 饼图区域</span>
+                                    <i class="fas fa-chart-pie fa-3x"></i>
+                                    <p>广告点击率图表</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">最近活动</h3>
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3 class="chart-title">最近文章</h3>
+                            <button class="btn btn-sm btn-primary">查看全部</button>
                         </div>
-                        <div id="recentActivities">
-                            <!-- 最近活动将动态生成 -->
+                        <div class="chart-container">
+                            <div class="chart-placeholder">
+                                <i class="fas fa-newspaper fa-3x"></i>
+                                <p>最近文章列表</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 文章管理页面 -->
+                <div class="page-content" id="articlesPage">
+                    <div class="user-management-header">
+                        <h2>文章管理</h2>
+                        <div class="user-search">
+                            <input type="text" placeholder="搜索文章...">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-search"></i>
+                                搜索
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="users-table-container">
+                        <table class="users-table">
+                            <thead>
+                                <tr>
+                                    <th>标题</th>
+                                    <th>作者</th>
+                                    <th>分类</th>
+                                    <th>发布日期</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>如何提高广告点击率</td>
+                                    <td>李春峰</td>
+                                    <td>广告技巧</td>
+                                    <td>2023-06-15</td>
+                                    <td><span class="status-badge status-active">已发布</span></td>
+                                    <td>
+                                        <div class="user-actions">
+                                            <button class="action-btn edit" title="编辑"><i class="fas fa-edit"></i></button>
+                                            <button class="action-btn delete" title="删除"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>自媒体运营策略</td>
+                                    <td>王明</td>
+                                    <td>运营技巧</td>
+                                    <td>2023-06-14</td>
+                                    <td><span class="status-badge status-active">已发布</span></td>
+                                    <td>
+                                        <div class="user-actions">
+                                            <button class="action-btn edit" title="编辑"><i class="fas fa-edit"></i></button>
+                                            <button class="action-btn delete" title="删除"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>内容创作指南</td>
+                                    <td>张华</td>
+                                    <td>内容创作</td>
+                                    <td>2023-06-13</td>
+                                    <td><span class="status-badge status-inactive">草稿</span></td>
+                                    <td>
+                                        <div class="user-actions">
+                                            <button class="action-btn edit" title="编辑"><i class="fas fa-edit"></i></button>
+                                            <button class="action-btn delete" title="删除"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <div class="table-footer">
+                            <div>显示 1-3 共 128 条记录</div>
+                            <div class="pagination">
+                                <button class="btn btn-sm btn-secondary">上一页</button>
+                                <button class="btn btn-sm btn-primary">1</button>
+                                <button class="btn btn-sm btn-secondary">2</button>
+                                <button class="btn btn-sm btn-secondary">3</button>
+                                <button class="btn btn-sm btn-secondary">下一页</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 广告管理页面 -->
+                <div class="page-content" id="adsPage">
+                    <div class="user-management-header">
+                        <h2>广告管理</h2>
+                        <button class="btn btn-primary" id="addAdBtn">
+                            <i class="fas fa-plus"></i>
+                            添加广告
+                        </button>
+                    </div>
+                    
+                    <div class="ad-templates">
+                        <div class="template-card">
+                            <div class="template-header">
+                                <h3 class="template-title">横幅广告</h3>
+                                <span class="template-badge template-type-image">图片广告</span>
+                            </div>
+                            <div class="template-content">
+                                <p>适合网站顶部或底部的横幅广告位，支持多种尺寸和格式。</p>
+                            </div>
+                            <div class="template-footer">
+                                <div>点击率: 2.5%</div>
+                                <div class="template-actions">
+                                    <button class="btn btn-sm btn-primary">编辑</button>
+                                    <button class="btn btn-sm btn-danger">删除</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="template-card">
+                            <div class="template-header">
+                                <h3 class="template-title">文章内嵌广告</h3>
+                                <span class="template-badge template-type-text">文本广告</span>
+                            </div>
+                            <div class="template-content">
+                                <p>嵌入在文章内容中的广告，与内容自然融合，不影响阅读体验。</p>
+                            </div>
+                            <div class="template-footer">
+                                <div>点击率: 3.8%</div>
+                                <div class="template-actions">
+                                    <button class="btn btn-sm btn-primary">编辑</button>
+                                    <button class="btn btn-sm btn-danger">删除</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="template-card">
+                            <div class="template-header">
+                                <h3 class="template-title">弹窗广告</h3>
+                                <span class="template-badge template-type-image">图片广告</span>
+                            </div>
+                            <div class="template-content">
+                                <p>在用户访问网站时弹出的广告，具有较高的曝光率和点击率。</p>
+                            </div>
+                            <div class="template-footer">
+                                <div>点击率: 5.2%</div>
+                                <div class="template-actions">
+                                    <button class="btn btn-sm btn-primary">编辑</button>
+                                    <button class="btn btn-sm btn-danger">删除</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="template-card">
+                            <div class="template-header">
+                                <h3 class="template-title">视频广告</h3>
+                                <span class="template-badge template-type-image">视频广告</span>
+                            </div>
+                            <div class="template-content">
+                                <p>在视频播放前、中或后展示的广告，适合品牌宣传和产品展示。</p>
+                            </div>
+                            <div class="template-footer">
+                                <div>点击率: 4.1%</div>
+                                <div class="template-actions">
+                                    <button class="btn btn-sm btn-primary">编辑</button>
+                                    <button class="btn btn-sm btn-danger">删除</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 用户管理页面 -->
+                <div class="page-content" id="usersPage">
+                    <div class="user-management-header">
+                        <h2>用户管理</h2>
+                        <div class="user-search">
+                            <input type="text" placeholder="搜索用户...">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-search"></i>
+                                搜索
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="users-table-container">
+                        <table class="users-table">
+                            <thead>
+                                <tr>
+                                    <th>用户</th>
+                                    <th>角色</th>
+                                    <th>注册日期</th>
+                                    <th>最后登录</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="user-cell">
+                                            <div class="user-avatar-small">李</div>
+                                            <div>
+                                                <div class="user-name-cell">李春峰</div>
+                                                <div class="user-email">lichunfeng@example.com</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="role-badge role-super-admin">超级管理员</span></td>
+                                    <td>2023-01-15</td>
+                                    <td>2023-06-15</td>
+                                    <td><span class="status-badge status-active">活跃</span></td>
+                                    <td>
+                                        <div class="user-actions">
+                                            <button class="action-btn edit" title="编辑"><i class="fas fa-edit"></i></button>
+                                            <button class="action-btn delete" title="删除"><i class="fas fa-trash"></i></button>
+                                            <button class="action-btn lock" title="锁定"><i class="fas fa-lock"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="user-cell">
+                                            <div class="user-avatar-small">王</div>
+                                            <div>
+                                                <div class="user-name-cell">王明</div>
+                                                <div class="user-email">wangming@example.com</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="role-badge role-admin">管理员</span></td>
+                                    <td>2023-02-20</td>
+                                    <td>2023-06-14</td>
+                                    <td><span class="status-badge status-active">活跃</span></td>
+                                    <td>
+                                        <div class="user-actions">
+                                            <button class="action-btn edit" title="编辑"><i class="fas fa-edit"></i></button>
+                                            <button class="action-btn delete" title="删除"><i class="fas fa-trash"></i></button>
+                                            <button class="action-btn lock" title="锁定"><i class="fas fa-lock"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="user-cell">
+                                            <div class="user-avatar-small">张</div>
+                                            <div>
+                                                <div class="user-name-cell">张华</div>
+                                                <div class="user-email">zhanghua@example.com</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="role-badge role-editor">编辑</span></td>
+                                    <td>2023-03-10</td>
+                                    <td>2023-06-10</td>
+                                    <td><span class="status-badge status-active">活跃</span></td>
+                                    <td>
+                                        <div class="user-actions">
+                                            <button class="action-btn edit" title="编辑"><i class="fas fa-edit"></i></button>
+                                            <button class="action-btn delete" title="删除"><i class="fas fa-trash"></i></button>
+                                            <button class="action-btn lock" title="锁定"><i class="fas fa-lock"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="user-cell">
+                                            <div class="user-avatar-small">刘</div>
+                                            <div>
+                                                <div class="user-name-cell">刘洋</div>
+                                                <div class="user-email">liuyang@example.com</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="role-badge role-user">普通用户</span></td>
+                                    <td>2023-04-05</td>
+                                    <td>2023-06-01</td>
+                                    <td><span class="status-badge status-inactive">不活跃</span></td>
+                                    <td>
+                                        <div class="user-actions">
+                                            <button class="action-btn edit" title="编辑"><i class="fas fa-edit"></i></button>
+                                            <button class="action-btn delete" title="删除"><i class="fas fa-trash"></i></button>
+                                            <button class="action-btn lock" title="锁定"><i class="fas fa-lock"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <div class="table-footer">
+                            <div>显示 1-4 共 1,258 条记录</div>
+                            <div class="pagination">
+                                <button class="btn btn-sm btn-secondary">上一页</button>
+                                <button class="btn btn-sm btn-primary">1</button>
+                                <button class="btn btn-sm btn-secondary">2</button>
+                                <button class="btn btn-sm btn-secondary">3</button>
+                                <button class="btn btn-sm btn-secondary">下一页</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 数据分析页面 -->
+                <div class="page-content" id="analyticsPage">
+                    <div class="dashboard-stats">
+                        <div class="stat-card">
+                            <div class="stat-icon articles">
+                                <i class="fas fa-eye"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>125,890</h3>
+                                <p>页面浏览量</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon ads">
+                                <i class="fas fa-mouse-pointer"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>8,562</h3>
+                                <p>广告点击量</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon earnings">
+                                <i class="fas fa-percentage"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>6.8%</h3>
+                                <p>点击率</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon users">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>328</h3>
+                                <p>新增用户</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-charts">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title">流量趋势</h3>
+                                <div class="chart-actions">
+                                    <button class="btn btn-sm btn-primary">本周</button>
+                                    <button class="btn btn-sm btn-secondary">本月</button>
+                                    <button class="btn btn-sm btn-secondary">本年</button>
+                                </div>
+                            </div>
+                            <div class="chart-container">
+                                <div class="chart-placeholder">
+                                    <i class="fas fa-chart-area fa-3x"></i>
+                                    <p>流量趋势图表</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title">用户来源</h3>
+                            </div>
+                            <div class="chart-container">
+                                <div class="chart-placeholder">
+                                    <i class="fas fa-chart-pie fa-3x"></i>
+                                    <p>用户来源图表</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 系统设置页面 -->
+                <div class="page-content" id="settingsPage">
+                    <div class="profile-container">
+                        <div class="profile-sidebar">
+                            <div class="profile-card">
+                                <div class="profile-avatar-large">
+                                    <i class="fas fa-cog"></i>
+                                </div>
+                                <h2 class="profile-name">系统设置</h2>
+                                <p class="profile-email">配置系统参数和选项</p>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-main">
+                            <div class="profile-tabs">
+                                <button class="profile-tab active" data-tab="general">基本设置</button>
+                                <button class="profile-tab" data-tab="email">邮件设置</button>
+                                <button class="profile-tab" data-tab="security">安全设置</button>
+                            </div>
+                            
+                            <div class="tab-content active" id="generalTab">
+                                <div class="settings-form">
+                                    <div class="form-group">
+                                        <label class="form-label">网站名称</label>
+                                        <input type="text" class="form-control" value="自媒体广告系统">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">网站描述</label>
+                                        <textarea class="form-control" rows="3">专业的自媒体广告管理系统，提供全方位的广告投放和数据分析服务。</textarea>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">管理员邮箱</label>
+                                            <input type="email" class="form-control" value="admin@example.com">
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label class="form-label">联系电话</label>
+                                            <input type="text" class="form-control" value="400-123-4567">
+                                        </div>
+                                    </div>
+                                    
+                                    <button class="btn btn-primary">保存设置</button>
+                                </div>
+                            </div>
+                            
+                            <div class="tab-content" id="emailTab">
+                                <div class="settings-form">
+                                    <div class="form-group">
+                                        <label class="form-label">SMTP服务器</label>
+                                        <input type="text" class="form-control" value="smtp.example.com">
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">SMTP端口</label>
+                                            <input type="text" class="form-control" value="587">
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label class="form-label">加密方式</label>
+                                            <select class="form-control">
+                                                <option value="tls">TLS</option>
+                                                <option value="ssl">SSL</option>
+                                                <option value="none">无</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">发件人邮箱</label>
+                                            <input type="email" class="form-control" value="noreply@example.com">
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label class="form-label">发件人名称</label>
+                                            <input type="text" class="form-control" value="自媒体广告系统">
+                                        </div>
+                                    </div>
+                                    
+                                    <button class="btn btn-primary">保存设置</button>
+                                </div>
+                            </div>
+                            
+                            <div class="tab-content" id="securityTab">
+                                <div class="settings-form">
+                                    <div class="form-group">
+                                        <label class="form-label">密码策略</label>
+                                        <select class="form-control">
+                                            <option value="low">低 - 至少6个字符</option>
+                                            <option value="medium" selected>中 - 至少8个字符，包含数字和字母</option>
+                                            <option value="high">高 - 至少10个字符，包含数字、字母和特殊字符</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">登录失败次数限制</label>
+                                        <input type="number" class="form-control" value="5">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">会话超时时间（分钟）</label>
+                                        <input type="number" class="form-control" value="30">
+                                    </div>
+                                    
+                                    <button class="btn btn-primary">保存设置</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 个人中心页面 -->
+                <div class="page-content" id="profilePage">
+                    <div class="profile-container">
+                        <div class="profile-sidebar">
+                            <div class="profile-card">
+                                <div class="profile-avatar-large">李</div>
+                                <h2 class="profile-name">李春峰</h2>
+                                <p class="profile-email">lichunfeng@example.com</p>
+                                
+                                <div class="profile-stats">
+                                    <div class="profile-stat">
+                                        <div class="profile-stat-value">128</div>
+                                        <div class="profile-stat-label">文章</div>
+                                    </div>
+                                    <div class="profile-stat">
+                                        <div class="profile-stat-value">56</div>
+                                        <div class="profile-stat-label">广告</div>
+                                    </div>
+                                    <div class="profile-stat">
+                                        <div class="profile-stat-value">1,258</div>
+                                        <div class="profile-stat-label">用户</div>
+                                    </div>
+                                    <div class="profile-stat">
+                                        <div class="profile-stat-value">¥12,580</div>
+                                        <div class="profile-stat-label">收入</div>
+                                    </div>
+                                </div>
+                                
+                                <button class="btn btn-primary" style="width: 100%;">
+                                    <i class="fas fa-edit"></i>
+                                    编辑资料
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-main">
+                            <div class="profile-tabs">
+                                <button class="profile-tab active" data-tab="info">个人信息</button>
+                                <button class="profile-tab" data-tab="password">修改密码</button>
+                                <button class="profile-tab" data-tab="notifications">通知设置</button>
+                            </div>
+                            
+                            <div class="tab-content active" id="infoTab">
+                                <div class="settings-form">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">姓名</label>
+                                            <input type="text" class="form-control" value="李春峰">
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label class="form-label">用户名</label>
+                                            <input type="text" class="form-control" value="lichunfeng">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">邮箱</label>
+                                        <input type="email" class="form-control" value="lichunfeng@example.com">
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">手机号码</label>
+                                            <input type="text" class="form-control" value="138****1234">
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label class="form-label">职位</label>
+                                            <input type="text" class="form-control" value="超级管理员">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">个人简介</label>
+                                        <textarea class="form-control" rows="3">自媒体广告系统超级管理员，负责系统运营和管理工作。</textarea>
+                                    </div>
+                                    
+                                    <button class="btn btn-primary">保存修改</button>
+                                </div>
+                            </div>
+                            
+                            <div class="tab-content" id="passwordTab">
+                                <div class="settings-form">
+                                    <div class="form-group">
+                                        <label class="form-label">当前密码</label>
+                                        <input type="password" class="form-control" placeholder="请输入当前密码">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">新密码</label>
+                                        <input type="password" class="form-control" placeholder="请输入新密码">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">确认新密码</label>
+                                        <input type="password" class="form-control" placeholder="请再次输入新密码">
+                                    </div>
+                                    
+                                    <button class="btn btn-primary">修改密码</button>
+                                </div>
+                            </div>
+                            
+                            <div class="tab-content" id="notificationsTab">
+                                <div class="settings-form">
+                                    <div class="form-group">
+                                        <label class="form-label">邮件通知</label>
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <input type="checkbox" id="emailNotifications" checked>
+                                            <label for="emailNotifications">接收系统邮件通知</label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">系统通知</label>
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <input type="checkbox" id="systemNotifications" checked>
+                                            <label for="systemNotifications">接收系统内部通知</label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">广告通知</label>
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <input type="checkbox" id="adNotifications" checked>
+                                            <label for="adNotifications">接收广告相关通知</label>
+                                        </div>
+                                    </div>
+                                    
+                                    <button class="btn btn-primary">保存设置</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1151,1014 +1739,271 @@
         </div>
     </div>
     
-    <!-- 模态框容器 -->
-    <div id="modalContainer"></div>
-
+    <!-- 添加广告模态框 -->
+    <div class="modal" id="addAdModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">添加新广告</h3>
+                <button class="close-modal" id="closeAdModal">&times;</button>
+            </div>
+            
+            <div class="settings-form">
+                <div class="form-group">
+                    <label class="form-label">广告名称</label>
+                    <input type="text" class="form-control" placeholder="请输入广告名称">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">广告类型</label>
+                    <select class="form-control">
+                        <option value="image">图片广告</option>
+                        <option value="text">文本广告</option>
+                        <option value="video">视频广告</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">广告位置</label>
+                    <select class="form-control">
+                        <option value="header">页面顶部</option>
+                        <option value="content">内容区域</option>
+                        <option value="sidebar">侧边栏</option>
+                        <option value="footer">页面底部</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">广告链接</label>
+                    <input type="text" class="form-control" placeholder="请输入广告链接URL">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">广告描述</label>
+                    <textarea class="form-control" rows="3" placeholder="请输入广告描述"></textarea>
+                </div>
+                
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="cancelAdBtn">取消</button>
+                    <button class="btn btn-primary" id="saveAdBtn">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 通知组件 -->
+    <div class="notification" id="notification">
+        <div class="notification-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="notification-message">
+            操作成功完成
+        </div>
+        <button class="notification-close">&times;</button>
+    </div>
+    
     <script>
-        // 系统数据初始化
-        const systemData = {
-            // 当前登录用户
-            currentUser: {
-                id: 1,
-                username: "admin",
-                name: "管理员",
-                email: "admin@example.com",
-                role: "super_admin",
-                avatar: "A",
-                joinDate: "2023-01-15",
-                lastLogin: "2023-10-20 14:30:00"
-            },
-            
-            // 用户角色定义
-            roles: {
-                super_admin: {
-                    name: "超级管理员",
-                    permissions: ["all"]
-                },
-                admin: {
-                    name: "管理员",
-                    permissions: ["user_manage", "article_manage", "ad_manage", "view_reports"]
-                },
-                editor: {
-                    name: "编辑",
-                    permissions: ["article_manage", "ad_manage"]
-                },
-                user: {
-                    name: "普通用户",
-                    permissions: ["article_view", "ad_view"]
-                }
-            },
-            
-            // 用户列表
-            users: [
-                {
-                    id: 1,
-                    username: "admin",
-                    name: "管理员",
-                    email: "admin@example.com",
-                    role: "super_admin",
-                    status: "active",
-                    joinDate: "2023-01-15",
-                    lastLogin: "2023-10-20 14:30:00"
-                },
-                {
-                    id: 2,
-                    username: "manager1",
-                    name: "张经理",
-                    email: "manager1@example.com",
-                    role: "admin",
-                    status: "active",
-                    joinDate: "2023-02-20",
-                    lastLogin: "2023-10-19 09:15:00"
-                },
-                {
-                    id: 3,
-                    username: "editor1",
-                    name: "李编辑",
-                    email: "editor1@example.com",
-                    role: "editor",
-                    status: "active",
-                    joinDate: "2023-03-10",
-                    lastLogin: "2023-10-20 10:45:00"
-                },
-                {
-                    id: 4,
-                    username: "writer1",
-                    name: "王作者",
-                    email: "writer1@example.com",
-                    role: "user",
-                    status: "active",
-                    joinDate: "2023-04-05",
-                    lastLogin: "2023-10-18 16:20:00"
-                },
-                {
-                    id: 5,
-                    username: "writer2",
-                    name: "赵作者",
-                    email: "writer2@example.com",
-                    role: "user",
-                    status: "inactive",
-                    joinDate: "2023-05-12",
-                    lastLogin: "2023-10-10 11:30:00"
-                }
-            ],
-            
-            // 文章数据
-            articles: [],
-            
-            // 广告模板
-            adTemplates: [
-                {
-                    id: 1,
-                    name: "会员推广模板",
-                    type: "image",
-                    content: "限时特惠！加入我们的高级会员计划，享受独家内容和无广告体验。",
-                    title: "独家会员福利",
-                    link: "https://example.com/premium",
-                    createdBy: 1,
-                    createdAt: "2023-10-15"
-                },
-                {
-                    id: 2,
-                    name: "产品推荐模板",
-                    type: "product",
-                    content: "发现我们的新产品系列，专为像您这样的用户设计。",
-                    title: "新品推荐",
-                    link: "https://example.com/products",
-                    createdBy: 2,
-                    createdAt: "2023-10-10"
-                },
-                {
-                    id: 3,
-                    name: "活动推广模板",
-                    type: "text",
-                    content: "参加我们的线上活动，赢取丰厚奖品！",
-                    title: "限时活动",
-                    link: "https://example.com/event",
-                    createdBy: 1,
-                    createdAt: "2023-10-05"
-                }
-            ],
-            
-            // 系统设置
-            settings: {
-                siteName: "自媒体广告系统",
-                siteUrl: "https://ad.example.com",
-                adFrequency: 4,
-                defaultAdType: "image"
-            },
-            
-            // 统计数据
-            statistics: {
-                totalArticles: 0,
-                totalAds: 0,
-                totalEarnings: 0,
-                totalUsers: 0,
-                recentActivities: []
-            }
-        };
-        
         // DOM元素
-        const sidebar = document.getElementById("sidebar");
-        const toggleSidebarBtn = document.getElementById("toggleSidebar");
-        const mobileMenuToggle = document.getElementById("mobileMenuToggle");
-        const contentArea = document.getElementById("contentArea");
-        const pageContent = document.getElementById("pageContent");
-        const currentPageTitle = document.getElementById("currentPageTitle");
-        const userAvatar = document.getElementById("userAvatar");
-        const userName = document.getElementById("userName");
-        const userRole = document.getElementById("userRole");
-        const logoutBtn = document.getElementById("logoutBtn");
-        const navItems = document.querySelectorAll(".nav-item");
-        const navSubitems = document.querySelectorAll(".nav-subitem");
-        const modalContainer = document.getElementById("modalContainer");
+        const sidebar = document.getElementById('sidebar');
+        const toggleSidebar = document.getElementById('toggleSidebar');
+        const navItems = document.querySelectorAll('.nav-item');
+        const pageContents = document.querySelectorAll('.page-content');
+        const currentPageTitle = document.getElementById('currentPageTitle');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const addAdBtn = document.getElementById('addAdBtn');
+        const addAdModal = document.getElementById('addAdModal');
+        const closeAdModal = document.getElementById('closeAdModal');
+        const cancelAdBtn = document.getElementById('cancelAdBtn');
+        const saveAdBtn = document.getElementById('saveAdBtn');
+        const notification = document.getElementById('notification');
+        const notificationClose = document.querySelector('.notification-close');
+        const profileTabs = document.querySelectorAll('.profile-tab');
+        const tabContents = document.querySelectorAll('.tab-content');
         
-        // 当前页面状态
-        let currentPage = "dashboard";
-        let isSidebarCollapsed = false;
-        
-        // 初始化页面
-        function initPage() {
-            // 加载用户数据
-            updateUserInfo();
-            
-            // 初始化事件监听
-            initEventListeners();
-            
-            // 加载初始页面
-            loadPage(currentPage);
-            
-            // 更新统计数据
-            updateStatistics();
-        }
-        
-        // 更新用户信息
-        function updateUserInfo() {
-            const user = systemData.currentUser;
-            userAvatar.textContent = user.avatar;
-            userName.textContent = user.name;
-            userRole.textContent = systemData.roles[user.role].name;
-        }
-        
-        // 初始化事件监听
-        function initEventListeners() {
-            // 侧边栏折叠/展开
-            toggleSidebarBtn.addEventListener("click", function() {
-                isSidebarCollapsed = !isSidebarCollapsed;
-                sidebar.classList.toggle("collapsed", isSidebarCollapsed);
-                
-                const icon = this.querySelector("i");
-                icon.classList.toggle("fa-chevron-left", !isSidebarCollapsed);
-                icon.classList.toggle("fa-chevron-right", isSidebarCollapsed);
-            });
-            
-            // 移动端菜单切换
-            mobileMenuToggle.addEventListener("click", function() {
-                sidebar.classList.toggle("active");
-            });
-            
-            // 导航菜单点击
-            navItems.forEach(item => {
-                item.addEventListener("click", function() {
-                    const page = this.dataset.page;
-                    
-                    // 更新导航状态
-                    navItems.forEach(nav => nav.classList.remove("active"));
-                    this.classList.add("active");
-                    
-                    // 如果是子菜单项，处理展开/收起
-                    if (this.classList.contains("has-submenu")) {
-                        this.classList.toggle("active");
-                        return; // 不切换页面，只展开子菜单
-                    }
-                    
-                    // 加载页面
-                    loadPage(page);
-                    
-                    // 移动端点击后关闭侧边栏
-                    if (window.innerWidth <= 768) {
-                        sidebar.classList.remove("active");
-                    }
-                });
-            });
-            
-            // 子菜单项点击
-            navSubitems.forEach(item => {
-                item.addEventListener("click", function() {
-                    const page = this.dataset.page;
-                    
-                    // 更新子菜单状态
-                    navSubitems.forEach(subitem => subitem.classList.remove("active"));
-                    this.classList.add("active");
-                    
-                    // 加载页面
-                    loadPage(page);
-                    
-                    // 移动端点击后关闭侧边栏
-                    if (window.innerWidth <= 768) {
-                        sidebar.classList.remove("active");
-                    }
-                });
-            });
-            
-            // 退出登录
-            logoutBtn.addEventListener("click", function() {
-                if (confirm("确定要退出登录吗？")) {
-                    // 在实际应用中，这里应该清除登录状态并跳转到登录页
-                    showNotification("已退出登录");
-                    // 模拟跳转到登录页
-                    setTimeout(() => {
-                        window.location.href = "login.html";
-                    }, 1000);
-                }
-            });
-            
-            // 通知图标点击
-            document.getElementById("notificationIcon").addEventListener("click", function() {
-                showNotificationsModal();
-            });
-            
-            // 帮助图标点击
-            document.getElementById("helpIcon").addEventListener("click", function() {
-                showHelpModal();
-            });
-        }
-        
-        // 加载页面
-        function loadPage(page) {
-            currentPage = page;
-            
-            // 更新页面标题
-            updatePageTitle(page);
-            
-            // 清空内容区域
-            pageContent.innerHTML = "";
-            
-            // 根据页面加载不同内容
-            switch(page) {
-                case "dashboard":
-                    loadDashboard();
-                    break;
-                case "ad-management":
-                    loadAdManagement();
-                    break;
-                case "article-management":
-                    loadArticleManagement();
-                    break;
-                case "user-list":
-                    loadUserList();
-                    break;
-                case "role-management":
-                    loadRoleManagement();
-                    break;
-                case "team-management":
-                    loadTeamManagement();
-                    break;
-                case "my-center":
-                    loadMyCenter();
-                    break;
-                case "statistics":
-                    loadStatistics();
-                    break;
-                case "settings":
-                    loadSettings();
-                    break;
-                default:
-                    loadDashboard();
-            }
-            
-            // 更新URL（不刷新页面）
-            history.pushState({ page }, "", `?page=${page}`);
-        }
-        
-        // 更新页面标题
-        function updatePageTitle(page) {
-            const titles = {
-                "dashboard": "控制面板",
-                "ad-management": "广告管理",
-                "article-management": "文章管理",
-                "user-list": "用户列表",
-                "role-management": "角色权限管理",
-                "team-management": "团队管理",
-                "my-center": "我的中心",
-                "statistics": "数据统计",
-                "settings": "系统设置"
-            };
-            
-            currentPageTitle.textContent = titles[page] || "控制面板";
-        }
-        
-        // 加载控制面板
-        function loadDashboard() {
-            pageContent.innerHTML = `
-                <div class="dashboard-stats">
-                    <div class="stat-card">
-                        <div class="stat-icon articles">
-                            <i class="fas fa-newspaper"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3 id="totalArticlesCount">0</h3>
-                            <p>总文章数</p>
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-icon ads">
-                            <i class="fas fa-ad"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3 id="totalAdsCount">0</h3>
-                            <p>总广告数</p>
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-icon earnings">
-                            <i class="fas fa-dollar-sign"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3 id="totalEarnings">¥0</h3>
-                            <p>总收益</p>
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-icon users">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3 id="totalUsersCount">0</h3>
-                            <p>总用户数</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="dashboard-charts">
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h3 class="chart-title">文章与广告数据趋势</h3>
-                        </div>
-                        <div class="chart-container">
-                            <div class="chart-placeholder">
-                                <i class="fas fa-chart-line"></i>
-                                <span> 数据图表区域</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h3 class="chart-title">用户活跃度</h3>
-                        </div>
-                        <div class="chart-container">
-                            <div class="chart-placeholder">
-                                <i class="fas fa-chart-pie"></i>
-                                <span> 饼图区域</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">最近活动</h3>
-                    </div>
-                    <div id="recentActivities">
-                        <!-- 最近活动将动态生成 -->
-                    </div>
-                </div>
-            `;
-            
-            updateStatistics();
-        }
-        
-        // 加载用户列表
-        function loadUserList() {
-            pageContent.innerHTML = `
-                <div class="user-management-header">
-                    <h2 class="page-title">用户管理</h2>
-                    <div class="page-actions">
-                        <div class="user-search">
-                            <input type="text" id="userSearch" placeholder="搜索用户...">
-                            <button class="btn btn-primary" id="searchUserBtn">
-                                <i class="fas fa-search"></i> 搜索
-                            </button>
-                        </div>
-                        <button class="btn btn-success" id="addUserBtn">
-                            <i class="fas fa-plus"></i> 添加用户
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="users-table-container">
-                    <table class="users-table">
-                        <thead>
-                            <tr>
-                                <th>用户</th>
-                                <th>角色</th>
-                                <th>状态</th>
-                                <th>加入时间</th>
-                                <th>最后登录</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody id="usersTableBody">
-                            <!-- 用户数据将动态生成 -->
-                        </tbody>
-                    </table>
-                    <div class="table-footer">
-                        <div>共 <span id="totalUsers">0</span> 个用户</div>
-                        <div class="pagination">
-                            <button class="btn" id="prevPage">上一页</button>
-                            <span>第 <span id="currentPage">1</span> 页</span>
-                            <button class="btn" id="nextPage">下一页</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // 填充用户数据
-            renderUsersTable();
-            
-            // 添加事件监听
-            document.getElementById("addUserBtn").addEventListener("click", showAddUserModal);
-            document.getElementById("searchUserBtn").addEventListener("click", searchUsers);
-            document.getElementById("userSearch").addEventListener("keypress", function(e) {
-                if (e.key === "Enter") searchUsers();
-            });
-        }
-        
-        // 渲染用户表格
-        function renderUsersTable(filteredUsers = null) {
-            const users = filteredUsers || systemData.users;
-            const tableBody = document.getElementById("usersTableBody");
-            
-            tableBody.innerHTML = "";
-            
-            users.forEach(user => {
-                const roleClass = `role-${user.role.replace("_", "-")}`;
-                const roleName = systemData.roles[user.role].name;
-                const statusClass = user.status === "active" ? "status-active" : "status-inactive";
-                const statusText = user.status === "active" ? "活跃" : "禁用";
-                
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>
-                        <div class="user-cell">
-                            <div class="user-avatar-small">${user.name.charAt(0)}</div>
-                            <div>
-                                <div class="user-name-cell">${user.name}</div>
-                                <div class="user-email">${user.email}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td><span class="role-badge ${roleClass}">${roleName}</span></td>
-                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-                    <td>${user.joinDate}</td>
-                    <td>${user.lastLogin}</td>
-                    <td>
-                        <div class="user-actions">
-                            <button class="action-btn edit" data-user-id="${user.id}">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            ${user.id !== 1 ? `
-                                <button class="action-btn lock" data-user-id="${user.id}">
-                                    <i class="fas fa-lock${user.status === 'active' ? '' : '-open'}"></i>
-                                </button>
-                                <button class="action-btn delete" data-user-id="${user.id}">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            ` : ''}
-                        </div>
-                    </td>
-                `;
-                
-                tableBody.appendChild(row);
-            });
-            
-            // 更新统计
-            document.getElementById("totalUsers").textContent = users.length;
-            
-            // 添加操作按钮事件
-            document.querySelectorAll(".action-btn.edit").forEach(btn => {
-                btn.addEventListener("click", function() {
-                    const userId = parseInt(this.dataset.userId);
-                    showEditUserModal(userId);
-                });
-            });
-            
-            document.querySelectorAll(".action-btn.lock").forEach(btn => {
-                btn.addEventListener("click", function() {
-                    const userId = parseInt(this.dataset.userId);
-                    toggleUserStatus(userId);
-                });
-            });
-            
-            document.querySelectorAll(".action-btn.delete").forEach(btn => {
-                btn.addEventListener("click", function() {
-                    const userId = parseInt(this.dataset.userId);
-                    deleteUser(userId);
-                });
-            });
-        }
-        
-        // 加载我的中心
-        function loadMyCenter() {
-            const user = systemData.currentUser;
-            const roleName = systemData.roles[user.role].name;
-            
-            pageContent.innerHTML = `
-                <div class="profile-container">
-                    <div class="profile-sidebar">
-                        <div class="profile-card">
-                            <div class="profile-avatar-large">${user.avatar}</div>
-                            <h2 class="profile-name">${user.name}</h2>
-                            <p class="profile-email">${user.email}</p>
-                            <div class="profile-stats">
-                                <div class="profile-stat">
-                                    <div class="profile-stat-value" id="myArticlesCount">0</div>
-                                    <div class="profile-stat-label">我的文章</div>
-                                </div>
-                                <div class="profile-stat">
-                                    <div class="profile-stat-value" id="myAdsCount">0</div>
-                                    <div class="profile-stat-label">我的广告</div>
-                                </div>
-                            </div>
-                            <button class="btn btn-primary" id="editProfileBtn" style="width: 100%;">
-                                <i class="fas fa-edit"></i> 编辑资料
-                            </button>
-                        </div>
-                        
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">账户信息</h3>
-                            </div>
-                            <div class="profile-info">
-                                <p><strong>用户名：</strong> ${user.username}</p>
-                                <p><strong>角色：</strong> ${roleName}</p>
-                                <p><strong>加入时间：</strong> ${user.joinDate}</p>
-                                <p><strong>最后登录：</strong> ${user.lastLogin}</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="profile-main">
-                        <div class="profile-tabs">
-                            <button class="profile-tab active" data-tab="my-articles">我的文章</button>
-                            <button class="profile-tab" data-tab="my-ads">我的广告</button>
-                            <button class="profile-tab" data-tab="account-settings">账户设置</button>
-                            <button class="profile-tab" data-tab="security">安全设置</button>
-                        </div>
-                        
-                        <div id="my-articles" class="tab-content active">
-                            <div class="page-actions" style="margin-bottom: 20px;">
-                                <button class="btn btn-primary" id="addMyArticleBtn">
-                                    <i class="fas fa-plus"></i> 添加文章
-                                </button>
-                            </div>
-                            <div id="myArticlesList">
-                                <!-- 我的文章将动态生成 -->
-                            </div>
-                        </div>
-                        
-                        <div id="my-ads" class="tab-content">
-                            <div class="page-actions" style="margin-bottom: 20px;">
-                                <button class="btn btn-primary" id="addMyAdBtn">
-                                    <i class="fas fa-plus"></i> 创建广告模板
-                                </button>
-                            </div>
-                            <div class="ad-templates" id="myAdTemplates">
-                                <!-- 我的广告模板将动态生成 -->
-                            </div>
-                        </div>
-                        
-                        <div id="account-settings" class="tab-content">
-                            <div class="settings-form">
-                                <div class="form-group">
-                                    <label class="form-label">显示名称</label>
-                                    <input type="text" class="form-control" id="displayName" value="${user.name}">
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label class="form-label">邮箱地址</label>
-                                    <input type="email" class="form-control" id="email" value="${user.email}">
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label class="form-label">个人简介</label>
-                                    <textarea class="form-control" id="bio" rows="4" placeholder="介绍一下你自己..."></textarea>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label class="form-label">时区</label>
-                                    <select class="form-control" id="timezone">
-                                        <option value="Asia/Shanghai" selected>中国标准时间 (UTC+8)</option>
-                                        <option value="America/New_York">美国东部时间 (UTC-5)</option>
-                                        <option value="Europe/London">伦敦时间 (UTC+0)</option>
-                                    </select>
-                                </div>
-                                
-                                <button class="btn btn-primary" id="saveAccountSettings">
-                                    <i class="fas fa-save"></i> 保存设置
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div id="security" class="tab-content">
-                            <div class="settings-form">
-                                <div class="form-group">
-                                    <label class="form-label">当前密码</label>
-                                    <input type="password" class="form-control" id="currentPassword" placeholder="输入当前密码">
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label class="form-label">新密码</label>
-                                    <input type="password" class="form-control" id="newPassword" placeholder="输入新密码">
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label class="form-label">确认新密码</label>
-                                    <input type="password" class="form-control" id="confirmPassword" placeholder="再次输入新密码">
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label class="form-label">两步验证</label>
-                                    <div style="display: flex; align-items: center; gap: 15px;">
-                                        <span>当前状态: 未启用</span>
-                                        <button class="btn" id="enable2FA">
-                                            <i class="fas fa-shield-alt"></i> 启用两步验证
-                                        </button>
-                                    </div>
-                                </div>
-                                
-                                <button class="btn btn-primary" id="saveSecuritySettings">
-                                    <i class="fas fa-save"></i> 更新安全设置
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // 初始化标签页
-            initProfileTabs();
-            
-            // 加载我的文章
-            loadMyArticles();
-            
-            // 加载我的广告模板
-            loadMyAdTemplates();
-            
-            // 添加事件监听
-            document.getElementById("editProfileBtn").addEventListener("click", showEditProfileModal);
-            document.getElementById("addMyArticleBtn").addEventListener("click", showAddArticleModal);
-            document.getElementById("addMyAdBtn").addEventListener("click", showAddAdTemplateModal);
-            document.getElementById("saveAccountSettings").addEventListener("click", saveAccountSettings);
-            document.getElementById("saveSecuritySettings").addEventListener("click", saveSecuritySettings);
-        }
-        
-        // 初始化我的中心标签页
-        function initProfileTabs() {
-            const tabs = document.querySelectorAll(".profile-tab");
-            const tabContents = document.querySelectorAll(".tab-content");
-            
-            tabs.forEach(tab => {
-                tab.addEventListener("click", function() {
-                    const tabId = this.dataset.tab;
-                    
-                    // 更新标签页状态
-                    tabs.forEach(t => t.classList.remove("active"));
-                    this.classList.add("active");
-                    
-                    // 显示对应的内容
-                    tabContents.forEach(content => {
-                        content.classList.remove("active");
-                        if (content.id === tabId) {
-                            content.classList.add("active");
-                        }
-                    });
-                });
-            });
-        }
-        
-        // 加载我的文章
-        function loadMyArticles() {
-            const myArticles = systemData.articles.filter(article => article.createdBy === systemData.currentUser.id);
-            const container = document.getElementById("myArticlesList");
-            
-            if (myArticles.length === 0) {
-                container.innerHTML = `
-                    <div class="card" style="text-align: center; padding: 50px;">
-                        <i class="fas fa-newspaper" style="font-size: 3rem; color: #bdc3c7; margin-bottom: 20px;"></i>
-                        <h3 style="margin-bottom: 10px;">暂无文章</h3>
-                        <p style="color: #7f8c8d; margin-bottom: 20px;">您还没有创建任何文章</p>
-                        <button class="btn btn-primary" id="createFirstArticle">
-                            <i class="fas fa-plus"></i> 创建第一篇文章
-                        </button>
-                    </div>
-                `;
-                
-                document.getElementById("createFirstArticle").addEventListener("click", showAddArticleModal);
+        // 侧边栏折叠功能
+        toggleSidebar.addEventListener('click', function() {
+            sidebar.classList.toggle('collapsed');
+            const icon = this.querySelector('i');
+            if (sidebar.classList.contains('collapsed')) {
+                icon.classList.remove('fa-chevron-left');
+                icon.classList.add('fa-chevron-right');
             } else {
-                container.innerHTML = `
-                    <div class="card-grid">
-                        ${myArticles.map(article => `
-                            <div class="card">
-                                <div class="card-header">
-                                    <h3 class="card-title">${article.title}</h3>
-                                    <span class="status-badge ${article.status === 'published' ? 'status-active' : 'status-inactive'}">
-                                        ${article.status === 'published' ? '已发布' : '草稿'}
-                                    </span>
-                                </div>
-                                <p style="color: #7f8c8d; margin-bottom: 20px;">${article.content.substring(0, 100)}...</p>
-                                <div class="template-footer">
-                                    <span style="color: #95a5a6; font-size: 0.9rem;">创建于: ${article.createdAt}</span>
-                                    <div class="template-actions">
-                                        <button class="action-btn edit" data-article-id="${article.id}">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="action-btn delete" data-article-id="${article.id}">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
+                icon.classList.remove('fa-chevron-right');
+                icon.classList.add('fa-chevron-left');
+            }
+        });
+        
+        // 页面导航功能
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                // 移除所有活动状态
+                navItems.forEach(nav => nav.classList.remove('active'));
+                pageContents.forEach(content => content.classList.remove('active'));
+                
+                // 添加当前活动状态
+                this.classList.add('active');
+                
+                // 获取页面ID并显示对应内容
+                const pageId = this.getAttribute('data-page') + 'Page';
+                document.getElementById(pageId).classList.add('active');
+                
+                // 更新页面标题
+                const pageTitle = this.querySelector('.nav-text').textContent;
+                currentPageTitle.textContent = pageTitle;
+            });
+        });
+        
+        // 个人中心标签页切换
+        profileTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                // 移除所有活动状态
+                profileTabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                // 添加当前活动状态
+                this.classList.add('active');
+                
+                // 获取标签ID并显示对应内容
+                const tabId = this.getAttribute('data-tab') + 'Tab';
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+        
+        // 退出登录功能
+        logoutBtn.addEventListener('click', function() {
+            showNotification('您已成功退出登录', 'success');
+            // 这里可以添加实际的退出登录逻辑
+        });
+        
+        // 添加广告模态框
+        addAdBtn.addEventListener('click', function() {
+            addAdModal.style.display = 'flex';
+        });
+        
+        closeAdModal.addEventListener('click', function() {
+            addAdModal.style.display = 'none';
+        });
+        
+        cancelAdBtn.addEventListener('click', function() {
+            addAdModal.style.display = 'none';
+        });
+        
+        saveAdBtn.addEventListener('click', function() {
+            addAdModal.style.display = 'none';
+            showNotification('广告已成功添加', 'success');
+        });
+        
+        // 点击模态框外部关闭
+        window.addEventListener('click', function(event) {
+            if (event.target === addAdModal) {
+                addAdModal.style.display = 'none';
+            }
+        });
+        
+        // 通知功能
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const notificationIcon = notification.querySelector('.notification-icon i');
+            const notificationMessage = notification.querySelector('.notification-message');
+            
+            // 设置通知类型
+            notification.className = 'notification';
+            notification.classList.add(`notification-${type}`);
+            
+            // 设置图标
+            if (type === 'success') {
+                notificationIcon.className = 'fas fa-check-circle';
+            } else if (type === 'error') {
+                notificationIcon.className = 'fas fa-exclamation-circle';
+            } else if (type === 'info') {
+                notificationIcon.className = 'fas fa-info-circle';
             }
             
-            // 更新统计
-            document.getElementById("myArticlesCount").textContent = myArticles.length;
+            // 设置消息
+            notificationMessage.textContent = message;
+            
+            // 显示通知
+            notification.classList.add('show');
+            
+            // 3秒后自动隐藏
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
         }
         
-        // 加载我的广告模板
-        function loadMyAdTemplates() {
-            const myTemplates = systemData.adTemplates.filter(template => template.createdBy === systemData.currentUser.id);
-            const container = document.getElementById("myAdTemplates");
-            
-            if (myTemplates.length === 0) {
-                container.innerHTML = `
-                    <div class="card" style="text-align: center; padding: 50px;">
-                        <i class="fas fa-ad" style="font-size: 3rem; color: #bdc3c7; margin-bottom: 20px;"></i>
-                        <h3 style="margin-bottom: 10px;">暂无广告模板</h3>
-                        <p style="color: #7f8c8d; margin-bottom: 20px;">您还没有创建任何广告模板</p>
-                        <button class="btn btn-primary" id="createFirstAdTemplate">
-                            <i class="fas fa-plus"></i> 创建第一个广告模板
-                        </button>
-                    </div>
-                `;
-                
-                document.getElementById("createFirstAdTemplate").addEventListener("click", showAddAdTemplateModal);
-            } else {
-                container.innerHTML = `
-                    ${myTemplates.map(template => `
-                        <div class="template-card">
-                            <div class="template-header">
-                                <h3 class="template-title">${template.name}</h3>
-                                <span class="template-badge template-type-${template.type}">${template.type === 'image' ? '图片广告' : template.type === 'text' ? '文字广告' : '产品推荐'}</span>
-                            </div>
-                            <div class="template-content">
-                                <p>${template.content}</p>
-                            </div>
-                            <div class="template-footer">
-                                <span style="color: #95a5a6; font-size: 0.9rem;">创建于: ${template.createdAt}</span>
-                                <div class="template-actions">
-                                    <button class="action-btn edit" data-template-id="${template.id}">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="action-btn delete" data-template-id="${template.id}">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    `).join('')}
-                `;
+        // 关闭通知
+        notificationClose.addEventListener('click', function() {
+            notification.classList.remove('show');
+        });
+        
+        // 表格操作按钮
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const action = this.classList.contains('edit') ? '编辑' : 
+                              this.classList.contains('delete') ? '删除' : '锁定';
+                showNotification(`${action}操作已执行`, 'info');
+            });
+        });
+        
+        // 保存按钮
+        document.querySelectorAll('.btn-primary').forEach(btn => {
+            if (btn.textContent.includes('保存')) {
+                btn.addEventListener('click', function() {
+                    showNotification('设置已成功保存', 'success');
+                });
             }
-            
-            // 更新统计
-            document.getElementById("myAdsCount").textContent = myTemplates.length;
+        });
+        
+        // 搜索按钮
+        文档.querySelectorAll('.user-search .btn-primary').forEach(按钮 => {
+            按钮.受控者("点击", 功能() {
+                显示通知('搜索完成'，'信息'）；"信息");
+            });});
+        });
+        
+        // 分页按钮
+        文档的每个按钮=>{文档.querySelectorAll('.pagination .btn').forEach(按钮 => {
+            按钮.受控者("点击", 功能() {按钮.受控者("点击", 功能() {
+                显示通知('页面已切换'页面已切换', "信息");"信息");显示通知('页面已切换'页面已切换', "信息");"信息");
+            });});
+        });
+        
+        // 响应式侧边栏
+        功能 手柄调整大小() {功能 手柄调整大小() {
+            如果 (窗口.内宽 <= 768) {如果 (窗口.内宽 <= 
+                侧边栏.类列表.消除("崩溃了");
+                侧边栏.类列表.消除('活跃');
+            }}}}
+        }}
+768
+类列表
+)
+        
+        // 移动端菜单切换// 移动端菜单切换
+// 移动端菜单切换移动菜单切换=文档。创建元素（‘按钮’）；
+// 移动端菜单切换// 移动端菜单切换
+移动菜单选项。样式。位置=“固定”；
+'btn btn-primary'
+手机菜单。风格。正确的=‘20像素’；
+mobileMenuToggle.风格.zIndex='99'；
+'btn btn-primary'
+；
+        
+文件。身体。附件儿童（移动菜单切换）；。身体。附件儿童（移动菜单切换）；
+        
+appendChild（mobileMenuToggle）；
+appendChild（mobileMenuToggle）；
+        });
+        
+checkMobile（） 
+如果（窗口内宽<=768）{。窗口内宽<=768）{<=768）{.内宽 <= 768） {
+{
+；
+{
+            }
         }
         
-        // 加载角色权限管理
-        function loadRoleManagement() {
-            pageContent.innerHTML = `
-                <div class="page-header">
-                    <h2 class="page-title">角色权限管理</h2>
-                    <div class="page-actions">
-                        <button class="btn btn-success" id="addRoleBtn">
-                            <i class="fas fa-plus"></i> 添加角色
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="card-grid">
-                    ${Object.entries(systemData.roles).map(([roleKey, role]) => `
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">${role.name}</h3>
-                                ${roleKey === 'super_admin' ? '<span class="role-badge role-super-admin">系统内置</span>' : ''}
-                            </div>
-                            <div style="margin-bottom: 20px;">
-                                <p><strong>权限列表：</strong></p>
-                                <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;">
-                                    ${role.permissions.map(perm => `
-                                        <span style="background: #f8f9fa; padding: 5px 10px; border-radius: 20px; font-size: 0.85rem;">
-                                            ${getPermissionName(perm)}
-                                        </span>
-                                    `).join('')}
-                                </div>
-                            </div>
-                            <div class="template-footer">
-                                <span style="color: #95a5a6; font-size: 0.9rem;">角色标识: ${roleKey}</span>
-                                ${roleKey !== 'super_admin' ? `
-                                    <div class="template-actions">
-                                        <button class="action-btn edit" data-role="${roleKey}">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="action-btn delete" data-role="${roleKey}">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                ` : ''}
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-        
-        // 加载团队管理
-        function loadTeamManagement() {
-            pageContent.innerHTML = `
-                <div class="page-header">
-                    <h2 class="page-title">团队管理</h2>
-                    <div class="page-actions">
-                        <button class="btn btn-success" id="createTeamBtn">
-                            <i class="fas fa-plus"></i> 创建团队
-                        </button>
-</div>
-</div>
-                
-<div class="card" style="text-align:center；padding:50px；">
-<i class="fas fa-users" style="font-size:3rem； color:#bdc3c7； margin-bottom:20px；"></i>
-                    <h3 style="margin-bottom: 10px;">团队功能</h3>
-<p style=“颜色:#7f8c8d；margin-bottom: 20px;”>团队管理功能正在开发中...</p>
-<p style="color：#7f8c8d；">您可以将用户组织成团队，并为团队分配项目和权限。</p>
-</div>
-            `;
-        }
-        
-        // 加载数据统计
-        功能 负载统计() {
-            页面内容.InnerHTML = `
-<div class=“页面标题”>
-《H2类=页面标题》数据统计
-<div class="page-actions">
-<select class="form-control" style="width:200px；">
-                            <option>最近7天</option>
-                            <option>最近30天</option>
-                            <option>最近90天</option>
-所有时间<选项>
-</选择>
-</div>
-</div>
-                
-<div class="card" style="text-align:center；padding:50px；">
-<i class="fas fa-chart-bar" style="font-size:3rem； color:#bdc3c7； margin-bottom:20px；"></i>
-<h3样式="边缘底部：10像素">数据统计功能</h3>
-<p样式=颜色：#7 f8c8d；边缘底部：20像素；“>数据统计功能正在开发中...</p>
-<p style="color：#7f8c8d；">这里将展示详细的文章、广告、用户等数据统计图表。</p>
-</div>
-            `;
-        }
-        
-        // 加载系统设置
-        功能 加载设置() {
-            常量 设定 = 系统数据.设定;
-            
-            页面内容.InnerHTML = `
-<div class=“页面标题”>
-页面标题》系统设置
-</div>
-                
-<div class=“card”>
-<div class="settings-form">
-<div class="form-group">
-<标签类=形式标签>系统名称</标签>
-<input type="text" class="form-control" id="siteName" value="${设定.站点名称}">
-设定
-${
-<div class="form-group">
-</div>
-输入类型=“网址”类=“表单控制”标识=“网站网址”值=“${设定。网站地址}“>
-设定
-${
-<输入类型=“范围”标识=“频率”最小值=”2“ 最大值=”8“ 值=”
 }
-默认广告插入频率</标签>
-<div class="滑块容器">
-<输入类型=“范围”标识=“频率”最小值=”2“ 最大值=”8“ 值=“${设定.广告频率}”类=”滑块“>
-设定
-${
-<选项值="图像"
-广告频率
-}
-广告频率
-设定
-<选项值="图像"${设定.默认广告类型 === "图像" ? "已选定" : ''}>图片广告</option>
-默认广告类型
->图片广告</option>
-}
-''
-"已选定"
-"产品"
-''
-<标签类=形式标签>系统描述</标签>
-输入系统描述...输入系统描述...输入系统描述“>自媒体文章自动广告插入系统，支持多用户管理和层级权限控制。</text一种re一种>
-</d我v>
-                        
-<d我v cl一种的的=“模态页脚”
-按钮类保存系统设置
-                                <我cl一种的的=“fas fa-保存””></i> 保存设置
-</按钮>
-<按钮 cl一种的的=按钮id="重置系统设置">
-                                <我 cl一种的的=法斯法雷多></i> 恢复默认
-</按钮>
-</d我v>
-</d我v>
-</d我v>
-            `;
-        }
-        
-        // 更新统计数据
-函数更新统计数据{
-            // 在实际应用中，这里应该从一种P我获取数据
-的y的temD一种t一种.的t一种t我的t我c的.小孩一种l一种rt我cle=
-的y的temD一种t一种.的t一种t我的t我c的.小孩一种l一种d的=156；
-的y的temD一种t一种.的t一种t我的t我c的.总收益=2450.50；的t一种t我的t我c的.总收益=2450.50；
-的y的temD一种t一种.的t一种t我的t我c的.小孩一种路的尔的=系统数据。用户。长度；
-            
-            // 更新显示
-文件。由我d（“托特一种l一种我的伯爵”）.文本内容=系统数据。统计数字.总文章数；
-总文章数；
-系统数据。统计数字
-文本内容
-            
-            // 更新最近活动
-常量活动 = [
-{ 用户:“管理员”, 动作：“创建了新用户”, 时间：“10分钟前” },
-{ 用户:“张经理”, 动作：“发布了新文章”, 时间：“1小时前” },
-,
-}
-}
-            ];
-            
-常量活动容器=文件。
-如果（活动容器）{
-活动容器.#ee；显示：柔性；对齐项目：中心；间隙：15=<ul的样式="列表"-样式:无;填充：0;”>
-<ul的样式=“列表样式：无；填充：0；”>
-“列表样式：无；填充：0；”
-<l我 #ee；显示：柔性；对齐项目：中心；间隙：15px实心#ee；显示：柔性；对齐项目：中心；间隙：15 px；">
-<迪我v的样式="宽度：40像素；高度：40像素；边缘半径：50%；背景：#3498 db；颜色：白色；显示：柔性；对齐项：中心；论证
+checkMobile（）；
+</脚本>/脚本>
+</身体>
+</html>
