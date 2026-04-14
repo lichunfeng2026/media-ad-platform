@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>自媒体广告系统 - 专业企业版</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
             margin: 0;
@@ -297,6 +298,12 @@
             display: flex;
             align-items: center;
             gap: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
         
         .stat-icon {
@@ -340,6 +347,19 @@
             font-size: 0.95rem;
         }
         
+        .stat-change {
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+        
+        .stat-change.positive {
+            color: #2ecc71;
+        }
+        
+        .stat-change.negative {
+            color: #e74c3c;
+        }
+        
         .dashboard-charts {
             display: grid;
             grid-template-columns: 2fr 1fr;
@@ -368,20 +388,12 @@
         
         .chart-container {
             height: 300px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            position: relative;
         }
         
-        .chart-placeholder {
-            width: 100%;
-            height: 100%;
-            background: #f8f9fa;
-            border-radius: 8px;
+        .chart-actions {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #95a5a6;
+            gap: 10px;
         }
         
         /* 用户管理样式 */
@@ -1038,6 +1050,9 @@
                             <div class="stat-info">
                                 <h3>128</h3>
                                 <p>文章总数</p>
+                                <div class="stat-change positive">
+                                    <i class="fas fa-arrow-up"></i> 12% 较上月
+                                </div>
                             </div>
                         </div>
                         
@@ -1048,6 +1063,9 @@
                             <div class="stat-info">
                                 <h3>56</h3>
                                 <p>广告总数</p>
+                                <div class="stat-change positive">
+                                    <i class="fas fa-arrow-up"></i> 8% 较上月
+                                </div>
                             </div>
                         </div>
                         
@@ -1058,6 +1076,9 @@
                             <div class="stat-info">
                                 <h3>¥12,580</h3>
                                 <p>本月收入</p>
+                                <div class="stat-change positive">
+                                    <i class="fas fa-arrow-up"></i> 23% 较上月
+                                </div>
                             </div>
                         </div>
                         
@@ -1068,6 +1089,9 @@
                             <div class="stat-info">
                                 <h3>1,258</h3>
                                 <p>用户总数</p>
+                                <div class="stat-change negative">
+                                    <i class="fas fa-arrow-down"></i> 3% 较上月
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1077,16 +1101,13 @@
                             <div class="chart-header">
                                 <h3 class="chart-title">收入趋势</h3>
                                 <div class="chart-actions">
-                                    <button class="btn btn-sm btn-primary">本周</button>
-                                    <button class="btn btn-sm btn-secondary">本月</button>
-                                    <button class="btn btn-sm btn-secondary">本年</button>
+                                    <button class="btn btn-sm btn-primary" id="weekBtn">本周</button>
+                                    <button class="btn btn-sm btn-secondary" id="monthBtn">本月</button>
+                                    <button class="btn btn-sm btn-secondary" id="yearBtn">本年</button>
                                 </div>
                             </div>
                             <div class="chart-container">
-                                <div class="chart-placeholder">
-                                    <i class="fas fa-chart-line fa-3x"></i>
-                                    <p>收入趋势图表</p>
-                                </div>
+                                <canvas id="revenueChart"></canvas>
                             </div>
                         </div>
                         
@@ -1095,10 +1116,7 @@
                                 <h3 class="chart-title">广告点击率</h3>
                             </div>
                             <div class="chart-container">
-                                <div class="chart-placeholder">
-                                    <i class="fas fa-chart-pie fa-3x"></i>
-                                    <p>广告点击率图表</p>
-                                </div>
+                                <canvas id="clickRateChart"></canvas>
                             </div>
                         </div>
                     </div>
@@ -1109,10 +1127,7 @@
                             <button class="btn btn-sm btn-primary">查看全部</button>
                         </div>
                         <div class="chart-container">
-                            <div class="chart-placeholder">
-                                <i class="fas fa-newspaper fa-3x"></i>
-                                <p>最近文章列表</p>
-                            </div>
+                            <canvas id="articlesChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -1419,6 +1434,9 @@
                             <div class="stat-info">
                                 <h3>125,890</h3>
                                 <p>页面浏览量</p>
+                                <div class="stat-change positive">
+                                    <i class="fas fa-arrow-up"></i> 18% 较上月
+                                </div>
                             </div>
                         </div>
                         
@@ -1429,6 +1447,9 @@
                             <div class="stat-info">
                                 <h3>8,562</h3>
                                 <p>广告点击量</p>
+                                <div class="stat-change positive">
+                                    <i class="fas fa-arrow-up"></i> 15% 较上月
+                                </div>
                             </div>
                         </div>
                         
@@ -1439,6 +1460,9 @@
                             <div class="stat-info">
                                 <h3>6.8%</h3>
                                 <p>点击率</p>
+                                <div class="stat-change negative">
+                                    <i class="fas fa-arrow-down"></i> 2% 较上月
+                                </div>
                             </div>
                         </div>
                         
@@ -1449,6 +1473,9 @@
                             <div class="stat-info">
                                 <h3>328</h3>
                                 <p>新增用户</p>
+                                <div class="stat-change positive">
+                                    <i class="fas fa-arrow-up"></i> 25% 较上月
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1464,10 +1491,7 @@
                                 </div>
                             </div>
                             <div class="chart-container">
-                                <div class="chart-placeholder">
-                                    <i class="fas fa-chart-area fa-3x"></i>
-                                    <p>流量趋势图表</p>
-                                </div>
+                                <canvas id="trafficChart"></canvas>
                             </div>
                         </div>
                         
@@ -1476,10 +1500,7 @@
                                 <h3 class="chart-title">用户来源</h3>
                             </div>
                             <div class="chart-container">
-                                <div class="chart-placeholder">
-                                    <i class="fas fa-chart-pie fa-3x"></i>
-                                    <p>用户来源图表</p>
-                                </div>
+                                <canvas id="sourceChart"></canvas>
                             </div>
                         </div>
                     </div>
@@ -1819,6 +1840,9 @@
         const profileTabs = document.querySelectorAll('.profile-tab');
         const tabContents = document.querySelectorAll('.tab-content');
         
+        // 图表实例
+        let revenueChart, clickRateChart, articlesChart, trafficChart, sourceChart;
+        
         // 侧边栏折叠功能
         toggleSidebar.addEventListener('click', function() {
             sidebar.classList.toggle('collapsed');
@@ -1849,6 +1873,13 @@
                 // 更新页面标题
                 const pageTitle = this.querySelector('.nav-text').textContent;
                 currentPageTitle.textContent = pageTitle;
+                
+                // 初始化对应页面的图表
+                if (pageId === 'dashboardPage') {
+                    initDashboardCharts();
+                } else if (pageId === 'analyticsPage') {
+                    initAnalyticsCharts();
+                }
             });
         });
         
@@ -1954,56 +1985,315 @@
         });
         
         // 搜索按钮
-        文档.querySelectorAll('.user-search .btn-primary').forEach(按钮 => {
-            按钮.受控者("点击", 功能() {
-                显示通知('搜索完成'，'信息'）；"信息");
-            });});
+        document.querySelectorAll('.user-search .btn-primary').forEach(btn => {
+            btn.addEventListener('click', function() {
+                showNotification('搜索完成', 'info');
+            });
         });
         
         // 分页按钮
-        文档的每个按钮=>{文档.querySelectorAll('.pagination .btn').forEach(按钮 => {
-            按钮.受控者("点击", 功能() {按钮.受控者("点击", 功能() {
-                显示通知('页面已切换'页面已切换', "信息");"信息");显示通知('页面已切换'页面已切换', "信息");"信息");
-            });});
+        document.querySelectorAll('.pagination .btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                showNotification('页面已切换', 'info');
+            });
         });
         
         // 响应式侧边栏
-        功能 手柄调整大小() {功能 手柄调整大小() {
-            如果 (窗口.内宽 <= 768) {如果 (窗口.内宽 <= 
-                侧边栏.类列表.消除("崩溃了");
-                侧边栏.类列表.消除('活跃');
-            }}}}
-        }}
-768
-类列表
-)
-        
-        // 移动端菜单切换// 移动端菜单切换
-// 移动端菜单切换移动菜单切换=文档。创建元素（‘按钮’）；
-// 移动端菜单切换// 移动端菜单切换
-移动菜单选项。样式。位置=“固定”；
-'btn btn-primary'
-手机菜单。风格。正确的=‘20像素’；
-mobileMenuToggle.风格.zIndex='99'；
-'btn btn-primary'
-；
-        
-文件。身体。附件儿童（移动菜单切换）；。身体。附件儿童（移动菜单切换）；
-        
-appendChild（mobileMenuToggle）；
-appendChild（mobileMenuToggle）；
-        });
-        
-checkMobile（） 
-如果（窗口内宽<=768）{。窗口内宽<=768）{<=768）{.内宽 <= 768） {
-{
-；
-{
+        function handleResize() {
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('collapsed');
+                sidebar.classList.remove('active');
             }
         }
         
-}
-checkMobile（）；
-</脚本>/脚本>
-</身体>
+        window.addEventListener('resize', handleResize);
+        handleResize();
+        
+        // 移动端菜单切换
+        const mobileMenuToggle = document.createElement('button');
+        mobileMenuToggle.className = 'btn btn-primary';
+        mobileMenuToggle.style.position = 'fixed';
+        mobileMenuToggle.style.bottom = '20px';
+        mobileMenuToggle.style.right = '20px';
+        mobileMenuToggle.style.zIndex = '99';
+        mobileMenuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+        mobileMenuToggle.style.display = 'none';
+        
+        document.body.appendChild(mobileMenuToggle);
+        
+        mobileMenuToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('active');
+        });
+        
+        function checkMobile() {
+            if (window.innerWidth <= 768) {
+                mobileMenuToggle.style.display = 'flex';
+            } else {
+                mobileMenuToggle.style.display = 'none';
+            }
+        }
+        
+        window.addEventListener('resize', checkMobile);
+        checkMobile();
+        
+        // 初始化仪表板图表
+        function initDashboardCharts() {
+            // 收入趋势图
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            if (revenueChart) {
+                revenueChart.destroy();
+            }
+            
+            revenueChart = new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+                    datasets: [{
+                        label: '收入',
+                        data: [1200, 1900, 1500, 2100, 1800, 2400, 2200],
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        borderColor: 'rgba(52, 152, 219, 1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return '¥' + context.raw;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '¥' + value;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 广告点击率图
+            const clickRateCtx = document.getElementById('clickRateChart').getContext('2d');
+            if (clickRateChart) {
+                clickRateChart.destroy();
+            }
+            
+            clickRateChart = new Chart(clickRateCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['横幅广告', '文章内嵌广告', '弹窗广告', '视频广告'],
+                    datasets: [{
+                        data: [25, 38, 52, 41],
+                        backgroundColor: [
+                            'rgba(52, 152, 219, 0.7)',
+                            'rgba(46, 204, 113, 0.7)',
+                            'rgba(155, 89, 182, 0.7)',
+                            'rgba(241, 196, 15, 0.7)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.raw + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 最近文章图
+            const articlesCtx = document.getElementById('articlesChart').getContext('2d');
+            if (articlesChart) {
+                articlesChart.destroy();
+            }
+            
+            articlesChart = new Chart(articlesCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['如何提高广告点击率', '自媒体运营策略', '内容创作指南', '数据分析入门', '用户增长技巧'],
+                    datasets: [{
+                        label: '浏览量',
+                        data: [1250, 980, 875, 720, 650],
+                        backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+        
+        // 初始化数据分析图表
+        function initAnalyticsCharts() {
+            // 流量趋势图
+            const trafficCtx = document.getElementById('trafficChart').getContext('2d');
+            if (trafficChart) {
+                trafficChart.destroy();
+            }
+            
+            trafficChart = new Chart(trafficCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                    datasets: [{
+                        label: '页面浏览量',
+                        data: [12500, 15800, 18200, 21500, 24800, 28500],
+                        borderColor: 'rgba(52, 152, 219, 1)',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: '广告点击量',
+                        data: [850, 980, 1250, 1480, 1720, 1950],
+                        borderColor: 'rgba(46, 204, 113, 1)',
+                        backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            // 用户来源图
+            const sourceCtx = document.getElementById('sourceChart').getContext('2d');
+            if (sourceChart) {
+                sourceChart.destroy();
+            }
+            
+            sourceChart = new Chart(sourceCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['搜索引擎', '社交媒体', '直接访问', '外部链接', '其他'],
+                    datasets: [{
+                        data: [35, 28, 20, 12, 5],
+                        backgroundColor: [
+                            'rgba(52, 152, 219, 0.7)',
+                            'rgba(46, 204, 113, 0.7)',
+                            'rgba(155, 89, 182, 0.7)',
+                            'rgba(241, 196, 15, 0.7)',
+                            'rgba(149, 165, 166, 0.7)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.raw + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // 时间范围切换
+        document.getElementById('weekBtn').addEventListener('click', function() {
+            document.getElementById('weekBtn').classList.add('btn-primary');
+            document.getElementById('weekBtn').classList.remove('btn-secondary');
+            document.getElementById('monthBtn').classList.remove('btn-primary');
+            document.getElementById('monthBtn').classList.add('btn-secondary');
+            document.getElementById('yearBtn').classList.remove('btn-primary');
+            document.getElementById('yearBtn').classList.add('btn-secondary');
+            
+            // 更新图表数据
+            revenueChart.data.labels = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+            revenueChart.data.datasets[0].data = [1200, 1900, 1500, 2100, 1800, 2400, 2200];
+            revenueChart.update();
+        });
+        
+        document.getElementById('monthBtn').addEventListener('click', function() {
+            document.getElementById('monthBtn').classList.add('btn-primary');
+            document.getElementById('monthBtn').classList.remove('btn-secondary');
+            document.getElementById('weekBtn').classList.remove('btn-primary');
+            document.getElementById('weekBtn').classList.add('btn-secondary');
+            document.getElementById('yearBtn').classList.remove('btn-primary');
+            document.getElementById('yearBtn').classList.add('btn-secondary');
+            
+            // 更新图表数据
+            revenueChart.data.labels = ['第1周', '第2周', '第3周', '第4周'];
+            revenueChart.data.datasets[0].data = [8500, 9200, 10500, 11800];
+            revenueChart.update();
+        });
+        
+        document.getElementById('yearBtn').addEventListener('click', function() {
+            document.getElementById('yearBtn').classList.add('btn-primary');
+            document.getElementById('yearBtn').classList.remove('btn-secondary');
+            document.getElementById('weekBtn').classList.remove('btn-primary');
+            document.getElementById('weekBtn').classList.add('btn-secondary');
+            document.getElementById('monthBtn').classList.remove('btn-primary');
+            document.getElementById('monthBtn').classList.add('btn-secondary');
+            
+            // 更新图表数据
+            revenueChart.data.labels = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+            revenueChart.data.datasets[0].data = [32000, 35000, 38000, 42000, 45000, 48000, 52000, 55000, 58000, 62000, 65000, 68000];
+            revenueChart.update();
+        });
+        
+        // 页面加载时初始化仪表板图表
+        window.addEventListener('load', function() {
+            initDashboardCharts();
+        });
+    </script>
+</body>
 </html>
