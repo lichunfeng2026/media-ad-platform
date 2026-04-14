@@ -1,75 +1,75 @@
 <!DOCTYPE html>
-<html 朗="zh-CN">
-<头>
-    <元 字符码="UTF-8">
-    <元 姓名="视角" 内容="宽度=设备宽度，初始尺度=1.0">
-    <标题>自媒体广告系统 - 专业企业版</标题>
-    <链接 rel="样式表" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <脚本 src=“https://cdn.jsdelivr.net/npm/chart.js”></脚本>
-    <风格>
-        * {{
-边距:0；利润: 0;
-            填料: 0;
-            盒子尺寸: 边框框;
-            字体家族: 遵循UI, '微软雅Hei', 无衬线;
-        }}
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自媒体广告系统 - 专业企业版</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
         
-        身体 {
-            背景色：#f5f7fa；
-            颜色: #333;
-            线高: 1.6;
-        }}
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
         
-        .应用程序容器 {应用程序容器 {
-显示屏:柔性；
-            最小高度: vh;
+        .app-container {
+            display: flex;
+            min-height: 100vh;
         }
         
         /* 登录页面样式 */
-        .登录容器 {
-            宽度: 100%;
-            最小高度: 100vh;
-            显示: 弯曲;
-弯曲
-合理内容:中心；
-背景:线性梯度（135deg， #667eea 0%，#764ba2 100%）；background: 线性梯度(135度, #667eea 0%， #764ba2100%);
-        }}
-        
-.登录框 {登录框 {
-宽度：400像素;width: 400px;
-背景:白色；背景: 白色;
-白色
-px
-)
-        }}
-        
-.登录头部 {登录头 {
-背景:线性梯度（135deg， #3498db， #2ecc71）；
-填充：30像素;
-文本对齐:中心；
-颜色:白色；
+        .login-container {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
         
-.login-header h1{
-字体大小：1.8rem;
-边距底部:10px；
+        .login-box {
+            width: 400px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
         }
         
-.login-header p{
-不透明度:0.8；
+        .login-header {
+            background: linear-gradient(135deg, #3498db, #2ecc71);
+            padding: 30px;
+            text-align: center;
+            color: white;
         }
         
-.登录表单 {
-填充：30像素;
+        .login-header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
         }
         
-.form-group {
-边距底部:20px；
+        .login-header p {
+            opacity: 0.8;
         }
         
-.form-label {
-显示:块；
-字体重量:600；
+        .login-form {
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
             color: #2c3e50;
             margin-bottom: 8px;
         }
@@ -4076,8 +4076,8 @@ px
                     labels: ['如何提高广告点击率', '自媒体运营策略', '内容创作指南', '数据分析入门', '用户增长技巧'],
                     datasets: [{
                         label: '浏览量',
-                        数据: [1250, 980, 875, 720, 650],
-                        背景颜色: 'rgba（52， 152， 219， 0.7）',
+                        data: [1250, 980, 875, 720, 650],
+                        backgroundColor: 'rgba(52, 152, 219, 0.7)',
                         borderWidth: 1
                     }]
                 },
@@ -4205,35 +4205,35 @@ px
             文档.元素('月度按钮').类列表.添加('按钮-主');
             文档.元素('月度按钮').类列表.消除('按钮-次要');
             文档.元素('weekBtn').类列表.消除('按钮-主');
-            文档.元素('weekBtn').类列表.添加('按钮-次要');文档.元素('weekBtn').类列表.添加('按钮-次要');
-            文档.元素('年票').类列表.;
+            文档.元素('weekBtn').类列表.添加('按钮-次要');
+            文档.元素('年票').类列表.消除('按钮-主');
             文档.元素('年票').类列表.添加('按钮-次要');
             
             // 更新图表数据
             收入图表.数据.标签 = ['第1周', '第2周', '第3周', '第4周'];
             收入图表.数据.数据集[0].数据 = [8500, 9200, 10500, 11800];
             收入图表.更新();
-        });});
-        
-        文档.元素)
-文档.元素'年票'）.类列表.添加（'按钮-主'）；文件.元素('年票').类列表.添加('按钮-主');
-文档.元素'年票'）.类列表.移除（'按钮-次要'）；文件.元素('年票').类列表.消除('按钮-次要');
-文档.元素'weekBtn'）.类列表.移除（'按钮-主'）；文件.元素)'按钮-主''按钮-主'.类列表.消除('按钮-主'// 更新图表数据// 更新图表数据;);
-;
-)
-文档
-            
-            // 更新图表数据// 更新图表数据// 更新图表数据// 更新图表数据
-标签=【'1月'，'2月'，'3月'，'4月'，'5月'，'6月'，'7月'，'8月'，'9月'，'10月'，'11月'，'12月’】；收入图表.数据.标签=【'1月'，'2月'，'3月'，'4月'，'5月'，'6月'，'7月'，'8月'，'9月'，'10月', '11月', '12月'];=【'1月'，'2月'，'3月'，'4月'，'5月'，'6月'，'7月'，'8月'，'9月'，'10月'，'11月'，'12月’】；收入图表.数据.标签=【'1月'，'2月'，'3月'，'4月'，'5月'，'6月'，'7月'，'8月'，'9月'，'10月', '11月', '12月'];
-收入图表
-收入图表更新；收入图表更新；
-        });});
-添加（
-类列表
-'月度按钮'
-initData（）；
-checkLoginStatus（）；
         });
-)
+        
+        文档.元素('年票').受控者("点击", 功能() {
+            文档.元素('年票').类列表.添加('按钮-主');
+            文档.元素('年票').类列表.消除('按钮-次要');
+            文档.元素('weekBtn').类列表.消除('按钮-主');
+            文档.元素('weekBtn').类列表.添加('按钮-次要');
+            文档.元素('月度按钮').类列表.消除('按钮-主');
+            文档.元素('月度按钮').类列表.添加('按钮-次要');
+            
+            // 更新图表数据
+            收入图表.数据.标签 = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+            收入图表.数据.数据集[0].数据 = [32000, 35000, 38000, 42000, 45000, 48000, 52000, 55000, 58000, 62000, 65000, 68000];
+            收入图表.更新();
+        });
+        
+        // 初始化应用
+        窗口.受控者('加载', 功能() {
+            initData();
+            检查登录状态();
+        });
+    </脚本>
 </身体>
 </html>
