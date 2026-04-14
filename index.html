@@ -1173,6 +1173,63 @@
             font-size: 1.2rem;
         }
         
+        /* 数据管理样式 */
+        .data-management-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .data-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .data-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 25px;
+        }
+        
+        .data-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .data-card-title {
+            font-size: 1.2rem;
+            color: #2c3e50;
+        }
+        
+        .data-card-content {
+            color: #7f8c8d;
+        }
+        
+        .data-backup-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .data-backup-info span {
+            color: #7f8c8d;
+        }
+        
+        .data-backup-info strong {
+            color: #2c3e50;
+        }
+        
         /* 响应式设计 */
         @media (max-width: 1200px) {
             .dashboard-charts {
@@ -1223,6 +1280,17 @@
             .login-box, .register-box, .forgot-password-box {
                 width: 90%;
                 max-width: 400px;
+            }
+            
+            .data-management-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .data-actions {
+                width: 100%;
+                flex-wrap: wrap;
             }
         }
     </style>
@@ -1392,6 +1460,11 @@
                     <span class="nav-text">数据分析</span>
                 </div>
                 
+                <div class="nav-item" data-page="data">
+                    <i class="fas fa-database"></i>
+                    <span class="nav-text">数据管理</span>
+                </div>
+                
                 <div class="nav-item" data-page="settings">
                     <i class="fas fa-cog"></i>
                     <span class="nav-text">系统设置</span>
@@ -1442,7 +1515,7 @@
                                 <i class="fas fa-newspaper"></i>
                             </div>
                             <div class="stat-info">
-                                <h3>128</h3>
+                                <h3 id="totalArticles">128</h3>
                                 <p>文章总数</p>
                                 <div class="stat-change positive">
                                     <i class="fas fa-arrow-up"></i> 12% 较上月
@@ -1455,7 +1528,7 @@
                                 <i class="fas fa-ad"></i>
                             </div>
                             <div class="stat-info">
-                                <h3>56</h3>
+                                <h3 id="totalAds">56</h3>
                                 <p>广告总数</p>
                                 <div class="stat-change positive">
                                     <i class="fas fa-arrow-up"></i> 8% 较上月
@@ -1481,7 +1554,7 @@
                                 <i class="fas fa-users"></i>
                             </div>
                             <div class="stat-info">
-                                <h3>1,258</h3>
+                                <h3 id="totalUsers">1,258</h3>
                                 <p>用户总数</p>
                                 <div class="stat-change negative">
                                     <i class="fas fa-arrow-down"></i> 3% 较上月
@@ -1531,10 +1604,14 @@
                     <div class="user-management-header">
                         <h2>文章管理</h2>
                         <div class="user-search">
-                            <input type="text" placeholder="搜索文章...">
-                            <button class="btn btn-primary">
+                            <input type="text" id="articleSearchInput" placeholder="搜索文章...">
+                            <button class="btn btn-primary" id="articleSearchBtn">
                                 <i class="fas fa-search"></i>
                                 搜索
+                            </button>
+                            <button class="btn btn-success" id="addArticleBtn">
+                                <i class="fas fa-plus"></i>
+                                添加文章
                             </button>
                         </div>
                     </div>
@@ -1551,57 +1628,15 @@
                                     <th>操作</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td>如何提高广告点击率</td>
-                                    <td>李春峰</td>
-                                    <td>广告技巧</td>
-                                    <td>2023-06-15</td>
-                                    <td><span class="status-badge status-active">已发布</span></td>
-                                    <td>
-                                        <div class="user-actions">
-                                            <button class="action-btn edit" title="编辑"><i class="fas fa-edit"></i></button>
-                                            <button class="action-btn delete" title="删除"><i class="fas fa-trash"></i></button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>自媒体运营策略</td>
-                                    <td>王明</td>
-                                    <td>运营技巧</td>
-                                    <td>2023-06-14</td>
-                                    <td><span class="status-badge status-active">已发布</span></td>
-                                    <td>
-                                        <div class="user-actions">
-                                            <button class="action-btn edit" title="编辑"><i class="fas fa-edit"></i></button>
-                                            <button class="action-btn delete" title="删除"><i class="fas fa-trash"></i></button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>内容创作指南</td>
-                                    <td>张华</td>
-                                    <td>内容创作</td>
-                                    <td>2023-06-13</td>
-                                    <td><span class="status-badge status-inactive">草稿</span></td>
-                                    <td>
-                                        <div class="user-actions">
-                                            <button class="action-btn edit" title="编辑"><i class="fas fa-edit"></i></button>
-                                            <button class="action-btn delete" title="删除"><i class="fas fa-trash"></i></button>
-                                        </div>
-                                    </td>
-                                </tr>
+                            <tbody id="articlesTableBody">
+                                <!-- 文章数据将通过JavaScript动态加载 -->
                             </tbody>
                         </table>
                         
                         <div class="table-footer">
-                            <div>显示 1-3 共 128 条记录</div>
-                            <div class="pagination">
-                                <button class="btn btn-sm btn-secondary">上一页</button>
-                                <button class="btn btn-sm btn-primary">1</button>
-                                <button class="btn btn-sm btn-secondary">2</button>
-                                <button class="btn btn-sm btn-secondary">3</button>
-                                <button class="btn btn-sm btn-secondary">下一页</button>
+                            <div id="articlesPaginationInfo">显示 0-0 共 0 条记录</div>
+                            <div class="pagination" id="articlesPagination">
+                                <!-- 分页按钮将通过JavaScript动态加载 -->
                             </div>
                         </div>
                     </div>
@@ -1611,80 +1646,21 @@
                 <div class="page-content" id="adsPage">
                     <div class="user-management-header">
                         <h2>广告管理</h2>
-                        <button class="btn btn-primary" id="addAdBtn">
-                            <i class="fas fa-plus"></i>
-                            添加广告
-                        </button>
+                        <div class="user-search">
+                            <input type="text" id="adSearchInput" placeholder="搜索广告...">
+                            <button class="btn btn-primary" id="adSearchBtn">
+                                <i class="fas fa-search"></i>
+                                搜索
+                            </button>
+                            <button class="btn btn-success" id="addAdBtn">
+                                <i class="fas fa-plus"></i>
+                                添加广告
+                            </button>
+                        </div>
                     </div>
                     
-                    <div class="ad-templates">
-                        <div class="template-card">
-                            <div class="template-header">
-                                <h3 class="template-title">横幅广告</h3>
-                                <span class="template-badge template-type-image">图片广告</span>
-                            </div>
-                            <div class="template-content">
-                                <p>适合网站顶部或底部的横幅广告位，支持多种尺寸和格式。</p>
-                            </div>
-                            <div class="template-footer">
-                                <div>点击率: 2.5%</div>
-                                <div class="template-actions">
-                                    <button class="btn btn-sm btn-primary">编辑</button>
-                                    <button class="btn btn-sm btn-danger">删除</button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="template-card">
-                            <div class="template-header">
-                                <h3 class="template-title">文章内嵌广告</h3>
-                                <span class="template-badge template-type-text">文本广告</span>
-                            </div>
-                            <div class="template-content">
-                                <p>嵌入在文章内容中的广告，与内容自然融合，不影响阅读体验。</p>
-                            </div>
-                            <div class="template-footer">
-                                <div>点击率: 3.8%</div>
-                                <div class="template-actions">
-                                    <button class="btn btn-sm btn-primary">编辑</button>
-                                    <button class="btn btn-sm btn-danger">删除</button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="template-card">
-                            <div class="template-header">
-                                <h3 class="template-title">弹窗广告</h3>
-                                <span class="template-badge template-type-image">图片广告</span>
-                            </div>
-                            <div class="template-content">
-                                <p>在用户访问网站时弹出的广告，具有较高的曝光率和点击率。</p>
-                            </div>
-                            <div class="template-footer">
-                                <div>点击率: 5.2%</div>
-                                <div class="template-actions">
-                                    <button class="btn btn-sm btn-primary">编辑</button>
-                                    <button class="btn btn-sm btn-danger">删除</button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="template-card">
-                            <div class="template-header">
-                                <h3 class="template-title">视频广告</h3>
-                                <span class="template-badge template-type-image">视频广告</span>
-                            </div>
-                            <div class="template-content">
-                                <p>在视频播放前、中或后展示的广告，适合品牌宣传和产品展示。</p>
-                            </div>
-                            <div class="template-footer">
-                                <div>点击率: 4.1%</div>
-                                <div class="template-actions">
-                                    <button class="btn btn-sm btn-primary">编辑</button>
-                                    <button class="btn btn-sm btn-danger">删除</button>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="ad-templates" id="adsContainer">
+                        <!-- 广告数据将通过JavaScript动态加载 -->
                     </div>
                 </div>
                 
@@ -1693,10 +1669,14 @@
                     <div class="user-management-header">
                         <h2>用户管理</h2>
                         <div class="user-search">
-                            <input type="text" placeholder="搜索用户...">
-                            <button class="btn btn-primary">
+                            <input type="text" id="userSearchInput" placeholder="搜索用户...">
+                            <button class="btn btn-primary" id="userSearchBtn">
                                 <i class="fas fa-search"></i>
                                 搜索
+                            </button>
+                            <button class="btn btn-success" id="addUserBtn">
+                                <i class="fas fa-plus"></i>
+                                添加用户
                             </button>
                         </div>
                     </div>
@@ -1713,106 +1693,15 @@
                                     <th>操作</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td>
-                                        <div class="user-cell">
-                                            <div class="user-avatar-small">李</div>
-                                            <div>
-                                                <div class="user-name-cell">李春峰</div>
-                                                <div class="user-email">lichunfeng@example.com</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td><span class="role-badge role-super-admin">超级管理员</span></td>
-                                    <td>2023-01-15</td>
-                                    <td>2023-06-15</td>
-                                    <td><span class="status-badge status-active">活跃</span></td>
-                                    <td>
-                                        <div class="user-actions">
-                                            <button class="action-btn edit" title="编辑"><i class="fas fa-edit"></i></button>
-                                            <button class="action-btn delete" title="删除"><i class="fas fa-trash"></i></button>
-                                            <button class="action-btn lock" title="锁定"><i class="fas fa-lock"></i></button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="user-cell">
-                                            <div class="user-avatar-small">王</div>
-                                            <div>
-                                                <div class="user-name-cell">王明</div>
-                                                <div class="user-email">wangming@example.com</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td><span class="role-badge role-admin">管理员</span></td>
-                                    <td>2023-02-20</td>
-                                    <td>2023-06-14</td>
-                                    <td><span class="status-badge status-active">活跃</span></td>
-                                    <td>
-                                        <div class="user-actions">
-                                            <button class="action-btn edit" title="编辑"><i class="fas fa-edit"></i></button>
-                                            <button class="action-btn delete" title="删除"><i class="fas fa-trash"></i></button>
-                                            <button class="action-btn lock" title="锁定"><i class="fas fa-lock"></i></button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="user-cell">
-                                            <div class="user-avatar-small">张</div>
-                                            <div>
-                                                <div class="user-name-cell">张华</div>
-                                                <div class="user-email">zhanghua@example.com</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td><span class="role-badge role-editor">编辑</span></td>
-                                    <td>2023-03-10</td>
-                                    <td>2023-06-10</td>
-                                    <td><span class="status-badge status-active">活跃</span></td>
-                                    <td>
-                                        <div class="user-actions">
-                                            <button class="action-btn edit" title="编辑"><i class="fas fa-edit"></i></button>
-                                            <button class="action-btn delete" title="删除"><i class="fas fa-trash"></i></button>
-                                            <button class="action-btn lock" title="锁定"><i class="fas fa-lock"></i></button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="user-cell">
-                                            <div class="user-avatar-small">刘</div>
-                                            <div>
-                                                <div class="user-name-cell">刘洋</div>
-                                                <div class="user-email">liuyang@example.com</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td><span class="role-badge role-user">普通用户</span></td>
-                                    <td>2023-04-05</td>
-                                    <td>2023-06-01</td>
-                                    <td><span class="status-badge status-inactive">不活跃</span></td>
-                                    <td>
-                                        <div class="user-actions">
-                                            <button class="action-btn edit" title="编辑"><i class="fas fa-edit"></i></button>
-                                            <button class="action-btn delete" title="删除"><i class="fas fa-trash"></i></button>
-                                            <button class="action-btn lock" title="锁定"><i class="fas fa-lock"></i></button>
-                                        </div>
-                                    </td>
-                                </tr>
+                            <tbody id="usersTableBody">
+                                <!-- 用户数据将通过JavaScript动态加载 -->
                             </tbody>
                         </table>
                         
                         <div class="table-footer">
-                            <div>显示 1-4 共 1,258 条记录</div>
-                            <div class="pagination">
-                                <button class="btn btn-sm btn-secondary">上一页</button>
-                                <button class="btn btn-sm btn-primary">1</button>
-                                <button class="btn btn-sm btn-secondary">2</button>
-                                <button class="btn btn-sm btn-secondary">3</button>
-                                <button class="btn btn-sm btn-secondary">下一页</button>
+                            <div id="usersPaginationInfo">显示 0-0 共 0 条记录</div>
+                            <div class="pagination" id="usersPagination">
+                                <!-- 分页按钮将通过JavaScript动态加载 -->
                             </div>
                         </div>
                     </div>
@@ -1900,6 +1789,109 @@
                     </div>
                 </div>
                 
+                <!-- 数据管理页面 -->
+                <div class="page-content" id="dataPage">
+                    <div class="data-management-header">
+                        <h2>数据管理</h2>
+                        <div class="data-actions">
+                            <button class="btn btn-primary" id="exportDataBtn">
+                                <i class="fas fa-download"></i>
+                                导出数据
+                            </button>
+                            <button class="btn btn-success" id="importDataBtn">
+                                <i class="fas fa-upload"></i>
+                                导入数据
+                            </button>
+                            <button class="btn btn-secondary" id="backupDataBtn">
+                                <i class="fas fa-save"></i>
+                                备份数据
+                            </button>
+                            <button class="btn btn-danger" id="restoreDataBtn">
+                                <i class="fas fa-undo"></i>
+                                恢复数据
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="data-card">
+                        <div class="data-card-header">
+                            <h3 class="data-card-title">数据备份信息</h3>
+                        </div>
+                        <div class="data-card-content">
+                            <div class="data-backup-info">
+                                <span>上次备份时间: <strong id="lastBackupTime">从未备份</strong></span>
+                                <span>备份大小: <strong id="backupSize">0 KB</strong></span>
+                            </div>
+                            <p>定期备份您的数据可以防止意外丢失。建议每周至少备份一次。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="data-card">
+                        <div class="data-card-header">
+                            <h3 class="data-card-title">数据统计</h3>
+                        </div>
+                        <div class="data-card-content">
+                            <div class="dashboard-stats">
+                                <div class="stat-card">
+                                    <div class="stat-icon articles">
+                                        <i class="fas fa-newspaper"></i>
+                                    </div>
+                                    <div class="stat-info">
+                                        <h3 id="dataArticlesCount">0</h3>
+                                        <p>文章数量</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="stat-card">
+                                    <div class="stat-icon ads">
+                                        <i class="fas fa-ad"></i>
+                                    </div>
+                                    <div class="stat-info">
+                                        <h3 id="dataAdsCount">0</h3>
+                                        <p>广告数量</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="stat-card">
+                                    <div class="stat-icon users">
+                                        <i class="fas fa-users"></i>
+                                    </div>
+                                    <div class="stat-info">
+                                        <h3 id="dataUsersCount">0</h3>
+                                        <p>用户数量</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="stat-card">
+                                    <div class="stat-icon earnings">
+                                        <i class="fas fa-database"></i>
+                                    </div>
+                                    <div class="stat-info">
+                                        <h3 id="dataTotalSize">0 KB</h3>
+                                        <p>数据大小</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="data-card">
+                        <div class="data-card-header">
+                            <h3 class="data-card-title">数据操作</h3>
+                        </div>
+                        <div class="data-card-content">
+                            <div class="form-group">
+                                <label class="form-label">清除所有数据</label>
+                                <p style="margin-bottom: 15px;">此操作将清除所有文章、广告和用户数据，且不可恢复。请谨慎操作。</p>
+                                <button class="btn btn-danger" id="clearAllDataBtn">
+                                    <i class="fas fa-trash"></i>
+                                    清除所有数据
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- 系统设置页面 -->
                 <div class="page-content" id="settingsPage">
                     <div class="profile-container">
@@ -1924,27 +1916,27 @@
                                 <div class="settings-form">
                                     <div class="form-group">
                                         <label class="form-label">网站名称</label>
-                                        <input type="text" class="form-control" value="自媒体广告系统">
+                                        <input type="text" class="form-control" id="siteName" value="自媒体广告系统">
                                     </div>
                                     
                                     <div class="form-group">
                                         <label class="form-label">网站描述</label>
-                                        <textarea class="form-control" rows="3">专业的自媒体广告管理系统，提供全方位的广告投放和数据分析服务。</textarea>
+                                        <textarea class="form-control" id="siteDescription" rows="3">专业的自媒体广告管理系统，提供全方位的广告投放和数据分析服务。</textarea>
                                     </div>
                                     
                                     <div class="form-row">
                                         <div class="form-group">
                                             <label class="form-label">管理员邮箱</label>
-                                            <input type="email" class="form-control" value="admin@example.com">
+                                            <input type="email" class="form-control" id="adminEmail" value="admin@example.com">
                                         </div>
                                         
                                         <div class="form-group">
                                             <label class="form-label">联系电话</label>
-                                            <input type="text" class="form-control" value="400-123-4567">
+                                            <input type="text" class="form-control" id="contactPhone" value="400-123-4567">
                                         </div>
                                     </div>
                                     
-                                    <button class="btn btn-primary">保存设置</button>
+                                    <button class="btn btn-primary" id="saveSettingsBtn">保存设置</button>
                                 </div>
                             </div>
                             
@@ -1952,18 +1944,18 @@
                                 <div class="settings-form">
                                     <div class="form-group">
                                         <label class="form-label">SMTP服务器</label>
-                                        <input type="text" class="form-control" value="smtp.example.com">
+                                        <input type="text" class="form-control" id="smtpServer" value="smtp.example.com">
                                     </div>
                                     
                                     <div class="form-row">
                                         <div class="form-group">
                                             <label class="form-label">SMTP端口</label>
-                                            <input type="text" class="form-control" value="587">
+                                            <input type="text" class="form-control" id="smtpPort" value="587">
                                         </div>
                                         
                                         <div class="form-group">
                                             <label class="form-label">加密方式</label>
-                                            <select class="form-control">
+                                            <select class="form-control" id="encryptionMethod">
                                                 <option value="tls">TLS</option>
                                                 <option value="ssl">SSL</option>
                                                 <option value="none">无</option>
@@ -1974,16 +1966,16 @@
                                     <div class="form-row">
                                         <div class="form-group">
                                             <label class="form-label">发件人邮箱</label>
-                                            <input type="email" class="form-control" value="noreply@example.com">
+                                            <input type="email" class="form-control" id="senderEmail" value="noreply@example.com">
                                         </div>
                                         
                                         <div class="form-group">
                                             <label class="form-label">发件人名称</label>
-                                            <input type="text" class="form-control" value="自媒体广告系统">
+                                            <input type="text" class="form-control" id="senderName" value="自媒体广告系统">
                                         </div>
                                     </div>
                                     
-                                    <button class="btn btn-primary">保存设置</button>
+                                    <button class="btn btn-primary" id="saveEmailSettingsBtn">保存设置</button>
                                 </div>
                             </div>
                             
@@ -1991,7 +1983,7 @@
                                 <div class="settings-form">
                                     <div class="form-group">
                                         <label class="form-label">密码策略</label>
-                                        <select class="form-control">
+                                        <select class="form-control" id="passwordPolicy">
                                             <option value="low">低 - 至少6个字符</option>
                                             <option value="medium" selected>中 - 至少8个字符，包含数字和字母</option>
                                             <option value="high">高 - 至少10个字符，包含数字、字母和特殊字符</option>
@@ -2000,15 +1992,15 @@
                                     
                                     <div class="form-group">
                                         <label class="form-label">登录失败次数限制</label>
-                                        <input type="number" class="form-control" value="5">
+                                        <input type="number" class="form-control" id="loginAttempts" value="5">
                                     </div>
                                     
                                     <div class="form-group">
                                         <label class="form-label">会话超时时间（分钟）</label>
-                                        <input type="number" class="form-control" value="30">
+                                        <input type="number" class="form-control" id="sessionTimeout" value="30">
                                     </div>
                                     
-                                    <button class="btn btn-primary">保存设置</button>
+                                    <button class="btn btn-primary" id="saveSecuritySettingsBtn">保存设置</button>
                                 </div>
                             </div>
                         </div>
@@ -2079,7 +2071,7 @@
                                     <div class="form-row">
                                         <div class="form-group">
                                             <label class="form-label">手机号码</label>
-                                            <input type="text" class="form-control" value="138****1234">
+                                            <input type="text" class="form-control" id="profilePhoneInput" value="138****1234">
                                         </div>
                                         
                                         <div class="form-group">
@@ -2090,7 +2082,7 @@
                                     
                                     <div class="form-group">
                                         <label class="form-label">个人简介</label>
-                                        <textarea class="form-control" rows="3">自媒体广告系统超级管理员，负责系统运营和管理工作。</textarea>
+                                        <textarea class="form-control" id="profileBioInput" rows="3">自媒体广告系统超级管理员，负责系统运营和管理工作。</textarea>
                                     </div>
                                     
                                     <button class="btn btn-primary" id="saveProfileBtn">保存修改</button>
@@ -2144,7 +2136,7 @@
                                         </div>
                                     </div>
                                     
-                                    <button class="btn btn-primary">保存设置</button>
+                                    <button class="btn btn-primary" id="saveNotificationsBtn">保存设置</button>
                                 </div>
                             </div>
                         </div>
@@ -2154,23 +2146,78 @@
         </div>
     </div>
     
+    <!-- 添加文章模态框 -->
+    <div class="modal" id="addArticleModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="articleModalTitle">添加新文章</h3>
+                <button class="close-modal" id="closeArticleModal">&times;</button>
+            </div>
+            
+            <div class="settings-form">
+                <input type="hidden" id="articleId">
+                
+                <div class="form-group">
+                    <label class="form-label">文章标题</label>
+                    <input type="text" class="form-control" id="articleTitle" placeholder="请输入文章标题">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">文章作者</label>
+                    <input type="text" class="form-control" id="articleAuthor" placeholder="请输入文章作者">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">文章分类</label>
+                    <select class="form-control" id="articleCategory">
+                        <option value="广告技巧">广告技巧</option>
+                        <option value="运营技巧">运营技巧</option>
+                        <option value="内容创作">内容创作</option>
+                        <option value="数据分析">数据分析</option>
+                        <option value="用户增长">用户增长</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">文章内容</label>
+                    <textarea class="form-control" id="articleContent" rows="5" placeholder="请输入文章内容"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">发布状态</label>
+                    <select class="form-control" id="articleStatus">
+                        <option value="published">已发布</option>
+                        <option value="draft">草稿</option>
+                    </select>
+                </div>
+                
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="cancelArticleBtn">取消</button>
+                    <button class="btn btn-primary" id="saveArticleBtn">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <!-- 添加广告模态框 -->
     <div class="modal" id="addAdModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">添加新广告</h3>
+                <h3 class="modal-title" id="adModalTitle">添加新广告</h3>
                 <button class="close-modal" id="closeAdModal">&times;</button>
             </div>
             
             <div class="settings-form">
+                <input type="hidden" id="adId">
+                
                 <div class="form-group">
                     <label class="form-label">广告名称</label>
-                    <input type="text" class="form-control" placeholder="请输入广告名称">
+                    <input type="text" class="form-control" id="adName" placeholder="请输入广告名称">
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">广告类型</label>
-                    <select class="form-control">
+                    <select class="form-control" id="adType">
                         <option value="image">图片广告</option>
                         <option value="text">文本广告</option>
                         <option value="video">视频广告</option>
@@ -2179,7 +2226,7 @@
                 
                 <div class="form-group">
                     <label class="form-label">广告位置</label>
-                    <select class="form-control">
+                    <select class="form-control" id="adPosition">
                         <option value="header">页面顶部</option>
                         <option value="content">内容区域</option>
                         <option value="sidebar">侧边栏</option>
@@ -2189,17 +2236,93 @@
                 
                 <div class="form-group">
                     <label class="form-label">广告链接</label>
-                    <input type="text" class="form-control" placeholder="请输入广告链接URL">
+                    <input type="text" class="form-control" id="adLink" placeholder="请输入广告链接URL">
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">广告描述</label>
-                    <textarea class="form-control" rows="3" placeholder="请输入广告描述"></textarea>
+                    <textarea class="form-control" id="adDescription" rows="3" placeholder="请输入广告描述"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">点击率 (%)</label>
+                    <input type="number" class="form-control" id="adClickRate" placeholder="请输入点击率" step="0.1" min="0" max="100">
                 </div>
                 
                 <div class="modal-footer">
                     <button class="btn btn-secondary" id="cancelAdBtn">取消</button>
                     <button class="btn btn-primary" id="saveAdBtn">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 添加用户模态框 -->
+    <div class="modal" id="addUserModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="userModalTitle">添加新用户</h3>
+                <button class="close-modal" id="closeUserModal">&times;</button>
+            </div>
+            
+            <div class="settings-form">
+                <input type="hidden" id="userId">
+                
+                <div class="form-group">
+                    <label class="form-label">姓名</label>
+                    <input type="text" class="form-control" id="userName" placeholder="请输入姓名">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">邮箱</label>
+                    <input type="email" class="form-control" id="userEmail" placeholder="请输入邮箱">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">密码</label>
+                    <input type="password" class="form-control" id="userPassword" placeholder="请输入密码">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">角色</label>
+                    <select class="form-control" id="userRole">
+                        <option value="超级管理员">超级管理员</option>
+                        <option value="管理员">管理员</option>
+                        <option value="编辑">编辑</option>
+                        <option value="普通用户">普通用户</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">状态</label>
+                    <select class="form-control" id="userStatus">
+                        <option value="active">活跃</option>
+                        <option value="inactive">不活跃</option>
+                    </select>
+                </div>
+                
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="cancelUserBtn">取消</button>
+                    <button class="btn btn-primary" id="saveUserBtn">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 确认删除模态框 -->
+    <div class="modal" id="confirmDeleteModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3 class="modal-title">确认删除</h3>
+                <button class="close-modal" id="closeConfirmDeleteModal">&times;</button>
+            </div>
+            
+            <div class="settings-form">
+                <p style="margin-bottom: 20px;">确定要删除此项目吗？此操作无法撤销。</p>
+                
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="cancelDeleteBtn">取消</button>
+                    <button class="btn btn-danger" id="confirmDeleteBtn">删除</button>
                 </div>
             </div>
         </div>
@@ -2216,12 +2339,121 @@
         <button class="notification-close">&times;</button>
     </div>
     
+    <!-- 隐藏的文件输入 -->
+    <input type="file" id="importFileInput" accept=".json" style="display: none;">
+    
     <script>
-        // 初始化用户数据
-        function initUserData() {
-            // 检查是否已有用户数据
+        // 初始化数据
+        function initData() {
+            // 检查是否已有数据
+            if (!localStorage.getItem('articles')) {
+                // 创建默认文章数据
+                const defaultArticles = [
+                    {
+                        id: 1,
+                        title: '如何提高广告点击率',
+                        author: '李春峰',
+                        category: '广告技巧',
+                        content: '本文将介绍如何通过优化广告内容和位置来提高点击率...',
+                        publishDate: '2023-06-15',
+                        status: 'published',
+                        views: 1250
+                    },
+                    {
+                        id: 2,
+                        title: '自媒体运营策略',
+                        author: '王明',
+                        category: '运营技巧',
+                        content: '本文将分享一些有效的自媒体运营策略，帮助您提升内容影响力...',
+                        publishDate: '2023-06-14',
+                        status: 'published',
+                        views: 980
+                    },
+                    {
+                        id: 3,
+                        title: '内容创作指南',
+                        author: '张华',
+                        category: '内容创作',
+                        content: '本文将提供一份全面的内容创作指南，帮助您创作出更优质的内容...',
+                        publishDate: '2023-06-13',
+                        status: 'draft',
+                        views: 875
+                    },
+                    {
+                        id: 4,
+                        title: '数据分析入门',
+                        author: '李春峰',
+                        category: '数据分析',
+                        content: '本文将介绍数据分析的基础知识和常用工具...',
+                        publishDate: '2023-06-12',
+                        status: 'published',
+                        views: 720
+                    },
+                    {
+                        id: 5,
+                        title: '用户增长技巧',
+                        author: '王明',
+                        category: '用户增长',
+                        content: '本文将分享一些有效的用户增长技巧，帮助您扩大用户群体...',
+                        publishDate: '2023-06-11',
+                        status: 'published',
+                        views: 650
+                    }
+                ];
+                
+                localStorage.setItem('articles', JSON.stringify(defaultArticles));
+            }
+            
+            if (!localStorage.getItem('ads')) {
+                // 创建默认广告数据
+                const defaultAds = [
+                    {
+                        id: 1,
+                        name: '横幅广告',
+                        type: 'image',
+                        position: 'header',
+                        link: 'https://example.com/banner',
+                        description: '适合网站顶部或底部的横幅广告位，支持多种尺寸和格式。',
+                        clickRate: 2.5,
+                        status: 'active'
+                    },
+                    {
+                        id: 2,
+                        name: '文章内嵌广告',
+                        type: 'text',
+                        position: 'content',
+                        link: 'https://example.com/embedded',
+                        description: '嵌入在文章内容中的广告，与内容自然融合，不影响阅读体验。',
+                        clickRate: 3.8,
+                        status: 'active'
+                    },
+                    {
+                        id: 3,
+                        name: '弹窗广告',
+                        type: 'image',
+                        position: 'content',
+                        link: 'https://example.com/popup',
+                        description: '在用户访问网站时弹出的广告，具有较高的曝光率和点击率。',
+                        clickRate: 5.2,
+                        status: 'active'
+                    },
+                    {
+                        id: 4,
+                        name: '视频广告',
+                        type: 'video',
+                        position: 'content',
+                        link: 'https://example.com/video',
+                        description: '在视频播放前、中或后展示的广告，适合品牌宣传和产品展示。',
+                        clickRate: 4.1,
+                        status: 'active'
+                    }
+                ];
+                
+                localStorage.setItem('ads', JSON.stringify(defaultAds));
+            }
+            
             if (!localStorage.getItem('users')) {
-                // 创建默认用户
+                // 创建默认用户数据
                 const defaultUsers = [
                     {
                         id: 1,
@@ -2275,6 +2507,33 @@
                 
                 localStorage.setItem('users', JSON.stringify(defaultUsers));
             }
+            
+            if (!localStorage.getItem('settings')) {
+                // 创建默认设置
+                const defaultSettings = {
+                    siteName: '自媒体广告系统',
+                    siteDescription: '专业的自媒体广告管理系统，提供全方位的广告投放和数据分析服务。',
+                    adminEmail: 'admin@example.com',
+                    contactPhone: '400-123-4567',
+                    smtpServer: 'smtp.example.com',
+                    smtpPort: '587',
+                    encryptionMethod: 'tls',
+                    senderEmail: 'noreply@example.com',
+                    senderName: '自媒体广告系统',
+                    passwordPolicy: 'medium',
+                    loginAttempts: 5,
+                    sessionTimeout: 30
+                };
+                
+                localStorage.setItem('settings', JSON.stringify(defaultSettings));
+            }
+            
+            if (!localStorage.getItem('backup')) {
+                localStorage.setItem('backup', JSON.stringify({
+                    lastBackupTime: null,
+                    backupSize: 0
+                }));
+            }
         }
         
         // 检查用户登录状态
@@ -2290,6 +2549,14 @@
                 
                 // 更新用户信息显示
                 updateUserInfo(currentUser);
+                
+                // 加载数据
+                loadDashboardData();
+                loadArticles();
+                loadAds();
+                loadUsers();
+                loadDataManagement();
+                loadSettings();
                 
                 // 初始化仪表板图表
                 initDashboardCharts();
@@ -2316,6 +2583,370 @@
             document.getElementById('profileUsernameInput').value = user.username;
             document.getElementById('profileEmailInput').value = user.email;
             document.getElementById('profilePositionInput').value = user.position;
+        }
+        
+        // 加载仪表板数据
+        function loadDashboardData() {
+            const articles = JSON.parse(localStorage.getItem('articles')) || [];
+            const ads = JSON.parse(localStorage.getItem('ads')) || [];
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            
+            document.getElementById('totalArticles').textContent = articles.length;
+            document.getElementById('totalAds').textContent = ads.length;
+            document.getElementById('totalUsers').textContent = users.length;
+        }
+        
+        // 加载文章数据
+        function loadArticles(page = 1, search = '') {
+            const articles = JSON.parse(localStorage.getItem('articles')) || [];
+            const articlesTableBody = document.getElementById('articlesTableBody');
+            const articlesPaginationInfo = document.getElementById('articlesPaginationInfo');
+            const articlesPagination = document.getElementById('articlesPagination');
+            
+            // 过滤搜索结果
+            let filteredArticles = articles;
+            if (search) {
+                filteredArticles = articles.filter(article => 
+                    article.title.toLowerCase().includes(search.toLowerCase()) ||
+                    article.author.toLowerCase().includes(search.toLowerCase()) ||
+                    article.category.toLowerCase().includes(search.toLowerCase())
+                );
+            }
+            
+            // 分页设置
+            const itemsPerPage = 5;
+            const totalPages = Math.ceil(filteredArticles.length / itemsPerPage);
+            const startIndex = (page - 1) * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, filteredArticles.length);
+            const currentPageArticles = filteredArticles.slice(startIndex, endIndex);
+            
+            // 清空表格
+            articlesTableBody.innerHTML = '';
+            
+            // 填充表格
+            currentPageArticles.forEach(article => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${article.title}</td>
+                    <td>${article.author}</td>
+                    <td>${article.category}</td>
+                    <td>${article.publishDate}</td>
+                    <td><span class="status-badge ${article.status === 'published' ? 'status-active' : 'status-inactive'}">${article.status === 'published' ? '已发布' : '草稿'}</span></td>
+                    <td>
+                        <div class="user-actions">
+                            <button class="action-btn edit" title="编辑" data-id="${article.id}"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn delete" title="删除" data-id="${article.id}"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                `;
+                
+                articlesTableBody.appendChild(row);
+            });
+            
+            // 更新分页信息
+            articlesPaginationInfo.textContent = `显示 ${startIndex + 1}-${endIndex} 共 ${filteredArticles.length} 条记录`;
+            
+            // 生成分页按钮
+            articlesPagination.innerHTML = '';
+            
+            // 上一页按钮
+            const prevBtn = document.createElement('button');
+            prevBtn.className = `btn btn-sm ${page === 1 ? 'btn-secondary' : 'btn-primary'}`;
+            prevBtn.textContent = '上一页';
+            prevBtn.disabled = page === 1;
+            prevBtn.addEventListener('click', () => loadArticles(page - 1, search));
+            articlesPagination.appendChild(prevBtn);
+            
+            // 页码按钮
+            for (let i = 1; i <= totalPages; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.className = `btn btn-sm ${i === page ? 'btn-primary' : 'btn-secondary'}`;
+                pageBtn.textContent = i;
+                pageBtn.addEventListener('click', () => loadArticles(i, search));
+                articlesPagination.appendChild(pageBtn);
+            }
+            
+            // 下一页按钮
+            const nextBtn = document.createElement('button');
+            nextBtn.className = `btn btn-sm ${page === totalPages ? 'btn-secondary' : 'btn-primary'}`;
+            nextBtn.textContent = '下一页';
+            nextBtn.disabled = page === totalPages || totalPages === 0;
+            nextBtn.addEventListener('click', () => loadArticles(page + 1, search));
+            articlesPagination.appendChild(nextBtn);
+            
+            // 添加编辑和删除事件监听
+            document.querySelectorAll('#articlesTableBody .action-btn.edit').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const articleId = parseInt(this.getAttribute('data-id'));
+                    editArticle(articleId);
+                });
+            });
+            
+            document.querySelectorAll('#articlesTableBody .action-btn.delete').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const articleId = parseInt(this.getAttribute('data-id'));
+                    confirmDelete('article', articleId);
+                });
+            });
+        }
+        
+        // 加载广告数据
+        function loadAds(search = '') {
+            const ads = JSON.parse(localStorage.getItem('ads')) || [];
+            const adsContainer = document.getElementById('adsContainer');
+            
+            // 过滤搜索结果
+            let filteredAds = ads;
+            if (search) {
+                filteredAds = ads.filter(ad => 
+                    ad.name.toLowerCase().includes(search.toLowerCase()) ||
+                    ad.description.toLowerCase().includes(search.toLowerCase())
+                );
+            }
+            
+            // 清空容器
+            adsContainer.innerHTML = '';
+            
+            // 填充广告卡片
+            filteredAds.forEach(ad => {
+                const adCard = document.createElement('div');
+                adCard.className = 'template-card';
+                
+                let typeBadgeClass = '';
+                let typeText = '';
+                
+                switch (ad.type) {
+                    case 'image':
+                        typeBadgeClass = 'template-type-image';
+                        typeText = '图片广告';
+                        break;
+                    case 'text':
+                        typeBadgeClass = 'template-type-text';
+                        typeText = '文本广告';
+                        break;
+                    case 'video':
+                        typeBadgeClass = 'template-type-image';
+                        typeText = '视频广告';
+                        break;
+                }
+                
+                adCard.innerHTML = `
+                    <div class="template-header">
+                        <h3 class="template-title">${ad.name}</h3>
+                        <span class="template-badge ${typeBadgeClass}">${typeText}</span>
+                    </div>
+                    <div class="template-content">
+                        <p>${ad.description}</p>
+                    </div>
+                    <div class="template-footer">
+                        <div>点击率: ${ad.clickRate}%</div>
+                        <div class="template-actions">
+                            <button class="btn btn-sm btn-primary edit-ad" data-id="${ad.id}">编辑</button>
+                            <button class="btn btn-sm btn-danger delete-ad" data-id="${ad.id}">删除</button>
+                        </div>
+                    </div>
+                `;
+                
+                adsContainer.appendChild(adCard);
+            });
+            
+            // 添加编辑和删除事件监听器
+            document.querySelectorAll('.edit-ad').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const adId = parseInt(this.getAttribute('data-id'));
+                    editAd(adId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-ad').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const adId = parseInt(this.getAttribute('data-id'));
+                    confirmDelete('ad', adId);
+                });
+            });
+        }
+        
+        // 加载用户数据
+        function loadUsers(page = 1, search = '') {
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const usersTableBody = document.getElementById('usersTableBody');
+            const usersPaginationInfo = document.getElementById('usersPaginationInfo');
+            const usersPagination = document.getElementById('usersPagination');
+            
+            // 过滤搜索结果
+            let filteredUsers = users;
+            if (search) {
+                filteredUsers = users.filter(user => 
+                    user.name.toLowerCase().includes(search.toLowerCase()) ||
+                    user.email.toLowerCase().includes(search.toLowerCase()) ||
+                    user.role.toLowerCase().includes(search.toLowerCase())
+                );
+            }
+            
+            // 分页设置
+            const itemsPerPage = 5;
+            const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+            const startIndex = (page - 1) * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, filteredUsers.length);
+            const currentPageUsers = filteredUsers.slice(startIndex, endIndex);
+            
+            // 清空表格
+            usersTableBody.innerHTML = '';
+            
+            // 填充表格
+            currentPageUsers.forEach(user => {
+                const row = document.createElement('tr');
+                
+                let roleBadgeClass = '';
+                
+                switch (user.role) {
+                    case '超级管理员':
+                        roleBadgeClass = 'role-super-admin';
+                        break;
+                    case '管理员':
+                        roleBadgeClass = 'role-admin';
+                        break;
+                    case '编辑':
+                        roleBadgeClass = 'role-editor';
+                        break;
+                    default:
+                        roleBadgeClass = 'role-user';
+                }
+                
+                row.innerHTML = `
+                    <td>
+                        <div class="user-cell">
+                            <div class="user-avatar-small">${user.avatar}</div>
+                            <div>
+                                <div class="user-name-cell">${user.name}</div>
+                                <div class="user-email">${user.email}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="role-badge ${roleBadgeClass}">${user.role}</span></td>
+                    <td>${user.lastLogin}</td>
+                    <td>${user.lastLogin}</td>
+                    <td><span class="status-badge ${user.status === 'active' ? 'status-active' : 'status-inactive'}">${user.status === 'active' ? '活跃' : '不活跃'}</span></td>
+                    <td>
+                        <div class="user-actions">
+                            <button class="action-btn edit" title="编辑" data-id="${user.id}"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn delete" title="删除" data-id="${user.id}"><i class="fas fa-trash"></i></button>
+                            <button class="action-btn lock" title="${user.status === 'active' ? '锁定' : '解锁'}" data-id="${user.id}"><i class="fas fa-${user.status === 'active' ? 'lock' : 'unlock'}"></i></button>
+                        </div>
+                    </td>
+                `;
+                
+                usersTableBody.appendChild(row);
+            });
+            
+            // 更新分页信息
+            usersPaginationInfo.textContent = `显示 ${startIndex + 1}-${endIndex} 共 ${filteredUsers.length} 条记录`;
+            
+            // 生成分页按钮
+            usersPagination.innerHTML = '';
+            
+            // 上一页按钮
+            const prevBtn = document.createElement('button');
+            prevBtn.className = `btn btn-sm ${page === 1 ? 'btn-secondary' : 'btn-primary'}`;
+            prevBtn.textContent = '上一页';
+            prevBtn.disabled = page === 1;
+            prevBtn.addEventListener('click', () => loadUsers(page - 1, search));
+            usersPagination.appendChild(prevBtn);
+            
+            // 页码按钮
+            for (let i = 1; i <= totalPages; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.className = `btn btn-sm ${i === page ? 'btn-primary' : 'btn-secondary'}`;
+                pageBtn.textContent = i;
+                pageBtn.addEventListener('click', () => loadUsers(i, search));
+                usersPagination.appendChild(pageBtn);
+            }
+            
+            // 下一页按钮
+            const nextBtn = document.createElement('button');
+            nextBtn.className = `btn btn-sm ${page === totalPages ? 'btn-secondary' : 'btn-primary'}`;
+            nextBtn.textContent = '下一页';
+            nextBtn.disabled = page === totalPages || totalPages === 0;
+            nextBtn.addEventListener('click', () => loadUsers(page + 1, search));
+            usersPagination.appendChild(nextBtn);
+            
+            // 添加编辑、删除和锁定事件监听器
+            document.querySelectorAll('#usersTableBody .action-btn.edit').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const userId = parseInt(this.getAttribute('data-id'));
+                    editUser(userId);
+                });
+            });
+            
+            document.querySelectorAll('#usersTableBody .action-btn.delete').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const userId = parseInt(this.getAttribute('data-id'));
+                    confirmDelete('user', userId);
+                });
+            });
+            
+            document.querySelectorAll('#usersTableBody .action-btn.lock').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const userId = parseInt(this.getAttribute('data-id'));
+                    toggleUserStatus(userId);
+                });
+            });
+        }
+        
+        // 加载数据管理页面
+        function loadDataManagement() {
+            const articles = JSON.parse(localStorage.getItem('articles')) || [];
+            const ads = JSON.parse(localStorage.getItem('ads')) || [];
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const backup = JSON.parse(localStorage.getItem('backup')) || { lastBackupTime: null, backupSize: 0 };
+            
+            // 更新数据统计
+            document.getElementById('dataArticlesCount').textContent = articles.length;
+            document.getElementById('dataAdsCount').textContent = ads.length;
+            document.getElementById('dataUsersCount').textContent = users.length;
+            
+            // 计算数据大小
+            const dataSize = new Blob([JSON.stringify({ articles, ads, users })]).size;
+            document.getElementById('dataTotalSize').textContent = formatFileSize(dataSize);
+            
+            // 更新备份信息
+            document.getElementById('lastBackupTime').textContent = backup.lastBackupTime || '从未备份';
+            document.getElementById('backupSize').textContent = formatFileSize(backup.backupSize);
+        }
+        
+        // 加载设置
+        function loadSettings() {
+            const settings = JSON.parse(localStorage.getItem('settings')) || {};
+            
+            // 基本设置
+            document.getElementById('siteName').value = settings.siteName || '';
+            document.getElementById('siteDescription').value = settings.siteDescription || '';
+            document.getElementById('adminEmail').value = settings.adminEmail || '';
+            document.getElementById('contactPhone').value = settings.contactPhone || '';
+            
+            // 邮件设置
+            document.getElementById('smtpServer').value = settings.smtpServer || '';
+            document.getElementById('smtpPort').value = settings.smtpPort || '';
+            document.getElementById('encryptionMethod').value = settings.encryptionMethod || 'tls';
+            document.getElementById('senderEmail').value = settings.senderEmail || '';
+            document.getElementById('senderName').value = settings.senderName || '';
+            
+            // 安全设置
+            document.getElementById('passwordPolicy').value = settings.passwordPolicy || 'medium';
+            document.getElementById('loginAttempts').value = settings.loginAttempts || 5;
+            document.getElementById('sessionTimeout').value = settings.sessionTimeout || 30;
+        }
+        
+        // 格式化文件大小
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
         
         // 登录功能
@@ -2621,11 +3252,6 @@
         const navItems = document.querySelectorAll('.nav-item');
         const pageContents = document.querySelectorAll('.page-content');
         const currentPageTitle = document.getElementById('currentPageTitle');
-        const addAdBtn = document.getElementById('addAdBtn');
-        const addAdModal = document.getElementById('addAdModal');
-        const closeAdModal = document.getElementById('closeAdModal');
-        const cancelAdBtn = document.getElementById('cancelAdBtn');
-        const saveAdBtn = document.getElementById('saveAdBtn');
         const notification = document.getElementById('notification');
         const notificationClose = document.querySelector('.notification-close');
         const profileTabs = document.querySelectorAll('.profile-tab');
@@ -2690,31 +3316,6 @@
             });
         });
         
-        // 添加广告模态框
-        addAdBtn.addEventListener('click', function() {
-            addAdModal.style.display = 'flex';
-        });
-        
-        closeAdModal.addEventListener('click', function() {
-            addAdModal.style.display = 'none';
-        });
-        
-        cancelAdBtn.addEventListener('click', function() {
-            addAdModal.style.display = 'none';
-        });
-        
-        saveAdBtn.addEventListener('click', function() {
-            addAdModal.style.display = 'none';
-            showNotification('广告已成功添加', 'success');
-        });
-        
-        // 点击模态框外部关闭
-        window.addEventListener('click', function(event) {
-            if (event.target === addAdModal) {
-                addAdModal.style.display = 'none';
-            }
-        });
-        
         // 通知功能
         function showNotification(message, type = 'success') {
             const notification = document.getElementById('notification');
@@ -2751,36 +3352,589 @@
             notification.classList.remove('show');
         });
         
-        // 表格操作按钮
-        document.querySelectorAll('.action-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const action = this.classList.contains('edit') ? '编辑' : 
-                              this.classList.contains('delete') ? '删除' : '锁定';
-                showNotification(`${action}操作已执行`, 'info');
-            });
+        // 文章搜索
+        document.getElementById('articleSearchBtn').addEventListener('click', function() {
+            const search = document.getElementById('articleSearchInput').value;
+            loadArticles(1, search);
         });
         
-        // 保存按钮
-        document.querySelectorAll('.btn-primary').forEach(btn => {
-            if (btn.textContent.includes('保存') && btn.id !== 'saveProfileBtn' && btn.id !== 'changePasswordBtn') {
-                btn.addEventListener('click', function() {
-                    showNotification('设置已成功保存', 'success');
-                });
+        // 添加文章
+        document.getElementById('addArticleBtn').addEventListener('click', function() {
+            document.getElementById('articleModalTitle').textContent = '添加新文章';
+            document.getElementById('articleId').value = '';
+            document.getElementById('articleTitle').value = '';
+            document.getElementById('articleAuthor').value = '';
+            document.getElementById('articleCategory').value = '广告技巧';
+            document.getElementById('articleContent').value = '';
+            document.getElementById('articleStatus').value = 'published';
+            document.getElementById('addArticleModal').style.display = 'flex';
+        });
+        
+        // 关闭文章模态框
+        document.getElementById('closeArticleModal').addEventListener('click', function() {
+            document.getElementById('addArticleModal').style.display = 'none';
+        });
+        
+        document.getElementById('cancelArticleBtn').addEventListener('click', function() {
+            document.getElementById('addArticleModal').style.display = 'none';
+        });
+        
+        // 保存文章
+        document.getElementById('saveArticleBtn').addEventListener('click', function() {
+            const articleId = document.getElementById('articleId').value;
+            const title = document.getElementById('articleTitle').value;
+            const author = document.getElementById('articleAuthor').value;
+            const category = document.getElementById('articleCategory').value;
+            const content = document.getElementById('articleContent').value;
+            const status = document.getElementById('articleStatus').value;
+            
+            if (!title || !author || !content) {
+                showNotification('请填写所有必填字段！', 'error');
+                return;
+            }
+            
+            const articles = JSON.parse(localStorage.getItem('articles')) || [];
+            
+            if (articleId) {
+                // 编辑现有文章
+                const index = articles.findIndex(a => a.id === parseInt(articleId));
+                if (index !== -1) {
+                    articles[index] = {
+                        ...articles[index],
+                        title,
+                        author,
+                        category,
+                        content,
+                        status
+                    };
+                }
+            } else {
+                // 添加新文章
+                const newArticle = {
+                    id: articles.length > 0 ? Math.max(...articles.map(a => a.id)) + 1 : 1,
+                    title,
+                    author,
+                    category,
+                    content,
+                    publishDate: new Date().toISOString().split('T')[0],
+                    status,
+                    views: 0
+                };
+                
+                articles.push(newArticle);
+            }
+            
+            localStorage.setItem('articles', JSON.stringify(articles));
+            
+            document.getElementById('addArticleModal').style.display = 'none';
+            
+            loadArticles();
+            loadDashboardData();
+            
+            showNotification(articleId ? '文章已更新！' : '文章已添加！', 'success');
+        });
+        
+        // 编辑文章
+        function editArticle(articleId) {
+            const articles = JSON.parse(localStorage.getItem('articles')) || [];
+            const article = articles.find(a => a.id === articleId);
+            
+            if (article) {
+                document.getElementById('articleModalTitle').textContent = '编辑文章';
+                document.getElementById('articleId').value = article.id;
+                document.getElementById('articleTitle').value = article.title;
+                document.getElementById('articleAuthor').value = article.author;
+                document.getElementById('articleCategory').value = article.category;
+                document.getElementById('articleContent').value = article.content;
+                document.getElementById('articleStatus').value = article.status;
+                document.getElementById('addArticleModal').style.display = 'flex';
+            }
+        }
+        
+        // 广告搜索
+        document.getElementById('adSearchBtn').addEventListener('click', function() {
+            const search = document.getElementById('adSearchInput').value;
+            loadAds(search);
+        });
+        
+        // 添加广告
+        document.getElementById('addAdBtn').addEventListener('click', function() {
+            document.getElementById('adModalTitle').textContent = '添加新广告';
+            document.getElementById('adId').value = '';
+            document.getElementById('adName').value = '';
+            document.getElementById('adType').value = 'image';
+            document.getElementById('adPosition').value = 'header';
+            document.getElementById('adLink').value = '';
+            document.getElementById('adDescription').value = '';
+            document.getElementById('adClickRate').value = '';
+            document.getElementById('addAdModal').style.display = 'flex';
+        });
+        
+        // 关闭广告模态框
+        document.getElementById('closeAdModal').addEventListener('click', function() {
+            document.getElementById('addAdModal').style.display = 'none';
+        });
+        
+        document.getElementById('cancelAdBtn').addEventListener('click', function() {
+            document.getElementById('addAdModal').style.display = 'none';
+        });
+        
+        // 保存广告
+        document.getElementById('saveAdBtn').addEventListener('click', function() {
+            const adId = document.getElementById('adId').value;
+            const name = document.getElementById('adName').value;
+            const type = document.getElementById('adType').value;
+            const position = document.getElementById('adPosition').value;
+            const link = document.getElementById('adLink').value;
+            const description = document.getElementById('adDescription').value;
+            const clickRate = parseFloat(document.getElementById('adClickRate').value);
+            
+            if (!name || !link || !description || isNaN(clickRate)) {
+                showNotification('请填写所有必填字段！', 'error');
+                return;
+            }
+            
+            const ads = JSON.parse(localStorage.getItem('ads')) || [];
+            
+            if (adId) {
+                // 编辑现有广告
+                const index = ads.findIndex(a => a.id === parseInt(adId));
+                if (index !== -1) {
+                    ads[index] = {
+                        ...ads[index],
+                        name,
+                        type,
+                        position,
+                        link,
+                        description,
+                        clickRate
+                    };
+                }
+            } else {
+                // 添加新广告
+                const newAd = {
+                    id: ads.length > 0 ? Math.max(...ads.map(a => a.id)) + 1 : 1,
+                    name,
+                    type,
+                    position,
+                    link,
+                    description,
+                    clickRate,
+                    status: 'active'
+                };
+                
+                ads.push(newAd);
+            }
+            
+            localStorage.setItem('ads', JSON.stringify(ads));
+            
+            document.getElementById('addAdModal').style.display = 'none';
+            
+            loadAds();
+            loadDashboardData();
+            
+            showNotification(adId ? '广告已更新！' : '广告已添加！', 'success');
+        });
+        
+        // 编辑广告
+        function editAd(adId) {
+            const ads = JSON.parse(localStorage.getItem('ads')) || [];
+            const ad = ads.find(a => a.id === adId);
+            
+            if (ad) {
+                document.getElementById('adModalTitle').textContent = '编辑广告';
+                document.getElementById('adId').value = ad.id;
+                document.getElementById('adName').value = ad.name;
+                document.getElementById('adType').value = ad.type;
+                document.getElementById('adPosition').value = ad.position;
+                document.getElementById('adLink').value = ad.link;
+                document.getElementById('adDescription').value = ad.description;
+                document.getElementById('adClickRate').value = ad.clickRate;
+                document.getElementById('addAdModal').style.display = 'flex';
+            }
+        }
+        
+        // 用户搜索
+        document.getElementById('userSearchBtn').addEventListener('click', function() {
+            const search = document.getElementById('userSearchInput').value;
+            loadUsers(1, search);
+        });
+        
+        // 添加用户
+        document.getElementById('addUserBtn').addEventListener('click', function() {
+            document.getElementById('userModalTitle').textContent = '添加新用户';
+            document.getElementById('userId').value = '';
+            document.getElementById('userName').value = '';
+            document.getElementById('userEmail').value = '';
+            document.getElementById('userPassword').value = '';
+            document.getElementById('userRole').value = '普通用户';
+            document.getElementById('userStatus').value = 'active';
+            document.getElementById('addUserModal').style.display = 'flex';
+        });
+        
+        // 关闭用户模态框
+        document.getElementById('closeUserModal').addEventListener('click', function() {
+            document.getElementById('addUserModal').style.display = 'none';
+        });
+        
+        document.getElementById('cancelUserBtn').addEventListener('click', function() {
+            document.getElementById('addUserModal').style.display = 'none';
+        });
+        
+        // 保存用户
+        document.getElementById('saveUserBtn').addEventListener('click', function() {
+            const userId = document.getElementById('userId').value;
+            const name = document.getElementById('userName').value;
+            const email = document.getElementById('userEmail').value;
+            const password = document.getElementById('userPassword').value;
+            const role = document.getElementById('userRole').value;
+            const status = document.getElementById('userStatus').value;
+            
+            if (!name || !email || (!userId && !password)) {
+                showNotification('请填写所有必填字段！', 'error');
+                return;
+            }
+            
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            
+            if (userId) {
+                // 编辑现有用户
+                const index = users.findIndex(u => u.id === parseInt(userId));
+                if (index !== -1) {
+                    users[index] = {
+                        ...users[index],
+                        name,
+                        email,
+                        role,
+                        status,
+                        avatar: name.charAt(0)
+                    };
+                    
+                    // 只有在提供了新密码时才更新密码
+                    if (password) {
+                        users[index].password = password;
+                    }
+                }
+            } else {
+                // 检查邮箱是否已存在
+                if (users.some(u => u.email === email)) {
+                    showNotification('该邮箱已被注册！', 'error');
+                    return;
+                }
+                
+                // 添加新用户
+                const newUser = {
+                    id: users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1,
+                    name,
+                    username: email.split('@')[0],
+                    email,
+                    password,
+                    role,
+                    position: role,
+                    avatar: name.charAt(0),
+                    status,
+                    lastLogin: new Date().toISOString().split('T')[0]
+                };
+                
+                users.push(newUser);
+            }
+            
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            document.getElementById('addUserModal').style.display = 'none';
+            
+            loadUsers();
+            loadDashboardData();
+            
+            showNotification(userId ? '用户已更新！' : '用户已添加！', 'success');
+        });
+        
+        // 编辑用户
+        function editUser(userId) {
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const user = users.find(u => u.id === userId);
+            
+            if (user) {
+                document.getElementById('userModalTitle').textContent = '编辑用户';
+                document.getElementById('userId').value = user.id;
+                document.getElementById('userName').value = user.name;
+                document.getElementById('userEmail').value = user.email;
+                document.getElementById('userPassword').value = '';
+                document.getElementById('userRole').value = user.role;
+                document.getElementById('userStatus').value = user.status;
+                document.getElementById('addUserModal').style.display = 'flex';
+            }
+        }
+        
+        // 切换用户状态
+        function toggleUserStatus(userId) {
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const index = users.findIndex(u => u.id === userId);
+            
+            if (index !== -1) {
+                users[index].status = users[index].status === 'active' ? 'inactive' : 'active';
+                localStorage.setItem('users', JSON.stringify(users));
+                
+                loadUsers();
+                
+                showNotification(`用户已${users[index].status === 'active' ? '解锁' : '锁定'}！`, 'success');
+            }
+        }
+        
+        // 确认删除
+        let deleteType = '';
+        let deleteId = null;
+        
+        function confirmDelete(type, id) {
+            deleteType = type;
+            deleteId = id;
+            document.getElementById('confirmDeleteModal').style.display = 'flex';
+        }
+        
+        // 关闭确认删除模态框
+        document.getElementById('closeConfirmDeleteModal').addEventListener('click', function() {
+            document.getElementById('confirmDeleteModal').style.display = 'none';
+        });
+        
+        document.getElementById('cancelDeleteBtn').addEventListener('click', function() {
+            document.getElementById('confirmDeleteModal').style.display = 'none';
+        });
+        
+        // 确认删除
+        document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+            if (deleteType === 'article') {
+                const articles = JSON.parse(localStorage.getItem('articles')) || [];
+                const filteredArticles = articles.filter(a => a.id !== deleteId);
+                localStorage.setItem('articles', JSON.stringify(filteredArticles));
+                
+                loadArticles();
+                loadDashboardData();
+                
+                showNotification('文章已删除！', 'success');
+            } else if (deleteType === 'ad') {
+                const ads = JSON.parse(localStorage.getItem('ads')) || [];
+                const filteredAds = ads.filter(a => a.id !== deleteId);
+                localStorage.setItem('ads', JSON.stringify(filteredAds));
+                
+                loadAds();
+                loadDashboardData();
+                
+                showNotification('广告已删除！', 'success');
+            } else if (deleteType === 'user') {
+                const users = JSON.parse(localStorage.getItem('users')) || [];
+                const filteredUsers = users.filter(u => u.id !== deleteId);
+                localStorage.setItem('users', JSON.stringify(filteredUsers));
+                
+                loadUsers();
+                loadDashboardData();
+                
+                showNotification('用户已删除！', 'success');
+            }
+            
+            document.getElementById('confirmDeleteModal').style.display = 'none';
+        });
+        
+        // 数据管理功能
+        // 导出数据
+        document.getElementById('exportDataBtn').addEventListener('click', function() {
+            const articles = JSON.parse(localStorage.getItem('articles')) || [];
+            const ads = JSON.parse(localStorage.getItem('ads')) || [];
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const settings = JSON.parse(localStorage.getItem('settings')) || {};
+            
+            const data = {
+                articles,
+                ads,
+                users,
+                settings,
+                exportDate: new Date().toISOString()
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = '自媒体广告系统数据_' + new Date().toISOString().split('T')[0] + '.json';
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showNotification('数据已导出！', 'success');
+        });
+        
+        // 导入数据
+        document.getElementById('importDataBtn').addEventListener('click', function() {
+            document.getElementById('importFileInput').click();
+        });
+        
+        document.getElementById('importFileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (data.articles) {
+                        localStorage.setItem('articles', JSON.stringify(data.articles));
+                    }
+                    
+                    if (data.ads) {
+                        localStorage.setItem('ads', JSON.stringify(data.ads));
+                    }
+                    
+                    if (data.users) {
+                        localStorage.setItem('users', JSON.stringify(data.users));
+                    }
+                    
+                    if (data.settings) {
+                        localStorage.setItem('settings', JSON.stringify(data.settings));
+                    }
+                    
+                    // 重新加载数据
+                    loadDashboardData();
+                    loadArticles();
+                    loadAds();
+                    loadUsers();
+                    loadDataManagement();
+                    loadSettings();
+                    
+                    showNotification('数据已导入！', 'success');
+                } catch (error) {
+                    showNotification('导入失败：无效的数据格式！', 'error');
+                }
+            };
+            reader.readAsText(file);
+            
+            // 重置文件输入
+            this.value = '';
+        });
+        
+        // 备份数据
+        document.getElementById('backupDataBtn').addEventListener('click', function() {
+            const articles = JSON.parse(localStorage.getItem('articles')) || [];
+            const ads = JSON.parse(localStorage.getItem('ads')) || [];
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const settings = JSON.parse(localStorage.getItem('settings')) || {};
+            
+            const data = {
+                articles,
+                ads,
+                users,
+                settings,
+                backupDate: new Date().toISOString()
+            };
+            
+            const backup = {
+                lastBackupTime: new Date().toLocaleString(),
+                backupSize: new Blob([JSON.stringify(data)]).size
+            };
+            
+            localStorage.setItem('backup', JSON.stringify(backup));
+            localStorage.setItem('dataBackup', JSON.stringify(data));
+            
+            loadDataManagement();
+            
+            showNotification('数据已备份！', 'success');
+        });
+        
+        // 恢复数据
+        document.getElementById('restoreDataBtn').addEventListener('click', function() {
+            const dataBackup = JSON.parse(localStorage.getItem('dataBackup'));
+            
+            if (!dataBackup) {
+                showNotification('没有可用的备份！', 'error');
+                return;
+            }
+            
+            if (confirm('确定要恢复数据吗？当前数据将被覆盖。')) {
+                if (dataBackup.articles) {
+                    localStorage.setItem('articles', JSON.stringify(dataBackup.articles));
+                }
+                
+                if (dataBackup.ads) {
+                    localStorage.setItem('ads', JSON.stringify(dataBackup.ads));
+                }
+                
+                if (dataBackup.users) {
+                    localStorage.setItem('users', JSON.stringify(dataBackup.users));
+                }
+                
+                if (dataBackup.settings) {
+                    localStorage.setItem('settings', JSON.stringify(dataBackup.settings));
+                }
+                
+                // 重新加载数据
+                loadDashboardData();
+                loadArticles();
+                loadAds();
+                loadUsers();
+                loadDataManagement();
+                loadSettings();
+                
+                showNotification('数据已恢复！', 'success');
             }
         });
         
-        // 搜索按钮
-        document.querySelectorAll('.user-search .btn-primary').forEach(btn => {
-            btn.addEventListener('click', function() {
-                showNotification('搜索完成', 'info');
-            });
+        // 清除所有数据
+        document.getElementById('clearAllDataBtn').addEventListener('click', function() {
+            if (confirm('确定要清除所有数据吗？此操作不可撤销！')) {
+                localStorage.removeItem('articles');
+                localStorage.removeItem('ads');
+                localStorage.removeItem('users');
+                localStorage.removeItem('settings');
+                localStorage.removeItem('backup');
+                localStorage.removeItem('dataBackup');
+                
+                // 重新初始化数据
+                initData();
+                
+                // 重新加载数据
+                loadDashboardData();
+                loadArticles();
+                loadAds();
+                loadUsers();
+                loadDataManagement();
+                loadSettings();
+                
+                showNotification('所有数据已清除！', 'success');
+            }
         });
         
-        // 分页按钮
-        document.querySelectorAll('.pagination .btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                showNotification('页面已切换', 'info');
-            });
+        // 保存设置
+        document.getElementById('saveSettingsBtn').addEventListener('click', function() {
+            const settings = {
+                siteName: document.getElementById('siteName').value,
+                siteDescription: document.getElementById('siteDescription').value,
+                adminEmail: document.getElementById('adminEmail').value,
+                contactPhone: document.getElementById('contactPhone').value,
+                smtpServer: document.getElementById('smtpServer').value,
+                smtpPort: document.getElementById('smtpPort').value,
+                encryptionMethod: document.getElementById('encryptionMethod').value,
+                senderEmail: document.getElementById('senderEmail').value,
+                senderName: document.getElementById('senderName').value,
+                passwordPolicy: document.getElementById('passwordPolicy').value,
+                loginAttempts: parseInt(document.getElementById('loginAttempts').value),
+                sessionTimeout: parseInt(document.getElementById('sessionTimeout').value)
+            };
+            
+            localStorage.setItem('settings', JSON.stringify(settings));
+            
+            showNotification('设置已保存！', 'success');
+        });
+        
+        document.getElementById('saveEmailSettingsBtn').addEventListener('click', function() {
+            document.getElementById('saveSettingsBtn').click();
+        });
+        
+        document.getElementById('saveSecuritySettingsBtn').addEventListener('click', function() {
+            document.getElementById('saveSettingsBtn').click();
+        });
+        
+        document.getElementById('saveNotificationsBtn').addEventListener('click', function() {
+            showNotification('通知设置已保存！', 'success');
         });
         
         // 响应式侧边栏
@@ -3048,38 +4202,38 @@
         });
         
         document.getElementById('monthBtn').addEventListener('click', function() {
-            document.getElementById('monthBtn').classList.add('btn-primary');
-            document.getElementById('monthBtn').classList.remove('btn-secondary');
-            document.getElementById('weekBtn').classList.remove('btn-primary');
-            document.getElementById('weekBtn').classList.add('btn-secondary');
-            document.getElementById('yearBtn').classList.remove('btn-primary');
-            document.getElementById('yearBtn').classList.add('btn-secondary');
+            文档.元素('月度按钮').类列表.添加('按钮-主');
+            文档.元素('月度按钮').类列表.消除('按钮-次要');
+            文档.元素('weekBtn').类列表.消除('按钮-主');
+            文档.元素('weekBtn').类列表.添加('按钮-次要');文档.元素('weekBtn').类列表.添加('按钮-次要');
+            文档.元素('年票').类列表.;
+            文档.元素('年票').类列表.添加('按钮-次要');
             
             // 更新图表数据
-            revenueChart.data.labels = ['第1周', '第2周', '第3周', '第4周'];
-            revenueChart.data.datasets[0].data = [8500, 9200, 10500, 11800];
-            revenueChart.update();
-        });
+            收入图表.数据.标签 = ['第1周', '第2周', '第3周', '第4周'];
+            收入图表.数据.数据集[0].数据 = [8500, 9200, 10500, 11800];
+            收入图表.更新();
+        });});
         
-        document.getElementById('yearBtn').addEventListener('click', function() {
-            document.getElementById('yearBtn').classList.add('btn-primary');
-            document.getElementById('yearBtn').classList.remove('btn-secondary');
-            document.getElementById('weekBtn').classList.remove('btn-primary');
-            document.getElementById('weekBtn').classList.add('btn-secondary');
-            document.getElementById('monthBtn').classList.remove('btn-primary');
-            document.getElementById('monthBtn').classList.add('btn-secondary');
+        文档.元素)
+文档.元素'年票'）.类列表.添加（'按钮-主'）；文件.元素('年票').类列表.添加('按钮-主');
+文档.元素'年票'）.类列表.移除（'按钮-次要'）；文件.元素('年票').类列表.消除('按钮-次要');
+文档.元素'weekBtn'）.类列表.移除（'按钮-主'）；文件.元素)'按钮-主''按钮-主'.类列表.消除('按钮-主'// 更新图表数据// 更新图表数据;);
+;
+)
+文档
             
-            // 更新图表数据
-            revenueChart.data.labels = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
-            revenueChart.data.datasets[0].data = [32000, 35000, 38000, 42000, 45000, 48000, 52000, 55000, 58000, 62000, 65000, 68000];
-            revenueChart.update();
+            // 更新图表数据// 更新图表数据// 更新图表数据// 更新图表数据
+标签=【'1月'，'2月'，'3月'，'4月'，'5月'，'6月'，'7月'，'8月'，'9月'，'10月'，'11月'，'12月’】；收入图表.数据.标签=【'1月'，'2月'，'3月'，'4月'，'5月'，'6月'，'7月'，'8月'，'9月'，'10月', '11月', '12月'];=【'1月'，'2月'，'3月'，'4月'，'5月'，'6月'，'7月'，'8月'，'9月'，'10月'，'11月'，'12月’】；收入图表.数据.标签=【'1月'，'2月'，'3月'，'4月'，'5月'，'6月'，'7月'，'8月'，'9月'，'10月', '11月', '12月'];
+收入图表
+收入图表更新；收入图表更新；
+        });});
+添加（
+类列表
+'月度按钮'
+initData（）；
+checkLoginStatus（）；
         });
-        
-        // 初始化应用
-        window.addEventListener('load', function() {
-            initUserData();
-            checkLoginStatus();
-        });
-    </script>
-</body>
-</html>>
+)
+</身体>
+</html>
