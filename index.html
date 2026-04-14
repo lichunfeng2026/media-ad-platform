@@ -3,155 +3,1295 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>自媒体广告系统</title>
+    <title>自媒体广告系统 - 专业企业版</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; }
-        body { background: #f5f7fa; color: #333; line-height: 1.6; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
         
-        /* 登录页面 */
-        .login-container { width: 100%; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .login-box { width: 400px; background: white; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; }
-        .login-header { background: linear-gradient(135deg, #3498db, #2ecc71); padding: 30px; text-align: center; color: white; }
-        .login-header h1 { font-size: 1.8rem; margin-bottom: 10px; }
-        .login-form { padding: 30px; }
-        .form-group { margin-bottom: 20px; }
-        .form-label { display: block; font-weight: 600; color: #2c3e50; margin-bottom: 8px; }
-        .form-control { width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; }
-        .form-control:focus { border-color: #3498db; outline: none; }
-        .login-btn { width: 100%; padding: 12px; background: #3498db; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; }
-        .login-btn:hover { background: #2980b9; }
-        .login-footer { padding: 20px 30px; text-align: center; border-top: 1px solid #eee; }
-        .login-footer a { color: #3498db; text-decoration: none; margin: 0 10px; }
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
         
-        /* 主应用 */
-        .app-container { display: flex; min-height: 100vh; }
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
         
-        /* 侧边栏 */
-        .sidebar { width: 260px; background: linear-gradient(180deg, #2c3e50 0%, #1a252f 100%); color: white; display: flex; flex-direction: column; transition: all 0.3s; position: relative; }
-        .sidebar.collapsed { width: 80px; }
-        .sidebar-header { padding: 25px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 15px; }
-        .sidebar-header h1 { font-size: 1.5rem; white-space: nowrap; overflow: hidden; }
-        .sidebar.collapsed .sidebar-header h1 { display: none; }
-        .logo { font-size: 2rem; color: #3498db; }
-        .toggle-sidebar { position: absolute; right: -15px; top: 20px; background: #3498db; color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; }
-        .user-profile { padding: 25px 20px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .user-avatar { width: 50px; height: 50px; border-radius: 50%; background: #3498db; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 600; }
-        .user-info { white-space: nowrap; overflow: hidden; }
-        .user-name { font-weight: 600; font-size: 1.1rem; margin-bottom: 5px; }
-        .user-role { font-size: 0.85rem; color: #bdc3c7; padding: 3px 10px; background: rgba(52,152,219,0.2); border-radius: 20px; display: inline-block; }
-        .sidebar.collapsed .user-info { display: none; }
-        .nav-menu { flex: 1; padding: 20px 0; overflow-y: auto; }
-        .nav-item { padding: 15px 20px; display: flex; align-items: center; gap: 15px; color: #bdc3c7; text-decoration: none; cursor: pointer; transition: all 0.3s; border-left: 3px solid transparent; }
-        .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
-        .nav-item.active { background: rgba(52,152,219,0.1); color: #3498db; border-left: 3px solid #3498db; }
-        .nav-item i { font-size: 1.2rem; min-width: 24px; }
-        .nav-text { white-space: nowrap; }
-        .sidebar.collapsed .nav-text { display: none; }
-        .sidebar-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
-        .logout-btn { display: flex; align-items: center; gap: 15px; padding: 12px 20px; background: rgba(231,76,60,0.1); color: #e74c3c; border: none; border-radius: 8px; cursor: pointer; width: 100%; transition: all 0.3s; }
-        .logout-btn:hover { background: rgba(231,76,60,0.2); }
-        .sidebar.collapsed .logout-btn span { display: none; }
+        /* 登录页面样式 */
+        .login-container {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
         
-        /* 主内容区 */
-        .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .top-nav { height: 70px; background: white; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .page-title { font-size: 1.5rem; color: #2c3e50; display: flex; align-items: center; gap: 10px; }
-        .top-nav-actions { display: flex; align-items: center; gap: 20px; }
-        .notification-icon { position: relative; font-size: 1.2rem; color: #7f8c8d; cursor: pointer; }
-        .notification-badge { position: absolute; top: -5px; right: -5px; background: #e74c3c; color: white; font-size: 0.7rem; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        .content-area { flex: 1; padding: 30px; overflow-y: auto; }
+        .login-box {
+            width: 400px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
         
-        /* 仪表板 */
-        .dashboard-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; margin-bottom: 30px; }
-        .stat-card { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 20px; transition: transform 0.3s, box-shadow 0.3s; }
-        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .stat-icon { width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; }
-        .stat-icon.articles { background: rgba(52,152,219,0.1); color: #3498db; }
-        .stat-icon.ads { background: rgba(46,204,113,0.1); color: #2ecc71; }
-        .stat-icon.earnings { background: rgba(155,89,182,0.1); color: #9b59b6; }
-        .stat-icon.users { background: rgba(241,196,15,0.1); color: #f1c40f; }
-        .stat-info h3 { font-size: 2.2rem; color: #2c3e50; margin-bottom: 5px; }
-        .stat-info p { color: #7f8c8d; font-size: 0.95rem; }
-        .stat-change { font-size: 0.85rem; margin-top: 5px; }
-        .stat-change.positive { color: #2ecc71; }
-        .stat-change.negative { color: #e74c3c; }
-        .dashboard-charts { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; margin-bottom: 30px; }
-        .chart-card { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .chart-title { font-size: 1.2rem; color: #2c3e50; }
-        .chart-container { height: 300px; position: relative; }
-        .chart-actions { display: flex; gap: 10px; }
+        .login-header {
+            background: linear-gradient(135deg, #3498db, #2ecc71);
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
         
-        /* 表格 */
-        .user-management-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-        .user-search { display: flex; gap: 10px; }
-        .user-search input { width: 300px; padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; }
-        .users-table-container { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        .users-table { width: 100%; border-collapse: collapse; }
-        .users-table th { background: #f8f9fa; padding: 18px 20px; text-align: left; font-weight: 600; color: #2c3e50; border-bottom: 1px solid #eee; }
-        .users-table td { padding: 18px 20px; border-bottom: 1px solid #eee; }
-        .user-avatar-small { width: 40px; height: 40px; border-radius: 50%; background: #3498db; color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; }
-        .user-cell { display: flex; align-items: center; gap: 15px; }
-        .user-name-cell { font-weight: 600; }
-        .user-email { color: #7f8c8d; font-size: 0.9rem; }
-        .role-badge { padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
-        .role-super-admin { background: rgba(231,76,60,0.1); color: #e74c3c; }
-        .role-admin { background: rgba(52,152,219,0.1); color: #3498db; }
-        .role-editor { background: rgba(46,204,113,0.1); color: #2ecc71; }
-        .role-user { background: rgba(149,165,166,0.1); color: #95a5a6; }
-        .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
-        .status-active { background: rgba(46,204,113,0.1); color: #2ecc71; }
-        .status-inactive { background: rgba(149,165,166,0.1); color: #95a5a6; }
-        .user-actions { display: flex; gap: 10px; }
-        .action-btn { width: 36px; height: 36px; border-radius: 8px; border: 1px solid #eee; background: white; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; }
-        .action-btn:hover { background: #f8f9fa; }
-        .action-btn.edit { color: #3498db; }
-        .action-btn.delete { color: #e74c3c; }
-        .table-footer { padding: 20px; display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; }
+        .login-header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
         
-        /* 按钮 */
-        .btn { padding: 12px 20px; background: #3498db; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .btn:hover { background: #2980b9; }
-        .btn-primary { background: #3498db; }
-        .btn-secondary { background: #95a5a6; }
-        .btn-success { background: #2ecc71; }
-        .btn-danger { background: #e74c3c; }
-        .btn-sm { padding: 8px 15px; font-size: 0.9rem; }
+        .login-header p {
+            opacity: 0.8;
+        }
         
-        /* 通知 */
-        .notification { position: fixed; top: 20px; right: 20px; padding: 15px 20px; background: white; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 15px; transform: translateX(120%); transition: transform 0.3s ease; z-index: 1001; }
-        .notification.show { transform: translateX(0); }
-        .notification-icon { font-size: 1.5rem; }
-        .notification-success .notification-icon { color: #2ecc71; }
-        .notification-error .notification-icon { color: #e74c3c; }
-        .notification-info .notification-icon { color: #3498db; }
-        .notification-message { flex: 1; }
-        .notification-close { background: none; border: none; color: #7f8c8d; cursor: pointer; font-size: 1.2rem; }
+        .login-form {
+            padding: 30px;
+        }
         
-        /* 模态框 */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
-        .modal-content { background: white; border-radius: 12px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0; }
-        .modal-title { font-size: 1.5rem; color: #2c3e50; }
-        .close-modal { background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #7f8c8d; }
-        .modal-footer { display: flex; gap: 15px; margin-top: 30px; }
+        .form-group {
+            margin-bottom: 20px;
+        }
         
-        /* 页面内容 */
-        .page-content { display: none; }
-        .page-content.active { display: block; }
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
         
-        /* 响应式 */
-        @media (max-width: 1200px) { .dashboard-charts { grid-template-columns: 1fr; } }
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .login-btn:hover {
+            background: #2980b9;
+        }
+        
+        .login-footer {
+            padding: 20px 30px;
+            text-align: center;
+            border-top: 1px solid #eee;
+        }
+        
+        .login-footer a {
+            color: #3498db;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .form-error {
+            color: #e74c3c;
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .password-toggle {
+            position: relative;
+        }
+        
+        .password-toggle i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+            cursor: pointer;
+        }
+        
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .remember-me input {
+            cursor: pointer;
+        }
+        
+        .remember-me label {
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+        
+        /* 注册页面样式 */
+        .register-container {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .register-box {
+            width: 450px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        .register-header {
+            background: linear-gradient(135deg, #3498db, #2ecc71);
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+        
+        .register-header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+        
+        .register-header p {
+            opacity: 0.8;
+        }
+        
+        .register-form {
+            padding: 30px;
+        }
+        
+        .register-btn {
+            width: 100%;
+            padding: 12px;
+            background: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .register-btn:hover {
+            background: #27ae60;
+        }
+        
+        .register-footer {
+            padding: 20px 30px;
+            text-align: center;
+            border-top: 1px solid #eee;
+        }
+        
+        .password-strength {
+            height: 5px;
+            background: #eee;
+            border-radius: 5px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        
+        .password-strength-meter {
+            height: 100%;
+            width: 0;
+            transition: width 0.3s, background 0.3s;
+        }
+        
+        .password-strength-text {
+            font-size: 0.8rem;
+            margin-top: 5px;
+        }
+        
+        /* 忘记密码页面样式 */
+        .forgot-password-container {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .forgot-password-box {
+            width: 400px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        .forgot-password-header {
+            background: linear-gradient(135deg, #3498db, #2ecc71);
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+        
+        .forgot-password-header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+        
+        .forgot-password-header p {
+            opacity: 0.8;
+        }
+        
+        .forgot-password-form {
+            padding: 30px;
+        }
+        
+        .forgot-password-btn {
+            width: 100%;
+            padding: 12px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .forgot-password-btn:hover {
+            background: #2980b9;
+        }
+        
+        .forgot-password-footer {
+            padding: 20px 30px;
+            text-align: center;
+            border-top: 1px solid #eee;
+        }
+        
+        /* 侧边栏样式 */
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(180deg, #2c3e50 0%, #1a252f 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .sidebar.collapsed {
+            width: 80px;
+        }
+        
+        .sidebar-header {
+            padding: 25px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .sidebar-header h1 {
+            font-size: 1.5rem;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        
+        .sidebar.collapsed .sidebar-header h1 {
+            display: none;
+        }
+        
+        .logo {
+            font-size: 2rem;
+            color: #3498db;
+        }
+        
+        .toggle-sidebar {
+            position: absolute;
+            right: -15px;
+            top: 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        
+        .user-profile {
+            padding: 25px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #3498db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .user-info {
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .user-role {
+            font-size: 0.85rem;
+            color: #bdc3c7;
+            padding: 3px 10px;
+            background: rgba(52, 152, 219, 0.2);
+            border-radius: 20px;
+            display: inline-block;
+        }
+        
+        .sidebar.collapsed .user-info {
+            display: none;
+        }
+        
+        .sidebar.collapsed .user-profile {
+            justify-content: center;
+        }
+        
+        .nav-menu {
+            flex: 1;
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+        
+        .nav-item {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #bdc3c7;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+        
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+        
+        .nav-item.active {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+            border-left: 3px solid #3498db;
+        }
+        
+        .nav-item i {
+            font-size: 1.2rem;
+            min-width: 24px;
+        }
+        
+        .nav-text {
+            white-space: nowrap;
+        }
+        
+        .sidebar.collapsed .nav-text {
+            display: none;
+        }
+        
+        .nav-submenu {
+            padding-left: 50px;
+            display: none;
+        }
+        
+        .nav-item.has-submenu.active + .nav-submenu {
+            display: block;
+        }
+        
+        .nav-subitem {
+            padding: 10px 20px;
+            color: #95a5a6;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .nav-subitem:hover {
+            color: white;
+        }
+        
+        .nav-subitem.active {
+            color: #3498db;
+        }
+        
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 20px;
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(231, 76, 60, 0.2);
+        }
+        
+        .sidebar.collapsed .logout-btn span {
+            display: none;
+        }
+        
+        /* 主内容区样式 */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .top-nav {
+            height: 70px;
+            background: white;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .page-title {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .top-nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .notification-icon, .help-icon {
+            position: relative;
+            font-size: 1.2rem;
+            color: #7f8c8d;
+            cursor: pointer;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #e74c3c;
+            color: white;
+            font-size: 0.7rem;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+        
+        /* 仪表板样式 */
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+        
+        .stat-icon.articles {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+        }
+        
+        .stat-icon.ads {
+            background: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+        }
+        
+        .stat-icon.earnings {
+            background: rgba(155, 89, 182, 0.1);
+            color: #9b59b6;
+        }
+        
+        .stat-icon.users {
+            background: rgba(241, 196, 15, 0.1);
+            color: #f1c40f;
+        }
+        
+        .stat-info h3 {
+            font-size: 2.2rem;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .stat-info p {
+            color: #7f8c8d;
+            font-size: 0.95rem;
+        }
+        
+        .stat-change {
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+        
+        .stat-change.positive {
+            color: #2ecc71;
+        }
+        
+        .stat-change.negative {
+            color: #e74c3c;
+        }
+        
+        .dashboard-charts {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .chart-title {
+            font-size: 1.2rem;
+            color: #2c3e50;
+        }
+        
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+        
+        .chart-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* 用户管理样式 */
+        .user-management-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .user-search {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .user-search input {
+            width: 300px;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        
+        .users-table-container {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .users-table th {
+            background: #f8f9fa;
+            padding: 18px 20px;
+            text-align: left;
+            font-weight: 600;
+            color: #2c3e50;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .users-table td {
+            padding: 18px 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .user-avatar-small {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #3498db;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-name-cell {
+            font-weight: 600;
+        }
+        
+        .user-email {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .role-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .role-super-admin {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+        
+        .role-admin {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+        }
+        
+        .role-editor {
+            background: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+        }
+        
+        .role-user {
+            background: rgba(149, 165, 166, 0.1);
+            color: #95a5a6;
+        }
+        
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .status-active {
+            background: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+        }
+        
+        .status-inactive {
+            background: rgba(149, 165, 166, 0.1);
+            color: #95a5a6;
+        }
+        
+        .user-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .action-btn:hover {
+            background: #f8f9fa;
+        }
+        
+        .action-btn.edit {
+            color: #3498db;
+        }
+        
+        .action-btn.delete {
+            color: #e74c3c;
+        }
+        
+        .action-btn.lock {
+            color: #f1c40f;
+        }
+        
+        .table-footer {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+        }
+        
+        /* 我的中心样式 */
+        .profile-container {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .profile-sidebar {
+            width: 300px;
+        }
+        
+        .profile-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .profile-avatar-large {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498db, #2ecc71);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: 600;
+            margin: 0 auto 20px;
+        }
+        
+        .profile-name {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .profile-email {
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+        
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .profile-stat {
+            text-align: center;
+        }
+        
+        .profile-stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #3498db;
+            margin-bottom: 5px;
+        }
+        
+        .profile-stat-label {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .profile-main {
+            flex: 1;
+        }
+        
+        .profile-tabs {
+            display: flex;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 25px;
+        }
+        
+        .profile-tab {
+            padding: 15px 25px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            font-size: 1rem;
+            color: #7f8c8d;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .profile-tab.active {
+            color: #3498db;
+            border-bottom: 3px solid #3498db;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .settings-form {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        /* 广告管理样式 */
+        .ad-templates {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        
+        .template-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+        }
+        
+        .template-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .template-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .template-title {
+            font-size: 1.2rem;
+            color: #2c3e50;
+        }
+        
+        .template-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .template-type-image {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+        }
+        
+        .template-type-text {
+            background: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+        }
+        
+        .template-content {
+            margin-bottom: 20px;
+            color: #7f8c8d;
+        }
+        
+        .template-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .template-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            color: #2c3e50;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+        
+        .modal-footer {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        /* 按钮样式 */
+        .btn {
+            padding: 12px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn:hover {
+            background: #2980b9;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+        }
+        
+        .btn-success {
+            background: #2ecc71;
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+        }
+        
+        .btn-sm {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+        }
+        
+        /* 通知样式 */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+            z-index: 1001;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification-icon {
+            font-size: 1.5rem;
+        }
+        
+        .notification-success .notification-icon {
+            color: #2ecc71;
+        }
+        
+        .notification-error .notification-icon {
+            color: #e74c3c;
+        }
+        
+        .notification-info .notification-icon {
+            color: #3498db;
+        }
+        
+        .notification-message {
+            flex: 1;
+        }
+        
+        .notification-close {
+            background: none;
+            border: none;
+            color: #7f8c8d;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        
+        /* 数据管理样式 */
+        .data-management-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .data-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .data-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 25px;
+        }
+        
+        .data-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .data-card-title {
+            font-size: 1.2rem;
+            color: #2c3e50;
+        }
+        
+        .data-card-content {
+            color: #7f8c8d;
+        }
+        
+        .data-backup-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .data-backup-info span {
+            color: #7f8c8d;
+        }
+        
+        .data-backup-info strong {
+            color: #2c3e50;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .dashboard-charts {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .profile-container {
+                flex-direction: column;
+            }
+            
+            .profile-sidebar {
+                width: 100%;
+            }
+        }
+        
         @media (max-width: 768px) {
-            .sidebar { position: fixed; left: -260px; z-index: 100; }
-            .sidebar.active { left: 0; }
-            .main-content { width: 100%; }
-            .user-management-header { flex-direction: column; align-items: flex-start; gap: 15px; }
-            .user-search input { width: 100%; }
-            .users-table { display: block; overflow-x: auto; }
-            .login-box { width: 90%; max-width: 400px; }
+            .sidebar {
+                position: fixed;
+                left: -260px;
+                z-index: 100;
+            }
+            
+            .sidebar.active {
+                left: 0;
+            }
+            
+            .main-content {
+                width: 100%;
+            }
+            
+            .user-management-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .user-search input {
+                width: 100%;
+            }
+            
+            .users-table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .login-box, .register-box, .forgot-password-box {
+                width: 90%;
+                max-width: 400px;
+            }
+            
+            .data-management-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .data-actions {
+                width: 100%;
+                flex-wrap: wrap;
+            }
         }
     </style>
 </head>
@@ -163,19 +1303,110 @@
                 <h1>自媒体广告系统</h1>
                 <p>专业企业版</p>
             </div>
+            
             <form class="login-form" id="loginForm">
                 <div class="form-group">
-                    <label class="form-label">邮箱</label>
+                    <label class="form-label" for="loginEmail">邮箱</label>
                     <input type="email" class="form-control" id="loginEmail" placeholder="请输入邮箱" required>
+                    <div class="form-error" id="loginEmailError">请输入有效的邮箱地址</div>
                 </div>
+                
                 <div class="form-group">
-                    <label class="form-label">密码</label>
-                    <input type="password" class="form-control" id="loginPassword" placeholder="请输入密码" required>
+                    <label class="form-label" for="loginPassword">密码</label>
+                    <div class="password-toggle">
+                        <input type="password" class="form-control" id="loginPassword" placeholder="请输入密码" required>
+                        <i class="fas fa-eye" id="loginPasswordToggle"></i>
+                    </div>
+                    <div class="form-error" id="loginPasswordError">请输入密码</div>
                 </div>
+                
+                <div class="remember-me">
+                    <input type="checkbox" id="rememberMe">
+                    <label for="rememberMe">记住我</label>
+                </div>
+                
                 <button type="submit" class="login-btn">登录</button>
             </form>
+            
             <div class="login-footer">
+                <a href="#" id="forgotPasswordLink">忘记密码？</a>
                 <a href="#" id="registerLink">注册账号</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 注册页面 -->
+    <div class="register-container" id="registerPage" style="display: none;">
+        <div class="register-box">
+            <div class="register-header">
+                <h1>创建账号</h1>
+                <p>加入自媒体广告系统</p>
+            </div>
+            
+            <form class="register-form" id="registerForm">
+                <div class="form-group">
+                    <label class="form-label" for="registerName">姓名</label>
+                    <input type="text" class="form-control" id="registerName" placeholder="请输入姓名" required>
+                    <div class="form-error" id="registerNameError">请输入姓名</div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="registerEmail">邮箱</label>
+                    <input type="email" class="form-control" id="registerEmail" placeholder="请输入邮箱" required>
+                    <div class="form-error" id="registerEmailError">请输入有效的邮箱地址</div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="registerPassword">密码</label>
+                    <div class="password-toggle">
+                        <input type="password" class="form-control" id="registerPassword" placeholder="请输入密码" required>
+                        <i class="fas fa-eye" id="registerPasswordToggle"></i>
+                    </div>
+                    <div class="password-strength">
+                        <div class="password-strength-meter" id="passwordStrengthMeter"></div>
+                    </div>
+                    <div class="password-strength-text" id="passwordStrengthText"></div>
+                    <div class="form-error" id="registerPasswordError">密码至少需要8个字符</div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="registerConfirmPassword">确认密码</label>
+                    <div class="password-toggle">
+                        <input type="password" class="form-control" id="registerConfirmPassword" placeholder="请再次输入密码" required>
+                        <i class="fas fa-eye" id="registerConfirmPasswordToggle"></i>
+                    </div>
+                    <div class="form-error" id="registerConfirmPasswordError">两次输入的密码不一致</div>
+                </div>
+                
+                <button type="submit" class="register-btn">注册</button>
+            </form>
+            
+            <div class="register-footer">
+                已有账号？<a href="#" id="loginLink">立即登录</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 忘记密码页面 -->
+    <div class="forgot-password-container" id="forgotPasswordPage" style="display: none;">
+        <div class="forgot-password-box">
+            <div class="forgot-password-header">
+                <h1>重置密码</h1>
+                <p>我们将发送重置链接到您的邮箱</p>
+            </div>
+            
+            <form class="forgot-password-form" id="forgotPasswordForm">
+                <div class="form-group">
+                    <label class="form-label" for="forgotEmail">邮箱</label>
+                    <input type="email" class="form-control" id="forgotEmail" placeholder="请输入注册邮箱" required>
+                    <div class="form-error" id="forgotEmailError">请输入有效的邮箱地址</div>
+                </div>
+                
+                <button type="submit" class="forgot-password-btn">发送重置链接</button>
+            </form>
+            
+            <div class="forgot-password-footer">
+                <a href="#" id="backToLoginLink">返回登录</a>
             </div>
         </div>
     </div>
@@ -185,10 +1416,16 @@
         <!-- 侧边栏 -->
         <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <div class="logo"><i class="fas fa-ad"></i></div>
+                <div class="logo">
+                    <i class="fas fa-ad"></i>
+                </div>
                 <h1>广告系统</h1>
             </div>
-            <button class="toggle-sidebar" id="toggleSidebar"><i class="fas fa-chevron-left"></i></button>
+            
+            <button class="toggle-sidebar" id="toggleSidebar">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            
             <div class="user-profile">
                 <div class="user-avatar" id="userAvatar">李</div>
                 <div class="user-info">
@@ -196,66 +1433,136 @@
                     <div class="user-role" id="userRole">超级管理员</div>
                 </div>
             </div>
+            
             <div class="nav-menu">
-                <div class="nav-item active" data-page="dashboard"><i class="fas fa-tachometer-alt"></i><span class="nav-text">仪表板</span></div>
-                <div class="nav-item" data-page="articles"><i class="fas fa-newspaper"></i><span class="nav-text">文章管理</span></div>
-                <div class="nav-item" data-page="ads"><i class="fas fa-ad"></i><span class="nav-text">广告管理</span></div>
-                <div class="nav-item" data-page="users"><i class="fas fa-users"></i><span class="nav-text">用户管理</span></div>
-                <div class="nav-item" data-page="analytics"><i class="fas fa-chart-line"></i><span class="nav-text">数据分析</span></div>
-                <div class="nav-item" data-page="settings"><i class="fas fa-cog"></i><span class="nav-text">系统设置</span></div>
+                <div class="nav-item active" data-page="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span class="nav-text">仪表板</span>
+                </div>
+                
+                <div class="nav-item" data-page="articles">
+                    <i class="fas fa-newspaper"></i>
+                    <span class="nav-text">文章管理</span>
+                </div>
+                
+                <div class="nav-item" data-page="ads">
+                    <i class="fas fa-ad"></i>
+                    <span class="nav-text">广告管理</span>
+                </div>
+                
+                <div class="nav-item" data-page="users">
+                    <i class="fas fa-users"></i>
+                    <span class="nav-text">用户管理</span>
+                </div>
+                
+                <div class="nav-item" data-page="analytics">
+                    <i class="fas fa-chart-line"></i>
+                    <span class="nav-text">数据分析</span>
+                </div>
+                
+                <div class="nav-item" data-page="data">
+                    <i class="fas fa-database"></i>
+                    <span class="nav-text">数据管理</span>
+                </div>
+                
+                <div class="nav-item" data-page="settings">
+                    <i class="fas fa-cog"></i>
+                    <span class="nav-text">系统设置</span>
+                </div>
+                
+                <div class="nav-item" data-page="profile">
+                    <i class="fas fa-user-circle"></i>
+                    <span class="nav-text">个人中心</span>
+                </div>
             </div>
+            
             <div class="sidebar-footer">
-                <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i><span>退出登录</span></button>
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>退出登录</span>
+                </button>
             </div>
         </div>
         
         <!-- 主内容区 -->
         <div class="main-content">
+            <!-- 顶部导航 -->
             <div class="top-nav">
                 <div class="page-title">
                     <i class="fas fa-tachometer-alt"></i>
                     <span id="currentPageTitle">仪表板</span>
                 </div>
+                
                 <div class="top-nav-actions">
                     <div class="notification-icon">
                         <i class="fas fa-bell"></i>
                         <span class="notification-badge">3</span>
                     </div>
+                    
+                    <div class="help-icon">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
                 </div>
             </div>
+            
+            <!-- 内容区域 -->
             <div class="content-area" id="contentArea">
                 <!-- 仪表板页面 -->
                 <div class="page-content active" id="dashboardPage">
                     <div class="dashboard-stats">
                         <div class="stat-card">
-                            <div class="stat-icon articles"><i class="fas fa-newspaper"></i></div>
+                            <div class="stat-icon articles">
+                                <i class="fas fa-newspaper"></i>
+                            </div>
                             <div class="stat-info">
-                                <h3 id="totalArticles">0</h3>
+                                <h3 id="totalArticles">128</h3>
                                 <p>文章总数</p>
+                                <div class="stat-change positive">
+                                    <i class="fas fa-arrow-up"></i> 12% 较上月
+                                </div>
                             </div>
                         </div>
+                        
                         <div class="stat-card">
-                            <div class="stat-icon ads"><i class="fas fa-ad"></i></div>
+                            <div class="stat-icon ads">
+                                <i class="fas fa-ad"></i>
+                            </div>
                             <div class="stat-info">
-                                <h3 id="totalAds">0</h3>
+                                <h3 id="totalAds">56</h3>
                                 <p>广告总数</p>
+                                <div class="stat-change positive">
+                                    <i class="fas fa-arrow-up"></i> 8% 较上月
+                                </div>
                             </div>
                         </div>
+                        
                         <div class="stat-card">
-                            <div class="stat-icon earnings"><i class="fas fa-dollar-sign"></i></div>
+                            <div class="stat-icon earnings">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
                             <div class="stat-info">
                                 <h3>¥12,580</h3>
                                 <p>本月收入</p>
+                                <div class="stat-change positive">
+                                    <i class="fas fa-arrow-up"></i> 23% 较上月
+                                </div>
                             </div>
                         </div>
+                        
                         <div class="stat-card">
-                            <div class="stat-icon users"><i class="fas fa-users"></i></div>
+                            <div class="stat-icon users">
+                                <i class="fas fa-users"></i>
+                            </div>
                             <div class="stat-info">
-                                <h3 id="totalUsers">0</h3>
+                                <h3 id="totalUsers">1,258</h3>
                                 <p>用户总数</p>
+                                <div class="stat-change negative">
+                                    <i class="fas fa-arrow-down"></i> 3% 较上月
+                                </div>
                             </div>
                         </div>
                     </div>
+                    
                     <div class="dashboard-charts">
                         <div class="chart-card">
                             <div class="chart-header">
@@ -263,13 +1570,31 @@
                                 <div class="chart-actions">
                                     <button class="btn btn-sm btn-primary" id="weekBtn">本周</button>
                                     <button class="btn btn-sm btn-secondary" id="monthBtn">本月</button>
+                                    <button class="btn btn-sm btn-secondary" id="yearBtn">本年</button>
                                 </div>
                             </div>
-                            <div class="chart-container"><canvas id="revenueChart"></canvas></div>
+                            <div class="chart-container">
+                                <canvas id="revenueChart"></canvas>
+                            </div>
                         </div>
+                        
                         <div class="chart-card">
-                            <div class="chart-header"><h3 class="chart-title">广告点击率</h3></div>
-                            <div class="chart-container"><canvas id="clickRateChart"></canvas></div>
+                            <div class="chart-header">
+                                <h3 class="chart-title">广告点击率</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="clickRateChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3 class="chart-title">最近文章</h3>
+                            <button class="btn btn-sm btn-primary">查看全部</button>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="articlesChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -280,18 +1605,39 @@
                         <h2>文章管理</h2>
                         <div class="user-search">
                             <input type="text" id="articleSearchInput" placeholder="搜索文章...">
-                            <button class="btn btn-primary" id="articleSearchBtn"><i class="fas fa-search"></i>搜索</button>
-                            <button class="btn btn-success" id="addArticleBtn"><i class="fas fa-plus"></i>添加文章</button>
+                            <button class="btn btn-primary" id="articleSearchBtn">
+                                <i class="fas fa-search"></i>
+                                搜索
+                            </button>
+                            <button class="btn btn-success" id="addArticleBtn">
+                                <i class="fas fa-plus"></i>
+                                添加文章
+                            </button>
                         </div>
                     </div>
+                    
                     <div class="users-table-container">
                         <table class="users-table">
-                            <thead><tr><th>标题</th><th>作者</th><th>分类</th><th>发布日期</th><th>状态</th><th>操作</th></tr></thead>
-                            <tbody id="articlesTableBody"></tbody>
+                            <thead>
+                                <tr>
+                                    <th>标题</th>
+                                    <th>作者</th>
+                                    <th>分类</th>
+                                    <th>发布日期</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="articlesTableBody">
+                                <!-- 文章数据将通过JavaScript动态加载 -->
+                            </tbody>
                         </table>
+                        
                         <div class="table-footer">
                             <div id="articlesPaginationInfo">显示 0-0 共 0 条记录</div>
-                            <div class="pagination" id="articlesPagination"></div>
+                            <div class="pagination" id="articlesPagination">
+                                <!-- 分页按钮将通过JavaScript动态加载 -->
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -302,11 +1648,20 @@
                         <h2>广告管理</h2>
                         <div class="user-search">
                             <input type="text" id="adSearchInput" placeholder="搜索广告...">
-                            <button class="btn btn-primary" id="adSearchBtn"><i class="fas fa-search"></i>搜索</button>
-                            <button class="btn btn-success" id="addAdBtn"><i class="fas fa-plus"></i>添加广告</button>
+                            <button class="btn btn-primary" id="adSearchBtn">
+                                <i class="fas fa-search"></i>
+                                搜索
+                            </button>
+                            <button class="btn btn-success" id="addAdBtn">
+                                <i class="fas fa-plus"></i>
+                                添加广告
+                            </button>
                         </div>
                     </div>
-                    <div class="ad-templates" id="adsContainer"></div>
+                    
+                    <div class="ad-templates" id="adsContainer">
+                        <!-- 广告数据将通过JavaScript动态加载 -->
+                    </div>
                 </div>
                 
                 <!-- 用户管理页面 -->
@@ -315,18 +1670,39 @@
                         <h2>用户管理</h2>
                         <div class="user-search">
                             <input type="text" id="userSearchInput" placeholder="搜索用户...">
-                            <button class="btn btn-primary" id="userSearchBtn"><i class="fas fa-search"></i>搜索</button>
-                            <button class="btn btn-success" id="addUserBtn"><i class="fas fa-plus"></i>添加用户</button>
+                            <button class="btn btn-primary" id="userSearchBtn">
+                                <i class="fas fa-search"></i>
+                                搜索
+                            </button>
+                            <button class="btn btn-success" id="addUserBtn">
+                                <i class="fas fa-plus"></i>
+                                添加用户
+                            </button>
                         </div>
                     </div>
+                    
                     <div class="users-table-container">
                         <table class="users-table">
-                            <thead><tr><th>用户</th><th>角色</th><th>注册日期</th><th>状态</th><th>操作</th></tr></thead>
-                            <tbody id="usersTableBody"></tbody>
+                            <thead>
+                                <tr>
+                                    <th>用户</th>
+                                    <th>角色</th>
+                                    <th>注册日期</th>
+                                    <th>最后登录</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <!-- 用户数据将通过JavaScript动态加载 -->
+                            </tbody>
                         </table>
+                        
                         <div class="table-footer">
                             <div id="usersPaginationInfo">显示 0-0 共 0 条记录</div>
-                            <div class="pagination" id="usersPagination"></div>
+                            <div class="pagination" id="usersPagination">
+                                <!-- 分页按钮将通过JavaScript动态加载 -->
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -335,49 +1711,434 @@
                 <div class="page-content" id="analyticsPage">
                     <div class="dashboard-stats">
                         <div class="stat-card">
-                            <div class="stat-icon articles"><i class="fas fa-eye"></i></div>
-                            <div class="stat-info"><h3>125,890</h3><p>页面浏览量</p></div>
+                            <div class="stat-icon articles">
+                                <i class="fas fa-eye"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>125,890</h3>
+                                <p>页面浏览量</p>
+                                <div class="stat-change positive">
+                                    <i class="fas fa-arrow-up"></i> 18% 较上月
+                                </div>
+                            </div>
                         </div>
+                        
                         <div class="stat-card">
-                            <div class="stat-icon ads"><i class="fas fa-mouse-pointer"></i></div>
-                            <div class="stat-info"><h3>8,562</h3><p>广告点击量</p></div>
+                            <div class="stat-icon ads">
+                                <i class="fas fa-mouse-pointer"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>8,562</h3>
+                                <p>广告点击量</p>
+                                <div class="stat-change positive">
+                                    <i class="fas fa-arrow-up"></i> 15% 较上月
+                                </div>
+                            </div>
                         </div>
+                        
                         <div class="stat-card">
-                            <div class="stat-icon earnings"><i class="fas fa-percentage"></i></div>
-                            <div class="stat-info"><h3>6.8%</h3><p>点击率</p></div>
+                            <div class="stat-icon earnings">
+                                <i class="fas fa-percentage"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>6.8%</h3>
+                                <p>点击率</p>
+                                <div class="stat-change negative">
+                                    <i class="fas fa-arrow-down"></i> 2% 较上月
+                                </div>
+                            </div>
                         </div>
+                        
                         <div class="stat-card">
-                            <div class="stat-icon users"><i class="fas fa-user-plus"></i></div>
-                            <div class="stat-info"><h3>328</h3><p>新增用户</p></div>
+                            <div class="stat-icon users">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>328</h3>
+                                <p>新增用户</p>
+                                <div class="stat-change positive">
+                                    <i class="fas fa-arrow-up"></i> 25% 较上月
+                                </div>
+                            </div>
                         </div>
                     </div>
+                    
                     <div class="dashboard-charts">
                         <div class="chart-card">
-                            <div class="chart-header"><h3 class="chart-title">流量趋势</h3></div>
-                            <div class="chart-container"><canvas id="trafficChart"></canvas></div>
+                            <div class="chart-header">
+                                <h3 class="chart-title">流量趋势</h3>
+                                <div class="chart-actions">
+                                    <button class="btn btn-sm btn-primary">本周</button>
+                                    <button class="btn btn-sm btn-secondary">本月</button>
+                                    <button class="btn btn-sm btn-secondary">本年</button>
+                                </div>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="trafficChart"></canvas>
+                            </div>
                         </div>
+                        
                         <div class="chart-card">
-                            <div class="chart-header"><h3 class="chart-title">用户来源</h3></div>
-                            <div class="chart-container"><canvas id="sourceChart"></canvas></div>
+                            <div class="chart-header">
+                                <h3 class="chart-title">用户来源</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="sourceChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 数据管理页面 -->
+                <div class="page-content" id="dataPage">
+                    <div class="data-management-header">
+                        <h2>数据管理</h2>
+                        <div class="data-actions">
+                            <button class="btn btn-primary" id="exportDataBtn">
+                                <i class="fas fa-download"></i>
+                                导出数据
+                            </button>
+                            <button class="btn btn-success" id="importDataBtn">
+                                <i class="fas fa-upload"></i>
+                                导入数据
+                            </button>
+                            <button class="btn btn-secondary" id="backupDataBtn">
+                                <i class="fas fa-save"></i>
+                                备份数据
+                            </button>
+                            <button class="btn btn-danger" id="restoreDataBtn">
+                                <i class="fas fa-undo"></i>
+                                恢复数据
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="data-card">
+                        <div class="data-card-header">
+                            <h3 class="data-card-title">数据备份信息</h3>
+                        </div>
+                        <div class="data-card-content">
+                            <div class="data-backup-info">
+                                <span>上次备份时间: <strong id="lastBackupTime">从未备份</strong></span>
+                                <span>备份大小: <strong id="backupSize">0 KB</strong></span>
+                            </div>
+                            <p>定期备份您的数据可以防止意外丢失。建议每周至少备份一次。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="data-card">
+                        <div class="data-card-header">
+                            <h3 class="data-card-title">数据统计</h3>
+                        </div>
+                        <div class="data-card-content">
+                            <div class="dashboard-stats">
+                                <div class="stat-card">
+                                    <div class="stat-icon articles">
+                                        <i class="fas fa-newspaper"></i>
+                                    </div>
+                                    <div class="stat-info">
+                                        <h3 id="dataArticlesCount">0</h3>
+                                        <p>文章数量</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="stat-card">
+                                    <div class="stat-icon ads">
+                                        <i class="fas fa-ad"></i>
+                                    </div>
+                                    <div class="stat-info">
+                                        <h3 id="dataAdsCount">0</h3>
+                                        <p>广告数量</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="stat-card">
+                                    <div class="stat-icon users">
+                                        <i class="fas fa-users"></i>
+                                    </div>
+                                    <div class="stat-info">
+                                        <h3 id="dataUsersCount">0</h3>
+                                        <p>用户数量</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="stat-card">
+                                    <div class="stat-icon earnings">
+                                        <i class="fas fa-database"></i>
+                                    </div>
+                                    <div class="stat-info">
+                                        <h3 id="dataTotalSize">0 KB</h3>
+                                        <p>数据大小</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="data-card">
+                        <div class="data-card-header">
+                            <h3 class="data-card-title">数据操作</h3>
+                        </div>
+                        <div class="data-card-content">
+                            <div class="form-group">
+                                <label class="form-label">清除所有数据</label>
+                                <p style="margin-bottom: 15px;">此操作将清除所有文章、广告和用户数据，且不可恢复。请谨慎操作。</p>
+                                <button class="btn btn-danger" id="clearAllDataBtn">
+                                    <i class="fas fa-trash"></i>
+                                    清除所有数据
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
                 
                 <!-- 系统设置页面 -->
                 <div class="page-content" id="settingsPage">
-                    <div class="user-management-header"><h2>系统设置</h2></div>
-                    <div class="chart-card">
-                        <div class="chart-header"><h3 class="chart-title">基本设置</h3></div>
-                        <div style="padding: 20px;">
-                            <div class="form-group">
-                                <label class="form-label">网站名称</label>
-                                <input type="text" class="form-control" id="siteName" value="自媒体广告系统">
+                    <div class="profile-container">
+                        <div class="profile-sidebar">
+                            <div class="profile-card">
+                                <div class="profile-avatar-large">
+                                    <i class="fas fa-cog"></i>
+                                </div>
+                                <h2 class="profile-name">系统设置</h2>
+                                <p class="profile-email">配置系统参数和选项</p>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">网站描述</label>
-                                <textarea class="form-control" id="siteDescription" rows="3">专业的自媒体广告管理系统。</textarea>
+                        </div>
+                        
+                        <div class="profile-main">
+                            <div class="profile-tabs">
+                                <button class="profile-tab active" data-tab="general">基本设置</button>
+                                <button class="profile-tab" data-tab="email">邮件设置</button>
+                                <button class="profile-tab" data-tab="security">安全设置</button>
                             </div>
-                            <button class="btn btn-primary" id="saveSettingsBtn">保存设置</button>
+                            
+                            <div class="tab-content active" id="generalTab">
+                                <div class="settings-form">
+                                    <div class="form-group">
+                                        <label class="form-label">网站名称</label>
+                                        <input type="text" class="form-control" id="siteName" value="自媒体广告系统">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">网站描述</label>
+                                        <textarea class="form-control" id="siteDescription" rows="3">专业的自媒体广告管理系统，提供全方位的广告投放和数据分析服务。</textarea>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">管理员邮箱</label>
+                                            <input type="email" class="form-control" id="adminEmail" value="admin@example.com">
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label class="form-label">联系电话</label>
+                                            <input type="text" class="form-control" id="contactPhone" value="400-123-4567">
+                                        </div>
+                                    </div>
+                                    
+                                    <button class="btn btn-primary" id="saveSettingsBtn">保存设置</button>
+                                </div>
+                            </div>
+                            
+                            <div class="tab-content" id="emailTab">
+                                <div class="settings-form">
+                                    <div class="form-group">
+                                        <label class="form-label">SMTP服务器</label>
+                                        <input type="text" class="form-control" id="smtpServer" value="smtp.example.com">
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">SMTP端口</label>
+                                            <input type="text" class="form-control" id="smtpPort" value="587">
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label class="form-label">加密方式</label>
+                                            <select class="form-control" id="encryptionMethod">
+                                                <option value="tls">TLS</option>
+                                                <option value="ssl">SSL</option>
+                                                <option value="none">无</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">发件人邮箱</label>
+                                            <input type="email" class="form-control" id="senderEmail" value="noreply@example.com">
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label class="form-label">发件人名称</label>
+                                            <input type="text" class="form-control" id="senderName" value="自媒体广告系统">
+                                        </div>
+                                    </div>
+                                    
+                                    <button class="btn btn-primary" id="saveEmailSettingsBtn">保存设置</button>
+                                </div>
+                            </div>
+                            
+                            <div class="tab-content" id="securityTab">
+                                <div class="settings-form">
+                                    <div class="form-group">
+                                        <label class="form-label">密码策略</label>
+                                        <select class="form-control" id="passwordPolicy">
+                                            <option value="low">低 - 至少6个字符</option>
+                                            <option value="medium" selected>中 - 至少8个字符，包含数字和字母</option>
+                                            <option value="high">高 - 至少10个字符，包含数字、字母和特殊字符</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">登录失败次数限制</label>
+                                        <input type="number" class="form-control" id="loginAttempts" value="5">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">会话超时时间（分钟）</label>
+                                        <input type="number" class="form-control" id="sessionTimeout" value="30">
+                                    </div>
+                                    
+                                    <button class="btn btn-primary" id="saveSecuritySettingsBtn">保存设置</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 个人中心页面 -->
+                <div class="page-content" id="profilePage">
+                    <div class="profile-container">
+                        <div class="profile-sidebar">
+                            <div class="profile-card">
+                                <div class="profile-avatar-large" id="profileAvatarLarge">李</div>
+                                <h2 class="profile-name" id="profileName">李春峰</h2>
+                                <p class="profile-email" id="profileEmail">lichunfeng@example.com</p>
+                                
+                                <div class="profile-stats">
+                                    <div class="profile-stat">
+                                        <div class="profile-stat-value">128</div>
+                                        <div class="profile-stat-label">文章</div>
+                                    </div>
+                                    <div class="profile-stat">
+                                        <div class="profile-stat-value">56</div>
+                                        <div class="profile-stat-label">广告</div>
+                                    </div>
+                                    <div class="profile-stat">
+                                        <div class="profile-stat-value">1,258</div>
+                                        <div class="profile-stat-label">用户</div>
+                                    </div>
+                                    <div class="profile-stat">
+                                        <div class="profile-stat-value">¥12,580</div>
+                                        <div class="profile-stat-label">收入</div>
+                                    </div>
+                                </div>
+                                
+                                <button class="btn btn-primary" style="width: 100%;">
+                                    <i class="fas fa-edit"></i>
+                                    编辑资料
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-main">
+                            <div class="profile-tabs">
+                                <button class="profile-tab active" data-tab="info">个人信息</button>
+                                <button class="profile-tab" data-tab="password">修改密码</button>
+                                <button class="profile-tab" data-tab="notifications">通知设置</button>
+                            </div>
+                            
+                            <div class="tab-content active" id="infoTab">
+                                <div class="settings-form">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">姓名</label>
+                                            <input type="text" class="form-control" id="profileNameInput" value="李春峰">
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label class="form-label">用户名</label>
+                                            <input type="text" class="form-control" id="profileUsernameInput" value="lichunfeng">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">邮箱</label>
+                                        <input type="email" class="form-control" id="profileEmailInput" value="lichunfeng@example.com">
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">手机号码</label>
+                                            <input type="text" class="form-control" id="profilePhoneInput" value="138****1234">
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label class="form-label">职位</label>
+                                            <input type="text" class="form-control" id="profilePositionInput" value="超级管理员">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">个人简介</label>
+                                        <textarea class="form-control" id="profileBioInput" rows="3">自媒体广告系统超级管理员，负责系统运营和管理工作。</textarea>
+                                    </div>
+                                    
+                                    <button class="btn btn-primary" id="saveProfileBtn">保存修改</button>
+                                </div>
+                            </div>
+                            
+                            <div class="tab-content" id="passwordTab">
+                                <div class="settings-form">
+                                    <div class="form-group">
+                                        <label class="form-label">当前密码</label>
+                                        <input type="password" class="form-control" id="currentPassword" placeholder="请输入当前密码">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">新密码</label>
+                                        <input type="password" class="form-control" id="newPassword" placeholder="请输入新密码">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">确认新密码</label>
+                                        <input type="password" class="form-control" id="confirmNewPassword" placeholder="请再次输入新密码">
+                                    </div>
+                                    
+                                    <button class="btn btn-primary" id="changePasswordBtn">修改密码</button>
+                                </div>
+                            </div>
+                            
+                            <div class="tab-content" id="notificationsTab">
+                                <div class="settings-form">
+                                    <div class="form-group">
+                                        <label class="form-label">邮件通知</label>
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <input type="checkbox" id="emailNotifications" checked>
+                                            <label for="emailNotifications">接收系统邮件通知</label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">系统通知</label>
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <input type="checkbox" id="systemNotifications" checked>
+                                            <label for="systemNotifications">接收系统内部通知</label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">广告通知</label>
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <input type="checkbox" id="adNotifications" checked>
+                                            <label for="adNotifications">接收广告相关通知</label>
+                                        </div>
+                                    </div>
+                                    
+                                    <button class="btn btn-primary" id="saveNotificationsBtn">保存设置</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -385,35 +2146,43 @@
         </div>
     </div>
     
-    <!-- 模态框 -->
+    <!-- 添加文章模态框 -->
     <div class="modal" id="addArticleModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title" id="articleModalTitle">添加新文章</h3>
                 <button class="close-modal" id="closeArticleModal">&times;</button>
             </div>
-            <div style="padding: 20px;">
+            
+            <div class="settings-form">
                 <input type="hidden" id="articleId">
+                
                 <div class="form-group">
                     <label class="form-label">文章标题</label>
                     <input type="text" class="form-control" id="articleTitle" placeholder="请输入文章标题">
                 </div>
+                
                 <div class="form-group">
                     <label class="form-label">文章作者</label>
                     <input type="text" class="form-control" id="articleAuthor" placeholder="请输入文章作者">
                 </div>
+                
                 <div class="form-group">
                     <label class="form-label">文章分类</label>
                     <select class="form-control" id="articleCategory">
                         <option value="广告技巧">广告技巧</option>
                         <option value="运营技巧">运营技巧</option>
                         <option value="内容创作">内容创作</option>
+                        <option value="数据分析">数据分析</option>
+                        <option value="用户增长">用户增长</option>
                     </select>
                 </div>
+                
                 <div class="form-group">
                     <label class="form-label">文章内容</label>
                     <textarea class="form-control" id="articleContent" rows="5" placeholder="请输入文章内容"></textarea>
                 </div>
+                
                 <div class="form-group">
                     <label class="form-label">发布状态</label>
                     <select class="form-control" id="articleStatus">
@@ -421,6 +2190,7 @@
                         <option value="draft">草稿</option>
                     </select>
                 </div>
+                
                 <div class="modal-footer">
                     <button class="btn btn-secondary" id="cancelArticleBtn">取消</button>
                     <button class="btn btn-primary" id="saveArticleBtn">保存</button>
@@ -429,18 +2199,22 @@
         </div>
     </div>
     
+    <!-- 添加广告模态框 -->
     <div class="modal" id="addAdModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title" id="adModalTitle">添加新广告</h3>
                 <button class="close-modal" id="closeAdModal">&times;</button>
             </div>
-            <div style="padding: 20px;">
+            
+            <div class="settings-form">
                 <input type="hidden" id="adId">
+                
                 <div class="form-group">
                     <label class="form-label">广告名称</label>
                     <input type="text" class="form-control" id="adName" placeholder="请输入广告名称">
                 </div>
+                
                 <div class="form-group">
                     <label class="form-label">广告类型</label>
                     <select class="form-control" id="adType">
@@ -449,18 +2223,32 @@
                         <option value="video">视频广告</option>
                     </select>
                 </div>
+                
+                <div class="form-group">
+                    <label class="form-label">广告位置</label>
+                    <select class="form-control" id="adPosition">
+                        <option value="header">页面顶部</option>
+                        <option value="content">内容区域</option>
+                        <option value="sidebar">侧边栏</option>
+                        <option value="footer">页面底部</option>
+                    </select>
+                </div>
+                
                 <div class="form-group">
                     <label class="form-label">广告链接</label>
                     <input type="text" class="form-control" id="adLink" placeholder="请输入广告链接URL">
                 </div>
+                
                 <div class="form-group">
                     <label class="form-label">广告描述</label>
                     <textarea class="form-control" id="adDescription" rows="3" placeholder="请输入广告描述"></textarea>
                 </div>
+                
                 <div class="form-group">
                     <label class="form-label">点击率 (%)</label>
                     <input type="number" class="form-control" id="adClickRate" placeholder="请输入点击率" step="0.1" min="0" max="100">
                 </div>
+                
                 <div class="modal-footer">
                     <button class="btn btn-secondary" id="cancelAdBtn">取消</button>
                     <button class="btn btn-primary" id="saveAdBtn">保存</button>
@@ -469,26 +2257,32 @@
         </div>
     </div>
     
+    <!-- 添加用户模态框 -->
     <div class="modal" id="addUserModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title" id="userModalTitle">添加新用户</h3>
                 <button class="close-modal" id="closeUserModal">&times;</button>
             </div>
-            <div style="padding: 20px;">
+            
+            <div class="settings-form">
                 <input type="hidden" id="userId">
+                
                 <div class="form-group">
                     <label class="form-label">姓名</label>
                     <input type="text" class="form-control" id="userName" placeholder="请输入姓名">
                 </div>
+                
                 <div class="form-group">
                     <label class="form-label">邮箱</label>
                     <input type="email" class="form-control" id="userEmail" placeholder="请输入邮箱">
                 </div>
+                
                 <div class="form-group">
                     <label class="form-label">密码</label>
                     <input type="password" class="form-control" id="userPassword" placeholder="请输入密码">
                 </div>
+                
                 <div class="form-group">
                     <label class="form-label">角色</label>
                     <select class="form-control" id="userRole">
@@ -498,6 +2292,15 @@
                         <option value="普通用户">普通用户</option>
                     </select>
                 </div>
+                
+                <div class="form-group">
+                    <label class="form-label">状态</label>
+                    <select class="form-control" id="userStatus">
+                        <option value="active">活跃</option>
+                        <option value="inactive">不活跃</option>
+                    </select>
+                </div>
+                
                 <div class="modal-footer">
                     <button class="btn btn-secondary" id="cancelUserBtn">取消</button>
                     <button class="btn btn-primary" id="saveUserBtn">保存</button>
@@ -506,14 +2309,17 @@
         </div>
     </div>
     
+    <!-- 确认删除模态框 -->
     <div class="modal" id="confirmDeleteModal">
         <div class="modal-content" style="max-width: 400px;">
             <div class="modal-header">
                 <h3 class="modal-title">确认删除</h3>
                 <button class="close-modal" id="closeConfirmDeleteModal">&times;</button>
             </div>
-            <div style="padding: 20px;">
+            
+            <div class="settings-form">
                 <p style="margin-bottom: 20px;">确定要删除此项目吗？此操作无法撤销。</p>
+                
                 <div class="modal-footer">
                     <button class="btn btn-secondary" id="cancelDeleteBtn">取消</button>
                     <button class="btn btn-danger" id="confirmDeleteBtn">删除</button>
@@ -524,75 +2330,259 @@
     
     <!-- 通知组件 -->
     <div class="notification" id="notification">
-        <div class="notification-icon"><i class="fas fa-check-circle"></i></div>
-        <div class="notification-message">操作成功完成</div>
+        <div class="notification-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="notification-message">
+            操作成功完成
+        </div>
         <button class="notification-close">&times;</button>
     </div>
+    
+    <!-- 隐藏的文件输入 -->
+    <input type="file" id="importFileInput" accept=".json" style="display: none;">
     
     <script>
         // 初始化数据
         function initData() {
-            if (!localStorage.getItem('users')) {
-                const defaultUsers = [
-                    { id: 1, name: '李春峰', username: 'lichunfeng', email: 'lichunfeng@example.com', password: 'admin123', role: '超级管理员', position: '超级管理员', avatar: '李', status: 'active', lastLogin: '2023-06-15' },
-                    { id: 2, name: '王明', username: 'wangming', email: 'wangming@example.com', password: 'admin123', role: '管理员', position: '内容管理员', avatar: '王', status: 'active', lastLogin: '2023-06-14' },
-                    { id: 3, name: '张华', username: 'zhanghua', email: 'zhanghua@example.com', password: 'admin123', role: '编辑', position: '内容编辑', avatar: '张', status: 'active', lastLogin: '2023-06-10' }
-                ];
-                localStorage.setItem('users', JSON.stringify(defaultUsers));
-            }
-            
+            // 检查是否已有数据
             if (!localStorage.getItem('articles')) {
+                // 创建默认文章数据
                 const defaultArticles = [
-                    { id: 1, title: '如何提高广告点击率', author: '李春峰', category: '广告技巧', content: '本文将介绍如何通过优化广告内容和位置来提高点击率...', publishDate: '2023-06-15', status: 'published', views: 1250 },
-                    { id: 2, title: '自媒体运营策略', author: '王明', category: '运营技巧', content: '本文将分享一些有效的自媒体运营策略...', publishDate: '2023-06-14', status: 'published', views: 980 },
-                    { id: 3, title: '内容创作指南', author: '张华', category: '内容创作', content: '本文将提供一份全面的内容创作指南...', publishDate: '2023-06-13', status: 'draft', views: 875 }
+                    {
+                        id: 1,
+                        title: '如何提高广告点击率',
+                        author: '李春峰',
+                        category: '广告技巧',
+                        content: '本文将介绍如何通过优化广告内容和位置来提高点击率...',
+                        publishDate: '2023-06-15',
+                        status: 'published',
+                        views: 1250
+                    },
+                    {
+                        id: 2,
+                        title: '自媒体运营策略',
+                        author: '王明',
+                        category: '运营技巧',
+                        content: '本文将分享一些有效的自媒体运营策略，帮助您提升内容影响力...',
+                        publishDate: '2023-06-14',
+                        status: 'published',
+                        views: 980
+                    },
+                    {
+                        id: 3,
+                        title: '内容创作指南',
+                        author: '张华',
+                        category: '内容创作',
+                        content: '本文将提供一份全面的内容创作指南，帮助您创作出更优质的内容...',
+                        publishDate: '2023-06-13',
+                        status: 'draft',
+                        views: 875
+                    },
+                    {
+                        id: 4,
+                        title: '数据分析入门',
+                        author: '李春峰',
+                        category: '数据分析',
+                        content: '本文将介绍数据分析的基础知识和常用工具...',
+                        publishDate: '2023-06-12',
+                        status: 'published',
+                        views: 720
+                    },
+                    {
+                        id: 5,
+                        title: '用户增长技巧',
+                        author: '王明',
+                        category: '用户增长',
+                        content: '本文将分享一些有效的用户增长技巧，帮助您扩大用户群体...',
+                        publishDate: '2023-06-11',
+                        status: 'published',
+                        views: 650
+                    }
                 ];
+                
                 localStorage.setItem('articles', JSON.stringify(defaultArticles));
             }
             
             if (!localStorage.getItem('ads')) {
+                // 创建默认广告数据
                 const defaultAds = [
-                    { id: 1, name: '横幅广告', type: 'image', position: 'header', link: 'https://example.com/banner', description: '适合网站顶部或底部的横幅广告位。', clickRate: 2.5, status: 'active' },
-                    { id: 2, name: '文章内嵌广告', type: 'text', position: 'content', link: 'https://example.com/embedded', description: '嵌入在文章内容中的广告。', clickRate: 3.8, status: 'active' },
-                    { id: 3, name: '弹窗广告', type: 'image', position: 'content', link: 'https://example.com/popup', description: '在用户访问网站时弹出的广告。', clickRate: 5.2, status: 'active' }
+                    {
+                        id: 1,
+                        name: '横幅广告',
+                        type: 'image',
+                        position: 'header',
+                        link: 'https://example.com/banner',
+                        description: '适合网站顶部或底部的横幅广告位，支持多种尺寸和格式。',
+                        clickRate: 2.5,
+                        status: 'active'
+                    },
+                    {
+                        id: 2,
+                        name: '文章内嵌广告',
+                        type: 'text',
+                        position: 'content',
+                        link: 'https://example.com/embedded',
+                        description: '嵌入在文章内容中的广告，与内容自然融合，不影响阅读体验。',
+                        clickRate: 3.8,
+                        status: 'active'
+                    },
+                    {
+                        id: 3,
+                        name: '弹窗广告',
+                        type: 'image',
+                        position: 'content',
+                        link: 'https://example.com/popup',
+                        description: '在用户访问网站时弹出的广告，具有较高的曝光率和点击率。',
+                        clickRate: 5.2,
+                        status: 'active'
+                    },
+                    {
+                        id: 4,
+                        name: '视频广告',
+                        type: 'video',
+                        position: 'content',
+                        link: 'https://example.com/video',
+                        description: '在视频播放前、中或后展示的广告，适合品牌宣传和产品展示。',
+                        clickRate: 4.1,
+                        status: 'active'
+                    }
                 ];
+                
                 localStorage.setItem('ads', JSON.stringify(defaultAds));
             }
             
+            if (!localStorage.getItem('users')) {
+                // 创建默认用户数据
+                const defaultUsers = [
+                    {
+                        id: 1,
+                        name: '李春峰',
+                        username: 'lichunfeng',
+                        email: 'lichunfeng@example.com',
+                        password: 'admin123',
+                        role: '超级管理员',
+                        position: '超级管理员',
+                        avatar: '李',
+                        status: 'active',
+                        lastLogin: '2023-06-15'
+                    },
+                    {
+                        id: 2,
+                        name: '王明',
+                        username: 'wangming',
+                        email: 'wangming@example.com',
+                        password: 'admin123',
+                        role: '管理员',
+                        position: '内容管理员',
+                        avatar: '王',
+                        status: 'active',
+                        lastLogin: '2023-06-14'
+                    },
+                    {
+                        id: 3,
+                        name: '张华',
+                        username: 'zhanghua',
+                        email: 'zhanghua@example.com',
+                        password: 'admin123',
+                        role: '编辑',
+                        position: '内容编辑',
+                        avatar: '张',
+                        status: 'active',
+                        lastLogin: '2023-06-10'
+                    },
+                    {
+                        id: 4,
+                        name: '刘洋',
+                        username: 'liuyang',
+                        email: 'liuyang@example.com',
+                        password: 'admin123',
+                        role: '普通用户',
+                        position: '普通用户',
+                        avatar: '刘',
+                        status: 'inactive',
+                        lastLogin: '2023-06-01'
+                    }
+                ];
+                
+                localStorage.setItem('users', JSON.stringify(defaultUsers));
+            }
+            
             if (!localStorage.getItem('settings')) {
+                // 创建默认设置
                 const defaultSettings = {
                     siteName: '自媒体广告系统',
-                    siteDescription: '专业的自媒体广告管理系统，提供全方位的广告投放和数据分析服务。'
+                    siteDescription: '专业的自媒体广告管理系统，提供全方位的广告投放和数据分析服务。',
+                    adminEmail: 'admin@example.com',
+                    contactPhone: '400-123-4567',
+                    smtpServer: 'smtp.example.com',
+                    smtpPort: '587',
+                    encryptionMethod: 'tls',
+                    senderEmail: 'noreply@example.com',
+                    senderName: '自媒体广告系统',
+                    passwordPolicy: 'medium',
+                    loginAttempts: 5,
+                    sessionTimeout: 30
                 };
+                
                 localStorage.setItem('settings', JSON.stringify(defaultSettings));
+            }
+            
+            if (!localStorage.getItem('backup')) {
+                localStorage.setItem('backup', JSON.stringify({
+                    lastBackupTime: null,
+                    backupSize: 0
+                }));
             }
         }
         
-        // 检查登录状态
+        // 检查用户登录状态
         function checkLoginStatus() {
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
             
             if (currentUser) {
+                // 用户已登录，显示主应用
                 document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('registerPage').style.display = 'none';
+                document.getElementById('forgotPasswordPage').style.display = 'none';
                 document.getElementById('appContainer').style.display = 'flex';
+                
+                // 更新用户信息显示
                 updateUserInfo(currentUser);
+                
+                // 加载数据
                 loadDashboardData();
                 loadArticles();
                 loadAds();
                 loadUsers();
+                loadDataManagement();
                 loadSettings();
+                
+                // 初始化仪表板图表
                 initDashboardCharts();
             } else {
+                // 用户未登录，显示登录页面
                 document.getElementById('loginPage').style.display = 'flex';
+                document.getElementById('registerPage').style.display = 'none';
+                document.getElementById('forgotPasswordPage').style.display = 'none';
                 document.getElementById('appContainer').style.display = 'none';
             }
         }
         
-        // 更新用户信息
+        // 更新用户信息显示
         function updateUserInfo(user) {
             document.getElementById('userAvatar').textContent = user.avatar;
             document.getElementById('userName').textContent = user.name;
             document.getElementById('userRole').textContent = user.role;
+            
+            document.getElementById('profileAvatarLarge').textContent = user.avatar;
+            document.getElementById('profileName').textContent = user.name;
+            document.getElementById('profileEmail').textContent = user.email;
+            
+            document.getElementById('profileNameInput').value = user.name;
+            document.getElementById('profileUsernameInput').value = user.username;
+            document.getElementById('profileEmailInput').value = user.email;
+            document.getElementById('profilePositionInput').value = user.position;
         }
         
         // 加载仪表板数据
@@ -606,29 +2596,37 @@
             document.getElementById('totalUsers').textContent = users.length;
         }
         
-        // 加载文章
+        // 加载文章数据
         function loadArticles(page = 1, search = '') {
             const articles = JSON.parse(localStorage.getItem('articles')) || [];
-            let filteredArticles = articles;
+            const articlesTableBody = document.getElementById('articlesTableBody');
+            const articlesPaginationInfo = document.getElementById('articlesPaginationInfo');
+            const articlesPagination = document.getElementById('articlesPagination');
             
+            // 过滤搜索结果
+            let filteredArticles = articles;
             if (search) {
                 filteredArticles = articles.filter(article => 
                     article.title.toLowerCase().includes(search.toLowerCase()) ||
-                    article.author.toLowerCase().includes(search.toLowerCase())
+                    article.author.toLowerCase().includes(search.toLowerCase()) ||
+                    article.category.toLowerCase().includes(search.toLowerCase())
                 );
             }
             
+            // 分页设置
             const itemsPerPage = 5;
             const totalPages = Math.ceil(filteredArticles.length / itemsPerPage);
             const startIndex = (page - 1) * itemsPerPage;
             const endIndex = Math.min(startIndex + itemsPerPage, filteredArticles.length);
             const currentPageArticles = filteredArticles.slice(startIndex, endIndex);
             
-            const articlesTableBody = document.getElementById('articlesTableBody');
+            // 清空表格
             articlesTableBody.innerHTML = '';
             
+            // 填充表格
             currentPageArticles.forEach(article => {
                 const row = document.createElement('tr');
+                
                 row.innerHTML = `
                     <td>${article.title}</td>
                     <td>${article.author}</td>
@@ -642,26 +2640,64 @@
                         </div>
                     </td>
                 `;
+                
                 articlesTableBody.appendChild(row);
             });
             
-            document.getElementById('articlesPaginationInfo').textContent = `显示 ${startIndex + 1}-${endIndex} 共 ${filteredArticles.length} 条记录`;
+            // 更新分页信息
+            articlesPaginationInfo.textContent = `显示 ${startIndex + 1}-${endIndex} 共 ${filteredArticles.length} 条记录`;
             
-            // 添加事件监听器
+            // 生成分页按钮
+            articlesPagination.innerHTML = '';
+            
+            // 上一页按钮
+            const prevBtn = document.createElement('button');
+            prevBtn.className = `btn btn-sm ${page === 1 ? 'btn-secondary' : 'btn-primary'}`;
+            prevBtn.textContent = '上一页';
+            prevBtn.disabled = page === 1;
+            prevBtn.addEventListener('click', () => loadArticles(page - 1, search));
+            articlesPagination.appendChild(prevBtn);
+            
+            // 页码按钮
+            for (let i = 1; i <= totalPages; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.className = `btn btn-sm ${i === page ? 'btn-primary' : 'btn-secondary'}`;
+                pageBtn.textContent = i;
+                pageBtn.addEventListener('click', () => loadArticles(i, search));
+                articlesPagination.appendChild(pageBtn);
+            }
+            
+            // 下一页按钮
+            const nextBtn = document.createElement('button');
+            nextBtn.className = `btn btn-sm ${page === totalPages ? 'btn-secondary' : 'btn-primary'}`;
+            nextBtn.textContent = '下一页';
+            nextBtn.disabled = page === totalPages || totalPages === 0;
+            nextBtn.addEventListener('click', () => loadArticles(page + 1, search));
+            articlesPagination.appendChild(nextBtn);
+            
+            // 添加编辑和删除事件监听
             document.querySelectorAll('#articlesTableBody .action-btn.edit').forEach(btn => {
-                btn.addEventListener('click', function() { editArticle(parseInt(this.getAttribute('data-id'))); });
+                btn.addEventListener('click', function() {
+                    const articleId = parseInt(this.getAttribute('data-id'));
+                    editArticle(articleId);
+                });
             });
             
             document.querySelectorAll('#articlesTableBody .action-btn.delete').forEach(btn => {
-                btn.addEventListener('click', function() { confirmDelete('article', parseInt(this.getAttribute('data-id'))); });
+                btn.addEventListener('click', function() {
+                    const articleId = parseInt(this.getAttribute('data-id'));
+                    confirmDelete('article', articleId);
+                });
             });
         }
         
-        // 加载广告
+        // 加载广告数据
         function loadAds(search = '') {
             const ads = JSON.parse(localStorage.getItem('ads')) || [];
-            let filteredAds = ads;
+            const adsContainer = document.getElementById('adsContainer');
             
+            // 过滤搜索结果
+            let filteredAds = ads;
             if (search) {
                 filteredAds = ads.filter(ad => 
                     ad.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -669,25 +2705,43 @@
                 );
             }
             
-            const adsContainer = document.getElementById('adsContainer');
+            // 清空容器
             adsContainer.innerHTML = '';
             
+            // 填充广告卡片
             filteredAds.forEach(ad => {
                 const adCard = document.createElement('div');
                 adCard.className = 'template-card';
-                adCard.style.cssText = 'background: white; border-radius: 12px; padding: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 25px;';
                 
-                let typeText = ad.type === 'image' ? '图片广告' : ad.type === 'text' ? '文本广告' : '视频广告';
+                let typeBadgeClass = '';
+                let typeText = '';
+                
+                switch (ad.type) {
+                    case 'image':
+                        typeBadgeClass = 'template-type-image';
+                        typeText = '图片广告';
+                        break;
+                    case 'text':
+                        typeBadgeClass = 'template-type-text';
+                        typeText = '文本广告';
+                        break;
+                    case 'video':
+                        typeBadgeClass = 'template-type-image';
+                        typeText = '视频广告';
+                        break;
+                }
                 
                 adCard.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <h3 style="font-size: 1.2rem; color: #2c3e50;">${ad.name}</h3>
-                        <span class="status-badge status-active">${typeText}</span>
+                    <div class="template-header">
+                        <h3 class="template-title">${ad.name}</h3>
+                        <span class="template-badge ${typeBadgeClass}">${typeText}</span>
                     </div>
-                    <p style="color: #7f8c8d; margin-bottom: 20px;">${ad.description}</p>
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div class="template-content">
+                        <p>${ad.description}</p>
+                    </div>
+                    <div class="template-footer">
                         <div>点击率: ${ad.clickRate}%</div>
-                        <div style="display: flex; gap: 10px;">
+                        <div class="template-actions">
                             <button class="btn btn-sm btn-primary edit-ad" data-id="${ad.id}">编辑</button>
                             <button class="btn btn-sm btn-danger delete-ad" data-id="${ad.id}">删除</button>
                         </div>
@@ -697,40 +2751,68 @@
                 adsContainer.appendChild(adCard);
             });
             
-            // 添加事件监听器
+            // 添加编辑和删除事件监听器
             document.querySelectorAll('.edit-ad').forEach(btn => {
-                btn.addEventListener('click', function() { editAd(parseInt(this.getAttribute('data-id'))); });
+                btn.addEventListener('click', function() {
+                    const adId = parseInt(this.getAttribute('data-id'));
+                    editAd(adId);
+                });
             });
             
             document.querySelectorAll('.delete-ad').forEach(btn => {
-                btn.addEventListener('click', function() { confirmDelete('ad', parseInt(this.getAttribute('data-id'))); });
+                btn.addEventListener('click', function() {
+                    const adId = parseInt(this.getAttribute('data-id'));
+                    confirmDelete('ad', adId);
+                });
             });
         }
         
-        // 加载用户
+        // 加载用户数据
         function loadUsers(page = 1, search = '') {
             const users = JSON.parse(localStorage.getItem('users')) || [];
-            let filteredUsers = users;
+            const usersTableBody = document.getElementById('usersTableBody');
+            const usersPaginationInfo = document.getElementById('usersPaginationInfo');
+            const usersPagination = document.getElementById('usersPagination');
             
+            // 过滤搜索结果
+            let filteredUsers = users;
             if (search) {
                 filteredUsers = users.filter(user => 
                     user.name.toLowerCase().includes(search.toLowerCase()) ||
-                    user.email.toLowerCase().includes(search.toLowerCase())
+                    user.email.toLowerCase().includes(search.toLowerCase()) ||
+                    user.role.toLowerCase().includes(search.toLowerCase())
                 );
             }
             
+            // 分页设置
             const itemsPerPage = 5;
             const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
             const startIndex = (page - 1) * itemsPerPage;
             const endIndex = Math.min(startIndex + itemsPerPage, filteredUsers.length);
             const currentPageUsers = filteredUsers.slice(startIndex, endIndex);
             
-            const usersTableBody = document.getElementById('usersTableBody');
+            // 清空表格
             usersTableBody.innerHTML = '';
             
+            // 填充表格
             currentPageUsers.forEach(user => {
                 const row = document.createElement('tr');
-                let roleBadgeClass = user.role === '超级管理员' ? 'role-super-admin' : user.role === '管理员' ? 'role-admin' : user.role === '编辑' ? 'role-editor' : 'role-user';
+                
+                let roleBadgeClass = '';
+                
+                switch (user.role) {
+                    case '超级管理员':
+                        roleBadgeClass = 'role-super-admin';
+                        break;
+                    case '管理员':
+                        roleBadgeClass = 'role-admin';
+                        break;
+                    case '编辑':
+                        roleBadgeClass = 'role-editor';
+                        break;
+                    default:
+                        roleBadgeClass = 'role-user';
+                }
                 
                 row.innerHTML = `
                     <td>
@@ -744,63 +2826,442 @@
                     </td>
                     <td><span class="role-badge ${roleBadgeClass}">${user.role}</span></td>
                     <td>${user.lastLogin}</td>
+                    <td>${user.lastLogin}</td>
                     <td><span class="status-badge ${user.status === 'active' ? 'status-active' : 'status-inactive'}">${user.status === 'active' ? '活跃' : '不活跃'}</span></td>
                     <td>
                         <div class="user-actions">
                             <button class="action-btn edit" title="编辑" data-id="${user.id}"><i class="fas fa-edit"></i></button>
                             <button class="action-btn delete" title="删除" data-id="${user.id}"><i class="fas fa-trash"></i></button>
+                            <button class="action-btn lock" title="${user.status === 'active' ? '锁定' : '解锁'}" data-id="${user.id}"><i class="fas fa-${user.status === 'active' ? 'lock' : 'unlock'}"></i></button>
                         </div>
                     </td>
                 `;
+                
                 usersTableBody.appendChild(row);
             });
             
-            document.getElementById('usersPaginationInfo').textContent = `显示 ${startIndex + 1}-${endIndex} 共 ${filteredUsers.length} 条记录`;
+            // 更新分页信息
+            usersPaginationInfo.textContent = `显示 ${startIndex + 1}-${endIndex} 共 ${filteredUsers.length} 条记录`;
             
-            // 添加事件监听器
+            // 生成分页按钮
+            usersPagination.innerHTML = '';
+            
+            // 上一页按钮
+            const prevBtn = document.createElement('button');
+            prevBtn.className = `btn btn-sm ${page === 1 ? 'btn-secondary' : 'btn-primary'}`;
+            prevBtn.textContent = '上一页';
+            prevBtn.disabled = page === 1;
+            prevBtn.addEventListener('click', () => loadUsers(page - 1, search));
+            usersPagination.appendChild(prevBtn);
+            
+            // 页码按钮
+            for (let i = 1; i <= totalPages; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.className = `btn btn-sm ${i === page ? 'btn-primary' : 'btn-secondary'}`;
+                pageBtn.textContent = i;
+                pageBtn.addEventListener('click', () => loadUsers(i, search));
+                usersPagination.appendChild(pageBtn);
+            }
+            
+            // 下一页按钮
+            const nextBtn = document.createElement('button');
+            nextBtn.className = `btn btn-sm ${page === totalPages ? 'btn-secondary' : 'btn-primary'}`;
+            nextBtn.textContent = '下一页';
+            nextBtn.disabled = page === totalPages || totalPages === 0;
+            nextBtn.addEventListener('click', () => loadUsers(page + 1, search));
+            usersPagination.appendChild(nextBtn);
+            
+            // 添加编辑、删除和锁定事件监听器
             document.querySelectorAll('#usersTableBody .action-btn.edit').forEach(btn => {
-                btn.addEventListener('click', function() { editUser(parseInt(this.getAttribute('data-id'))); });
+                btn.addEventListener('click', function() {
+                    const userId = parseInt(this.getAttribute('data-id'));
+                    editUser(userId);
+                });
             });
             
             document.querySelectorAll('#usersTableBody .action-btn.delete').forEach(btn => {
-                btn.addEventListener('click', function() { confirmDelete('user', parseInt(this.getAttribute('data-id'))); });
+                btn.addEventListener('click', function() {
+                    const userId = parseInt(this.getAttribute('data-id'));
+                    confirmDelete('user', userId);
+                });
             });
+            
+            document.querySelectorAll('#usersTableBody .action-btn.lock').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const userId = parseInt(this.getAttribute('data-id'));
+                    toggleUserStatus(userId);
+                });
+            });
+        }
+        
+        // 加载数据管理页面
+        function loadDataManagement() {
+            const articles = JSON.parse(localStorage.getItem('articles')) || [];
+            const ads = JSON.parse(localStorage.getItem('ads')) || [];
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const backup = JSON.parse(localStorage.getItem('backup')) || { lastBackupTime: null, backupSize: 0 };
+            
+            // 更新数据统计
+            document.getElementById('dataArticlesCount').textContent = articles.length;
+            document.getElementById('dataAdsCount').textContent = ads.length;
+            document.getElementById('dataUsersCount').textContent = users.length;
+            
+            // 计算数据大小
+            const dataSize = new Blob([JSON.stringify({ articles, ads, users })]).size;
+            document.getElementById('dataTotalSize').textContent = formatFileSize(dataSize);
+            
+            // 更新备份信息
+            document.getElementById('lastBackupTime').textContent = backup.lastBackupTime || '从未备份';
+            document.getElementById('backupSize').textContent = formatFileSize(backup.backupSize);
         }
         
         // 加载设置
         function loadSettings() {
             const settings = JSON.parse(localStorage.getItem('settings')) || {};
+            
+            // 基本设置
             document.getElementById('siteName').value = settings.siteName || '';
             document.getElementById('siteDescription').value = settings.siteDescription || '';
+            document.getElementById('adminEmail').value = settings.adminEmail || '';
+            document.getElementById('contactPhone').value = settings.contactPhone || '';
+            
+            // 邮件设置
+            document.getElementById('smtpServer').value = settings.smtpServer || '';
+            document.getElementById('smtpPort').value = settings.smtpPort || '';
+            document.getElementById('encryptionMethod').value = settings.encryptionMethod || 'tls';
+            document.getElementById('senderEmail').value = settings.senderEmail || '';
+            document.getElementById('senderName').value = settings.senderName || '';
+            
+            // 安全设置
+            document.getElementById('passwordPolicy').value = settings.passwordPolicy || 'medium';
+            document.getElementById('loginAttempts').value = settings.loginAttempts || 5;
+            document.getElementById('sessionTimeout').value = settings.sessionTimeout || 30;
         }
         
-        // 登录
+        // 格式化文件大小
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        // 登录功能
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
+            
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
-            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const rememberMe = document.getElementById('rememberMe').checked;
+            
+            // 获取用户列表
+            const users = JSON.parse(localStorage.getItem('users'));
+            
+            // 查找匹配的用户
             const user = users.find(u => u.email === email && u.password === password);
             
             if (user) {
-                localStorage.setItem('currentUser', JSON.stringify(user));
+                // 登录成功
+                if (rememberMe) {
+                    localStorage.setItem('currentUser', JSON.stringify(user));
+                } else {
+                    sessionStorage.setItem('currentUser', JSON.stringify(user));
+                }
+                
+                // 更新最后登录时间
+                user.lastLogin = new Date().toISOString().split('T')[0];
+                localStorage.setItem('users', JSON.stringify(users));
+                
+                // 显示主应用
                 checkLoginStatus();
+                
                 showNotification('登录成功！', 'success');
             } else {
+                // 登录失败
                 showNotification('邮箱或密码错误！', 'error');
             }
+        });
+        
+        // 注册功能
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            
+            // 验证密码
+            if (password !== confirmPassword) {
+                document.getElementById('registerConfirmPasswordError').style.display = 'block';
+                return;
+            }
+            
+            // 获取用户列表
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            
+            // 检查邮箱是否已注册
+            if (users.some(u => u.email === email)) {
+                showNotification('该邮箱已被注册！', 'error');
+                return;
+            }
+            
+            // 创建新用户
+            const newUser = {
+                id: users.length + 1,
+                name: name,
+                username: email.split('@')[0],
+                email: email,
+                password: password,
+                role: '普通用户',
+                position: '普通用户',
+                avatar: name.charAt(0),
+                status: 'active',
+                lastLogin: new Date().toISOString().split('T')[0]
+            };
+            
+            // 添加到用户列表
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            // 自动登录
+            localStorage.setItem('currentUser', JSON.stringify(newUser));
+            
+            // 显示主应用
+            checkLoginStatus();
+            
+            showNotification('注册成功！', 'success');
+        });
+        
+        // 忘记密码功能
+        document.getElementById('forgotPasswordForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('forgotEmail').value;
+            
+            // 获取用户列表
+            const users = JSON.parse(localStorage.getItem('users'));
+            
+            // 查找匹配的用户
+            const user = users.find(u => u.email === email);
+            
+            if (user) {
+                // 模拟发送重置链接
+                showNotification('重置链接已发送到您的邮箱！', 'success');
+                
+                // 返回登录页面
+                setTimeout(() => {
+                    document.getElementById('loginPage').style.display = 'flex';
+                    document.getElementById('forgotPasswordPage').style.display = 'none';
+                }, 2000);
+            } else {
+                showNotification('该邮箱未注册！', 'error');
+            }
+        });
+        
+        // 修改密码功能
+        document.getElementById('changePasswordBtn').addEventListener('click', function() {
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+            
+            // 获取当前用户
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            
+            // 验证当前密码
+            if (currentUser.password !== currentPassword) {
+                showNotification('当前密码错误！', 'error');
+                return;
+            }
+            
+            // 验证新密码
+            if (newPassword !== confirmNewPassword) {
+                showNotification('两次输入的新密码不一致！', 'error');
+                return;
+            }
+            
+            // 更新密码
+            currentUser.password = newPassword;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            // 更新用户列表中的密码
+            const users = JSON.parse(localStorage.getItem('users'));
+            const userIndex = users.findIndex(u => u.id === currentUser.id);
+            if (userIndex !== -1) {
+                users[userIndex].password = newPassword;
+                localStorage.setItem('users', JSON.stringify(users));
+            }
+            
+            showNotification('密码修改成功！', 'success');
+            
+            // 清空输入框
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmNewPassword').value = '';
+        });
+        
+        // 保存个人资料
+        document.getElementById('saveProfileBtn').addEventListener('click', function() {
+            const name = document.getElementById('profileNameInput').value;
+            const username = document.getElementById('profileUsernameInput').value;
+            const email = document.getElementById('profileEmailInput').value;
+            const position = document.getElementById('profilePositionInput').value;
+            
+            // 获取当前用户
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            
+            // 更新用户信息
+            currentUser.name = name;
+            currentUser.username = username;
+            currentUser.email = email;
+            currentUser.position = position;
+            currentUser.avatar = name.charAt(0);
+            
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            // 更新用户列表中的信息
+            const users = JSON.parse(localStorage.getItem('users'));
+            const userIndex = users.findIndex(u => u.id === currentUser.id);
+            if (userIndex !== -1) {
+                users[userIndex] = currentUser;
+                localStorage.setItem('users', JSON.stringify(users));
+            }
+            
+            // 更新显示
+            updateUserInfo(currentUser);
+            
+            showNotification('个人资料已更新！', 'success');
         });
         
         // 退出登录
         document.getElementById('logoutBtn').addEventListener('click', function() {
             localStorage.removeItem('currentUser');
+            sessionStorage.removeItem('currentUser');
+            
             checkLoginStatus();
+            
             showNotification('已成功退出登录！', 'success');
         });
         
-        // 侧边栏折叠
-        document.getElementById('toggleSidebar').addEventListener('click', function() {
-            const sidebar = document.getElementById('sidebar');
+        // 页面切换
+        document.getElementById('registerLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('registerPage').style.display = 'flex';
+        });
+        
+        document.getElementById('loginLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('registerPage').style.display = 'none';
+            document.getElementById('loginPage').style.display = 'flex';
+        });
+        
+        document.getElementById('forgotPasswordLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('forgotPasswordPage').style.display = 'flex';
+        });
+        
+        document.getElementById('backToLoginLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('forgotPasswordPage').style.display = 'none';
+            document.getElementById('loginPage').style.display = 'flex';
+        });
+        
+        // 密码可见性切换
+        document.getElementById('loginPasswordToggle').addEventListener('click', function() {
+            const passwordInput = document.getElementById('loginPassword');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                this.classList.remove('fa-eye');
+                this.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                this.classList.remove('fa-eye-slash');
+                this.classList.add('fa-eye');
+            }
+        });
+        
+        document.getElementById('registerPasswordToggle').addEventListener('click', function() {
+            const passwordInput = document.getElementById('registerPassword');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                this.classList.remove('fa-eye');
+                this.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                this.classList.remove('fa-eye-slash');
+                this.classList.add('fa-eye');
+            }
+        });
+        
+        document.getElementById('registerConfirmPasswordToggle').addEventListener('click', function() {
+            const passwordInput = document.getElementById('registerConfirmPassword');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                this.classList.remove('fa-eye');
+                this.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                this.classList.remove('fa-eye-slash');
+                this.classList.add('fa-eye');
+            }
+        });
+        
+        // 密码强度检测
+        document.getElementById('registerPassword').addEventListener('input', function() {
+            const password = this.value;
+            const strengthMeter = document.getElementById('passwordStrengthMeter');
+            const strengthText = document.getElementById('passwordStrengthText');
+            
+            // 计算密码强度
+            let strength = 0;
+            if (password.length >= 8) strength += 25;
+            if (password.match(/[a-z]+/)) strength += 25;
+            if (password.match(/[A-Z]+/)) strength += 25;
+            if (password.match(/[0-9]+/)) strength += 25;
+            
+            // 更新强度指示器
+            strengthMeter.style.width = strength + '%';
+            
+            if (strength <= 25) {
+                strengthMeter.style.background = '#e74c3c';
+                strengthText.textContent = '弱';
+                strengthText.style.color = '#e74c3c';
+            } else if (strength <= 50) {
+                strengthMeter.style.background = '#f1c40f';
+                strengthText.textContent = '中';
+                strengthText.style.color = '#f1c40f';
+            } else if (strength <= 75) {
+                strengthMeter.style.background = '#3498db';
+                strengthText.textContent = '强';
+                strengthText.style.color = '#3498db';
+            } else {
+                strengthMeter.style.background = '#2ecc71';
+                strengthText.textContent = '非常强';
+                strengthText.style.color = '#2ecc71';
+            }
+        });
+        
+        // DOM元素
+        const sidebar = document.getElementById('sidebar');
+        const toggleSidebar = document.getElementById('toggleSidebar');
+        const navItems = document.querySelectorAll('.nav-item');
+        const pageContents = document.querySelectorAll('.page-content');
+        const currentPageTitle = document.getElementById('currentPageTitle');
+        const notification = document.getElementById('notification');
+        const notificationClose = document.querySelector('.notification-close');
+        const profileTabs = document.querySelectorAll('.profile-tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        // 图表实例
+        let revenueChart, clickRateChart, articlesChart, trafficChart, sourceChart;
+        
+        // 侧边栏折叠功能
+        toggleSidebar.addEventListener('click', function() {
             sidebar.classList.toggle('collapsed');
             const icon = this.querySelector('i');
             if (sidebar.classList.contains('collapsed')) {
@@ -812,21 +3273,46 @@
             }
         });
         
-        // 页面导航
-        document.querySelectorAll('.nav-item').forEach(item => {
+        // 页面导航功能
+        navItems.forEach(item => {
             item.addEventListener('click', function() {
-                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-                document.querySelectorAll('.page-content').forEach(content => content.classList.remove('active'));
+                // 移除所有活动状态
+                navItems.forEach(nav => nav.classList.remove('active'));
+                pageContents.forEach(content => content.classList.remove('active'));
                 
+                // 添加当前活动状态
                 this.classList.add('active');
+                
+                // 获取页面ID并显示对应内容
                 const pageId = this.getAttribute('data-page') + 'Page';
                 document.getElementById(pageId).classList.add('active');
                 
+                // 更新页面标题
                 const pageTitle = this.querySelector('.nav-text').textContent;
-                document.getElementById('currentPageTitle').textContent = pageTitle;
+                currentPageTitle.textContent = pageTitle;
                 
-                if (pageId === 'dashboardPage') initDashboardCharts();
-                if (pageId === 'analyticsPage') initAnalyticsCharts();
+                // 初始化对应页面的图表
+                if (pageId === 'dashboardPage') {
+                    initDashboardCharts();
+                } else if (pageId === 'analyticsPage') {
+                    initAnalyticsCharts();
+                }
+            });
+        });
+        
+        // 个人中心标签页切换
+        profileTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                // 移除所有活动状态
+                profileTabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                // 添加当前活动状态
+                this.classList.add('active');
+                
+                // 获取标签ID并显示对应内容
+                const tabId = this.getAttribute('data-tab') + 'Tab';
+                document.getElementById(tabId).classList.add('active');
             });
         });
         
@@ -836,22 +3322,40 @@
             const notificationIcon = notification.querySelector('.notification-icon i');
             const notificationMessage = notification.querySelector('.notification-message');
             
+            // 设置通知类型
             notification.className = 'notification';
             notification.classList.add(`notification-${type}`);
             
-            if (type === 'success') notificationIcon.className = 'fas fa-check-circle';
-            else if (type === 'error') notificationIcon.className = 'fas fa-exclamation-circle';
-            else if (type === 'info') notificationIcon.className = 'fas fa-info-circle';
+            // 设置图标
+            if (type === 'success') {
+                notificationIcon.className = 'fas fa-check-circle';
+            } else if (type === 'error') {
+                notificationIcon.className = 'fas fa-exclamation-circle';
+            } else if (type === 'info') {
+                notificationIcon.className = 'fas fa-info-circle';
+            }
             
+            // 设置消息
             notificationMessage.textContent = message;
+            
+            // 显示通知
             notification.classList.add('show');
             
-            setTimeout(() => { notification.classList.remove('show'); }, 3000);
+            // 3秒后自动隐藏
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
         }
+        
+        // 关闭通知
+        notificationClose.addEventListener('click', function() {
+            notification.classList.remove('show');
+        });
         
         // 文章搜索
         document.getElementById('articleSearchBtn').addEventListener('click', function() {
-            loadArticles(1, document.getElementById('articleSearchInput').value);
+            const search = document.getElementById('articleSearchInput').value;
+            loadArticles(1, search);
         });
         
         // 添加文章
@@ -866,15 +3370,14 @@
             document.getElementById('addArticleModal').style.display = 'flex';
         });
         
-        // 关闭模态框
-        document.getElementById('closeArticleModal').addEventListener('click', function() { document.getElementById('addArticleModal').style.display = 'none'; });
-        document.getElementById('cancelArticleBtn').addEventListener('click', function() { document.getElementById('addArticleModal').style.display = 'none'; });
-        document.getElementById('closeAdModal').addEventListener('click', function() { document.getElementById('addAdModal').style.display = 'none'; });
-        document.getElementById('cancelAdBtn').addEventListener('click', function() { document.getElementById('addAdModal').style.display = 'none'; });
-        document.getElementById('closeUserModal').addEventListener('click', function() { document.getElementById('addUserModal').style.display = 'none'; });
-        document.getElementById('cancelUserBtn').addEventListener('click', function() { document.getElementById('addUserModal').style.display = 'none'; });
-        document.getElementById('closeConfirmDeleteModal').addEventListener('click', function() { document.getElementById('confirmDeleteModal').style.display = 'none'; });
-        document.getElementById('cancelDeleteBtn').addEventListener('click', function() { document.getElementById('confirmDeleteModal').style.display = 'none'; });
+        // 关闭文章模态框
+        document.getElementById('closeArticleModal').addEventListener('click', function() {
+            document.getElementById('addArticleModal').style.display = 'none';
+        });
+        
+        document.getElementById('cancelArticleBtn').addEventListener('click', function() {
+            document.getElementById('addArticleModal').style.display = 'none';
+        });
         
         // 保存文章
         document.getElementById('saveArticleBtn').addEventListener('click', function() {
@@ -893,24 +3396,41 @@
             const articles = JSON.parse(localStorage.getItem('articles')) || [];
             
             if (articleId) {
+                // 编辑现有文章
                 const index = articles.findIndex(a => a.id === parseInt(articleId));
                 if (index !== -1) {
-                    articles[index] = { ...articles[index], title, author, category, content, status };
+                    articles[index] = {
+                        ...articles[index],
+                        title,
+                        author,
+                        category,
+                        content,
+                        status
+                    };
                 }
             } else {
+                // 添加新文章
                 const newArticle = {
                     id: articles.length > 0 ? Math.max(...articles.map(a => a.id)) + 1 : 1,
-                    title, author, category, content,
+                    title,
+                    author,
+                    category,
+                    content,
                     publishDate: new Date().toISOString().split('T')[0],
-                    status, views: 0
+                    status,
+                    views: 0
                 };
+                
                 articles.push(newArticle);
             }
             
             localStorage.setItem('articles', JSON.stringify(articles));
+            
             document.getElementById('addArticleModal').style.display = 'none';
+            
             loadArticles();
             loadDashboardData();
+            
             showNotification(articleId ? '文章已更新！' : '文章已添加！', 'success');
         });
         
@@ -933,7 +3453,8 @@
         
         // 广告搜索
         document.getElementById('adSearchBtn').addEventListener('click', function() {
-            loadAds(document.getElementById('adSearchInput').value);
+            const search = document.getElementById('adSearchInput').value;
+            loadAds(search);
         });
         
         // 添加广告
@@ -942,10 +3463,20 @@
             document.getElementById('adId').value = '';
             document.getElementById('adName').value = '';
             document.getElementById('adType').value = 'image';
+            document.getElementById('adPosition').value = 'header';
             document.getElementById('adLink').value = '';
             document.getElementById('adDescription').value = '';
             document.getElementById('adClickRate').value = '';
             document.getElementById('addAdModal').style.display = 'flex';
+        });
+        
+        // 关闭广告模态框
+        document.getElementById('closeAdModal').addEventListener('click', function() {
+            document.getElementById('addAdModal').style.display = 'none';
+        });
+        
+        document.getElementById('cancelAdBtn').addEventListener('click', function() {
+            document.getElementById('addAdModal').style.display = 'none';
         });
         
         // 保存广告
@@ -953,6 +3484,7 @@
             const adId = document.getElementById('adId').value;
             const name = document.getElementById('adName').value;
             const type = document.getElementById('adType').value;
+            const position = document.getElementById('adPosition').value;
             const link = document.getElementById('adLink').value;
             const description = document.getElementById('adDescription').value;
             const clickRate = parseFloat(document.getElementById('adClickRate').value);
@@ -965,22 +3497,42 @@
             const ads = JSON.parse(localStorage.getItem('ads')) || [];
             
             if (adId) {
+                // 编辑现有广告
                 const index = ads.findIndex(a => a.id === parseInt(adId));
                 if (index !== -1) {
-                    ads[index] = { ...ads[index], name, type, link, description, clickRate };
+                    ads[index] = {
+                        ...ads[index],
+                        name,
+                        type,
+                        position,
+                        link,
+                        description,
+                        clickRate
+                    };
                 }
             } else {
+                // 添加新广告
                 const newAd = {
                     id: ads.length > 0 ? Math.max(...ads.map(a => a.id)) + 1 : 1,
-                    name, type, position: 'content', link, description, clickRate, status: 'active'
+                    name,
+                    type,
+                    position,
+                    link,
+                    description,
+                    clickRate,
+                    status: 'active'
                 };
+                
                 ads.push(newAd);
             }
             
             localStorage.setItem('ads', JSON.stringify(ads));
+            
             document.getElementById('addAdModal').style.display = 'none';
+            
             loadAds();
             loadDashboardData();
+            
             showNotification(adId ? '广告已更新！' : '广告已添加！', 'success');
         });
         
@@ -994,6 +3546,7 @@
                 document.getElementById('adId').value = ad.id;
                 document.getElementById('adName').value = ad.name;
                 document.getElementById('adType').value = ad.type;
+                document.getElementById('adPosition').value = ad.position;
                 document.getElementById('adLink').value = ad.link;
                 document.getElementById('adDescription').value = ad.description;
                 document.getElementById('adClickRate').value = ad.clickRate;
@@ -1003,7 +3556,8 @@
         
         // 用户搜索
         document.getElementById('userSearchBtn').addEventListener('click', function() {
-            loadUsers(1, document.getElementById('userSearchInput').value);
+            const search = document.getElementById('userSearchInput').value;
+            loadUsers(1, search);
         });
         
         // 添加用户
@@ -1014,7 +3568,17 @@
             document.getElementById('userEmail').value = '';
             document.getElementById('userPassword').value = '';
             document.getElementById('userRole').value = '普通用户';
+            document.getElementById('userStatus').value = 'active';
             document.getElementById('addUserModal').style.display = 'flex';
+        });
+        
+        // 关闭用户模态框
+        document.getElementById('closeUserModal').addEventListener('click', function() {
+            document.getElementById('addUserModal').style.display = 'none';
+        });
+        
+        document.getElementById('cancelUserBtn').addEventListener('click', function() {
+            document.getElementById('addUserModal').style.display = 'none';
         });
         
         // 保存用户
@@ -1024,6 +3588,7 @@
             const email = document.getElementById('userEmail').value;
             const password = document.getElementById('userPassword').value;
             const role = document.getElementById('userRole').value;
+            const status = document.getElementById('userStatus').value;
             
             if (!name || !email || (!userId && !password)) {
                 showNotification('请填写所有必填字段！', 'error');
@@ -1033,30 +3598,54 @@
             const users = JSON.parse(localStorage.getItem('users')) || [];
             
             if (userId) {
+                // 编辑现有用户
                 const index = users.findIndex(u => u.id === parseInt(userId));
                 if (index !== -1) {
-                    users[index] = { ...users[index], name, email, role, avatar: name.charAt(0) };
-                    if (password) users[index].password = password;
+                    users[index] = {
+                        ...users[index],
+                        name,
+                        email,
+                        role,
+                        status,
+                        avatar: name.charAt(0)
+                    };
+                    
+                    // 只有在提供了新密码时才更新密码
+                    if (password) {
+                        users[index].password = password;
+                    }
                 }
             } else {
+                // 检查邮箱是否已存在
                 if (users.some(u => u.email === email)) {
                     showNotification('该邮箱已被注册！', 'error');
                     return;
                 }
                 
+                // 添加新用户
                 const newUser = {
                     id: users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1,
-                    name, username: email.split('@')[0], email, password, role,
-                    position: role, avatar: name.charAt(0), status: 'active',
+                    name,
+                    username: email.split('@')[0],
+                    email,
+                    password,
+                    role,
+                    position: role,
+                    avatar: name.charAt(0),
+                    status,
                     lastLogin: new Date().toISOString().split('T')[0]
                 };
+                
                 users.push(newUser);
             }
             
             localStorage.setItem('users', JSON.stringify(users));
+            
             document.getElementById('addUserModal').style.display = 'none';
+            
             loadUsers();
             loadDashboardData();
+            
             showNotification(userId ? '用户已更新！' : '用户已添加！', 'success');
         });
         
@@ -1072,7 +3661,23 @@
                 document.getElementById('userEmail').value = user.email;
                 document.getElementById('userPassword').value = '';
                 document.getElementById('userRole').value = user.role;
+                document.getElementById('userStatus').value = user.status;
                 document.getElementById('addUserModal').style.display = 'flex';
+            }
+        }
+        
+        // 切换用户状态
+        function toggleUserStatus(userId) {
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const index = users.findIndex(u => u.id === userId);
+            
+            if (index !== -1) {
+                users[index].status = users[index].status === 'active' ? 'inactive' : 'active';
+                localStorage.setItem('users', JSON.stringify(users));
+                
+                loadUsers();
+                
+                showNotification(`用户已${users[index].status === 'active' ? '解锁' : '锁定'}！`, 'success');
             }
         }
         
@@ -1086,49 +3691,297 @@
             document.getElementById('confirmDeleteModal').style.display = 'flex';
         }
         
+        // 关闭确认删除模态框
+        document.getElementById('closeConfirmDeleteModal').addEventListener('click', function() {
+            document.getElementById('confirmDeleteModal').style.display = 'none';
+        });
+        
+        document.getElementById('cancelDeleteBtn').addEventListener('click', function() {
+            document.getElementById('confirmDeleteModal').style.display = 'none';
+        });
+        
+        // 确认删除
         document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
             if (deleteType === 'article') {
                 const articles = JSON.parse(localStorage.getItem('articles')) || [];
                 const filteredArticles = articles.filter(a => a.id !== deleteId);
                 localStorage.setItem('articles', JSON.stringify(filteredArticles));
+                
                 loadArticles();
                 loadDashboardData();
+                
                 showNotification('文章已删除！', 'success');
             } else if (deleteType === 'ad') {
                 const ads = JSON.parse(localStorage.getItem('ads')) || [];
                 const filteredAds = ads.filter(a => a.id !== deleteId);
                 localStorage.setItem('ads', JSON.stringify(filteredAds));
+                
                 loadAds();
                 loadDashboardData();
+                
                 showNotification('广告已删除！', 'success');
             } else if (deleteType === 'user') {
                 const users = JSON.parse(localStorage.getItem('users')) || [];
                 const filteredUsers = users.filter(u => u.id !== deleteId);
                 localStorage.setItem('users', JSON.stringify(filteredUsers));
+                
                 loadUsers();
                 loadDashboardData();
+                
                 showNotification('用户已删除！', 'success');
             }
             
             document.getElementById('confirmDeleteModal').style.display = 'none';
         });
         
+        // 数据管理功能
+        // 导出数据
+        document.getElementById('exportDataBtn').addEventListener('click', function() {
+            const articles = JSON.parse(localStorage.getItem('articles')) || [];
+            const ads = JSON.parse(localStorage.getItem('ads')) || [];
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const settings = JSON.parse(localStorage.getItem('settings')) || {};
+            
+            const data = {
+                articles,
+                ads,
+                users,
+                settings,
+                exportDate: new Date().toISOString()
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = '自媒体广告系统数据_' + new Date().toISOString().split('T')[0] + '.json';
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showNotification('数据已导出！', 'success');
+        });
+        
+        // 导入数据
+        document.getElementById('importDataBtn').addEventListener('click', function() {
+            document.getElementById('importFileInput').click();
+        });
+        
+        document.getElementById('importFileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (data.articles) {
+                        localStorage.setItem('articles', JSON.stringify(data.articles));
+                    }
+                    
+                    if (data.ads) {
+                        localStorage.setItem('ads', JSON.stringify(data.ads));
+                    }
+                    
+                    if (data.users) {
+                        localStorage.setItem('users', JSON.stringify(data.users));
+                    }
+                    
+                    if (data.settings) {
+                        localStorage.setItem('settings', JSON.stringify(data.settings));
+                    }
+                    
+                    // 重新加载数据
+                    loadDashboardData();
+                    loadArticles();
+                    loadAds();
+                    loadUsers();
+                    loadDataManagement();
+                    loadSettings();
+                    
+                    showNotification('数据已导入！', 'success');
+                } catch (error) {
+                    showNotification('导入失败：无效的数据格式！', 'error');
+                }
+            };
+            reader.readAsText(file);
+            
+            // 重置文件输入
+            this.value = '';
+        });
+        
+        // 备份数据
+        document.getElementById('backupDataBtn').addEventListener('click', function() {
+            const articles = JSON.parse(localStorage.getItem('articles')) || [];
+            const ads = JSON.parse(localStorage.getItem('ads')) || [];
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const settings = JSON.parse(localStorage.getItem('settings')) || {};
+            
+            const data = {
+                articles,
+                ads,
+                users,
+                settings,
+                backupDate: new Date().toISOString()
+            };
+            
+            const backup = {
+                lastBackupTime: new Date().toLocaleString(),
+                backupSize: new Blob([JSON.stringify(data)]).size
+            };
+            
+            localStorage.setItem('backup', JSON.stringify(backup));
+            localStorage.setItem('dataBackup', JSON.stringify(data));
+            
+            loadDataManagement();
+            
+            showNotification('数据已备份！', 'success');
+        });
+        
+        // 恢复数据
+        document.getElementById('restoreDataBtn').addEventListener('click', function() {
+            const dataBackup = JSON.parse(localStorage.getItem('dataBackup'));
+            
+            if (!dataBackup) {
+                showNotification('没有可用的备份！', 'error');
+                return;
+            }
+            
+            if (confirm('确定要恢复数据吗？当前数据将被覆盖。')) {
+                if (dataBackup.articles) {
+                    localStorage.setItem('articles', JSON.stringify(dataBackup.articles));
+                }
+                
+                if (dataBackup.ads) {
+                    localStorage.setItem('ads', JSON.stringify(dataBackup.ads));
+                }
+                
+                if (dataBackup.users) {
+                    localStorage.setItem('users', JSON.stringify(dataBackup.users));
+                }
+                
+                if (dataBackup.settings) {
+                    localStorage.setItem('settings', JSON.stringify(dataBackup.settings));
+                }
+                
+                // 重新加载数据
+                loadDashboardData();
+                loadArticles();
+                loadAds();
+                loadUsers();
+                loadDataManagement();
+                loadSettings();
+                
+                showNotification('数据已恢复！', 'success');
+            }
+        });
+        
+        // 清除所有数据
+        document.getElementById('clearAllDataBtn').addEventListener('click', function() {
+            if (confirm('确定要清除所有数据吗？此操作不可撤销！')) {
+                localStorage.removeItem('articles');
+                localStorage.removeItem('ads');
+                localStorage.removeItem('users');
+                localStorage.removeItem('settings');
+                localStorage.removeItem('backup');
+                localStorage.removeItem('dataBackup');
+                
+                // 重新初始化数据
+                initData();
+                
+                // 重新加载数据
+                loadDashboardData();
+                loadArticles();
+                loadAds();
+                loadUsers();
+                loadDataManagement();
+                loadSettings();
+                
+                showNotification('所有数据已清除！', 'success');
+            }
+        });
+        
         // 保存设置
         document.getElementById('saveSettingsBtn').addEventListener('click', function() {
             const settings = {
                 siteName: document.getElementById('siteName').value,
-                siteDescription: document.getElementById('siteDescription').value
+                siteDescription: document.getElementById('siteDescription').value,
+                adminEmail: document.getElementById('adminEmail').value,
+                contactPhone: document.getElementById('contactPhone').value,
+                smtpServer: document.getElementById('smtpServer').value,
+                smtpPort: document.getElementById('smtpPort').value,
+                encryptionMethod: document.getElementById('encryptionMethod').value,
+                senderEmail: document.getElementById('senderEmail').value,
+                senderName: document.getElementById('senderName').value,
+                passwordPolicy: document.getElementById('passwordPolicy').value,
+                loginAttempts: parseInt(document.getElementById('loginAttempts').value),
+                sessionTimeout: parseInt(document.getElementById('sessionTimeout').value)
             };
+            
             localStorage.setItem('settings', JSON.stringify(settings));
+            
             showNotification('设置已保存！', 'success');
         });
         
-        // 初始化图表
-        let revenueChart, clickRateChart, trafficChart, sourceChart;
+        document.getElementById('saveEmailSettingsBtn').addEventListener('click', function() {
+            document.getElementById('saveSettingsBtn').click();
+        });
         
+        document.getElementById('saveSecuritySettingsBtn').addEventListener('click', function() {
+            document.getElementById('saveSettingsBtn').click();
+        });
+        
+        document.getElementById('saveNotificationsBtn').addEventListener('click', function() {
+            showNotification('通知设置已保存！', 'success');
+        });
+        
+        // 响应式侧边栏
+        function handleResize() {
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('collapsed');
+                sidebar.classList.remove('active');
+            }
+        }
+        
+        window.addEventListener('resize', handleResize);
+        handleResize();
+        
+        // 移动端菜单切换
+        const mobileMenuToggle = document.createElement('button');
+        mobileMenuToggle.className = 'btn btn-primary';
+        mobileMenuToggle.style.position = 'fixed';
+        mobileMenuToggle.style.bottom = '20px';
+        mobileMenuToggle.style.right = '20px';
+        mobileMenuToggle.style.zIndex = '99';
+        mobileMenuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+        mobileMenuToggle.style.display = 'none';
+        
+        document.body.appendChild(mobileMenuToggle);
+        
+        mobileMenuToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('active');
+        });
+        
+        function checkMobile() {
+            if (window.innerWidth <= 768) {
+                mobileMenuToggle.style.display = 'flex';
+            } else {
+                mobileMenuToggle.style.display = 'none';
+            }
+        }
+        
+        window.addEventListener('resize', checkMobile);
+        checkMobile();
+        
+        // 初始化仪表板图表
         function initDashboardCharts() {
+            // 收入趋势图
             const revenueCtx = document.getElementById('revenueChart').getContext('2d');
-            if (revenueChart) revenueChart.destroy();
+            if (revenueChart) {
+                revenueChart.destroy();
+            }
             
             revenueChart = new Chart(revenueCtx, {
                 type: 'line',
@@ -1147,26 +4000,41 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true } }
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return '¥' + context.raw;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '¥' + value;
+                                }
+                            }
+                        }
+                    }
                 }
             });
             
+            // 广告点击率图
             const clickRateCtx = document.getElementById('clickRateChart').getContext('2d');
-            if (clickRateChart) clickRateChart.destroy();
+            if (clickRateChart) {
+                clickRateChart.destroy();
+            }
             
             clickRateChart = new Chart(clickRateCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['横幅广告', '文章内嵌广告', '弹窗广告'],
-                    datasets: [{
-                        data: [25, 38, 52],
-                        backgroundColor: ['rgba(52, 152, 219, 0.7)', 'rgba(46, 204, 113, 0.7)', 'rgba(155, 89, 182, 0.7)'],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
+                    labels: ['横幅广告', '文章内嵌广告', '弹窗广告', '视频广告'],
                     datasets: [{
                         data: [25, 38, 52, 41],
                         backgroundColor: [
@@ -1181,14 +4049,63 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom' } }
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.raw + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 最近文章图
+            const articlesCtx = document.getElementById('articlesChart').getContext('2d');
+            if (articlesChart) {
+                articlesChart.destroy();
+            }
+            
+            articlesChart = new Chart(articlesCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['如何提高广告点击率', '自媒体运营策略', '内容创作指南', '数据分析入门', '用户增长技巧'],
+                    datasets: [{
+                        label: '浏览量',
+                        data: [1250, 980, 875, 720, 650],
+                        backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true
+                        }
+                    }
                 }
             });
         }
         
+        // 初始化数据分析图表
         function initAnalyticsCharts() {
+            // 流量趋势图
             const trafficCtx = document.getElementById('trafficChart').getContext('2d');
-            if (trafficChart) trafficChart.destroy();
+            if (trafficChart) {
+                trafficChart.destroy();
+            }
             
             trafficChart = new Chart(trafficCtx, {
                 type: 'line',
@@ -1215,13 +4132,24 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { position: 'top' } },
-                    scales: { y: { beginAtZero: true } }
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
                 }
             });
             
+            // 用户来源图
             const sourceCtx = document.getElementById('sourceChart').getContext('2d');
-            if (sourceChart) sourceChart.destroy();
+            if (sourceChart) {
+                sourceChart.destroy();
+            }
             
             sourceChart = new Chart(sourceCtx, {
                 type: 'pie',
@@ -1242,7 +4170,18 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom' } }
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.raw + '%';
+                                }
+                            }
+                        }
+                    }
                 }
             });
         }
@@ -1253,7 +4192,10 @@
             document.getElementById('weekBtn').classList.remove('btn-secondary');
             document.getElementById('monthBtn').classList.remove('btn-primary');
             document.getElementById('monthBtn').classList.add('btn-secondary');
+            document.getElementById('yearBtn').classList.remove('btn-primary');
+            document.getElementById('yearBtn').classList.add('btn-secondary');
             
+            // 更新图表数据
             revenueChart.data.labels = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
             revenueChart.data.datasets[0].data = [1200, 1900, 1500, 2100, 1800, 2400, 2200];
             revenueChart.update();
@@ -1264,9 +4206,26 @@
             document.getElementById('monthBtn').classList.remove('btn-secondary');
             document.getElementById('weekBtn').classList.remove('btn-primary');
             document.getElementById('weekBtn').classList.add('btn-secondary');
+            document.getElementById('yearBtn').classList.remove('btn-primary');
+            document.getElementById('yearBtn').classList.add('btn-secondary');
             
+            // 更新图表数据
             revenueChart.data.labels = ['第1周', '第2周', '第3周', '第4周'];
             revenueChart.data.datasets[0].data = [8500, 9200, 10500, 11800];
+            revenueChart.update();
+        });
+        
+        document.getElementById('yearBtn').addEventListener('click', function() {
+            document.getElementById('yearBtn').classList.add('btn-primary');
+            document.getElementById('yearBtn').classList.remove('btn-secondary');
+            document.getElementById('weekBtn').classList.remove('btn-primary');
+            document.getElementById('weekBtn').classList.add('btn-secondary');
+            document.getElementById('monthBtn').classList.remove('btn-primary');
+            document.getElementById('monthBtn').classList.add('btn-secondary');
+            
+            // 更新图表数据
+            revenueChart.data.labels = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+            revenueChart.data.datasets[0].data = [32000, 35000, 38000, 42000, 45000, 48000, 52000, 55000, 58000, 62000, 65000, 68000];
             revenueChart.update();
         });
         
