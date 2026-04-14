@@ -258,7 +258,6 @@
                 <div class="form-group">
                     <label class="form-label" for="loginEmail">邮箱</label>
                     <input type="email" class="form-control" id="loginEmail" placeholder="请输入邮箱" required>
-                    <div class="form-error" id="loginEmailError">请输入有效的邮箱地址</div>
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="loginPassword">密码</label>
@@ -266,7 +265,6 @@
                         <input type="password" class="form-control" id="loginPassword" placeholder="请输入密码" required>
                         <i class="fas fa-eye" id="loginPasswordToggle"></i>
                     </div>
-                    <div class="form-error" id="loginPasswordError">请输入密码</div>
                 </div>
                 <div class="remember-me">
                     <input type="checkbox" id="rememberMe">
@@ -386,9 +384,6 @@
                         <i class="fas fa-bell"></i>
                         <span class="notification-badge">3</span>
                     </div>
-                    <div class="help-icon">
-                        <i class="fas fa-question-circle"></i>
-                    </div>
                 </div>
             </div>
             
@@ -450,7 +445,6 @@
                     <div class="chart-card">
                         <div class="chart-header">
                             <h3 class="chart-title">最近文章</h3>
-                            <button class="btn btn-sm btn-primary">查看全部</button>
                         </div>
                         <div class="chart-container"><canvas id="articlesChart"></canvas></div>
                     </div>
@@ -535,7 +529,14 @@
                     </div>
                     <div class="dashboard-charts">
                         <div class="chart-card">
-                            <div class="chart-header"><h3 class="chart-title">流量趋势</h3></div>
+                            <div class="chart-header">
+                                <h3 class="chart-title">流量趋势</h3>
+                                <div class="chart-actions">
+                                    <button class="btn btn-sm btn-primary" id="analyticsWeekBtn">本周</button>
+                                    <button class="btn btn-sm btn-secondary" id="analyticsMonthBtn">本月</button>
+                                    <button class="btn btn-sm btn-secondary" id="analyticsYearBtn">本年</button>
+                                </div>
+                            </div>
                             <div class="chart-container"><canvas id="trafficChart"></canvas></div>
                         </div>
                         <div class="chart-card">
@@ -739,10 +740,6 @@
                                             <label class="form-label">职位</label>
                                             <input type="text" class="form-control" id="profilePositionInput" value="超级管理员">
                                         </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">个人简介</label>
-                                        <textarea class="form-control" id="profileBioInput" rows="3">自媒体广告系统超级管理员，负责系统运营和管理工作。</textarea>
                                     </div>
                                 </div>
                             </div>
@@ -1075,7 +1072,6 @@
             document.getElementById('userName').textContent = user.name;
             document.getElementById('userRole').textContent = user.role;
             
-            // 更新个人中心
             const profileAvatarText = document.getElementById('profileAvatarText');
             const profileAvatarImg = document.getElementById('profileAvatarImg');
             
@@ -1217,18 +1213,9 @@
                 let typeText = '';
                 
                 switch (ad.type) {
-                    case 'image':
-                        typeBadgeClass = 'template-type-image';
-                        typeText = '图片广告';
-                        break;
-                    case 'text':
-                        typeBadgeClass = 'template-type-text';
-                        typeText = '文本广告';
-                        break;
-                    case 'video':
-                        typeBadgeClass = 'template-type-image';
-                        typeText = '视频广告';
-                        break;
+                    case 'image': typeBadgeClass = 'template-type-image'; typeText = '图片广告'; break;
+                    case 'text': typeBadgeClass = 'template-type-text'; typeText = '文本广告'; break;
+                    case 'video': typeBadgeClass = 'template-type-image'; typeText = '视频广告'; break;
                 }
                 
                 let imageContent = '';
@@ -1740,7 +1727,10 @@
                 if (pageId === 'dashboardPage') {
                     initDashboardCharts();
                 } else if (pageId === 'analyticsPage') {
-                    initAnalyticsCharts();
+                    // 延迟初始化图表，确保容器可见
+                    setTimeout(() => {
+                        initAnalyticsCharts();
+                    }, 100);
                 }
             });
         });
@@ -2581,10 +2571,10 @@
             trafficChart = new Chart(trafficCtx, {
                 type: 'line',
                 data: {
-                    labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                    labels: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
                     datasets: [{
                         label: '页面浏览量',
-                        data: [12500, 15800, 18200, 21500, 24800, 28500],
+                        data: [12500, 15800, 18200, 21500, 24800, 28500, 22000],
                         borderColor: 'rgba(52, 152, 219, 1)',
                         backgroundColor: 'rgba(52, 152, 219, 0.1)',
                         borderWidth: 2,
@@ -2592,7 +2582,7 @@
                         fill: true
                     }, {
                         label: '广告点击量',
-                        data: [850, 980, 1250, 1480, 1720, 1950],
+                        data: [850, 980, 1250, 1480, 1720, 1950, 1600],
                         borderColor: 'rgba(46, 204, 113, 1)',
                         backgroundColor: 'rgba(46, 204, 113, 0.1)',
                         borderWidth: 2,
@@ -2655,6 +2645,49 @@
                 }
             });
         }
+        
+        // 数据分析页面时间切换
+        document.getElementById('analyticsWeekBtn').addEventListener('click', function() {
+            document.getElementById('analyticsWeekBtn').classList.add('btn-primary');
+            document.getElementById('analyticsWeekBtn').classList.remove('btn-secondary');
+            document.getElementById('analyticsMonthBtn').classList.remove('btn-primary');
+            document.getElementById('analyticsMonthBtn').classList.add('btn-secondary');
+            document.getElementById('analyticsYearBtn').classList.remove('btn-primary');
+            document.getElementById('analyticsYearBtn').classList.add('btn-secondary');
+            
+            trafficChart.data.labels = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+            trafficChart.data.datasets[0].data = [12500, 15800, 18200, 21500, 24800, 28500, 22000];
+            trafficChart.data.datasets[1].data = [850, 980, 1250, 1480, 1720, 1950, 1600];
+            trafficChart.update();
+        });
+        
+        document.getElementById('analyticsMonthBtn').addEventListener('click', function() {
+            document.getElementById('analyticsMonthBtn').classList.add('btn-primary');
+            document.getElementById('analyticsMonthBtn').classList.remove('btn-secondary');
+            document.getElementById('analyticsWeekBtn').classList.remove('btn-primary');
+            document.getElementById('analyticsWeekBtn').classList.add('btn-secondary');
+            document.getElementById('analyticsYearBtn').classList.remove('btn-primary');
+            document.getElementById('analyticsYearBtn').classList.add('btn-secondary');
+            
+            trafficChart.data.labels = ['第1周', '第2周', '第3周', '第4周'];
+            trafficChart.data.datasets[0].data = [85000, 92000, 105000, 118000];
+            trafficChart.data.datasets[1].data = [5500, 6200, 7100, 7800];
+            trafficChart.update();
+        });
+        
+        document.getElementById('analyticsYearBtn').addEventListener('click', function() {
+            document.getElementById('analyticsYearBtn').classList.add('btn-primary');
+            document.getElementById('analyticsYearBtn').classList.remove('btn-secondary');
+            document.getElementById('analyticsWeekBtn').classList.remove('btn-primary');
+            document.getElementById('analyticsWeekBtn').classList.add('btn-secondary');
+            document.getElementById('analyticsMonthBtn').classList.remove('btn-primary');
+            document.getElementById('analyticsMonthBtn').classList.add('btn-secondary');
+            
+            trafficChart.data.labels = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+            trafficChart.data.datasets[0].data = [320000, 350000, 380000, 420000, 450000, 480000, 520000, 550000, 580000, 620000, 650000, 680000];
+            trafficChart.data.datasets[1].data = [25000, 28000, 31000, 34000, 37000, 40000, 43000, 46000, 49000, 52000, 55000, 58000];
+            trafficChart.update();
+        });
         
         // 时间范围切换
         document.getElementById('weekBtn').addEventListener('click', function() {
