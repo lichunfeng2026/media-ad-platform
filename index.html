@@ -2735,5 +2735,631 @@
             checkLoginStatus();
         });
     </script>
+<!-- ==================== 修复脚本 - 粘贴到 </body> 前面 ==================== -->
+<script>
+(function(){
+    'use strict';
+
+    // ========================
+    // 1. Toast 全局提示组件
+    // ========================
+    let toastBox = document.getElementById('_toastBox');
+    if (!toastBox) {
+        toastBox = document.createElement('div');
+        toastBox.id = '_toastBox';
+        Object.assign(toastBox.style, {
+            position:'fixed', top:'20px', right:'20px', zIndex:'99999',
+            display:'flex', flexDirection:'column', gap:'10px', pointerEvents:'none'
+        });
+        document.body.appendChild(toastBox);
+    }
+    function showToast(msg, type) {
+        type = type || 'success';
+        const colors = { success:'#2ecc71', error:'#e74c3c', warning:'#f39c12', info:'#3498db' };
+        const icons = { success:'\u2713', error:'\u2717', warning:'\u26A0', info:'\u2139' };
+        const t = document.createElement('div');
+        Object.assign(t.style, {
+            background: colors[type]||colors.success, color:'#fff',
+            padding:'14px 22px', borderRadius:'10px', fontSize:'14px', fontWeight:'600',
+            boxShadow:'0 6px 20px rgba(0,0,0,0.25)', display:'flex', alignItems:'center', gap:'10px',
+            transform:'translateX(140%)', transition:'transform 0.35s cubic-bezier(.4,0,.2,1)',
+            pointerEvents:'auto', maxWidth:'340px', fontFamily:'inherit'
+        });
+        t.innerHTML = '<span style="font-size:18px;font-weight:900">' + (icons[type]||icons.success) + '</span>' + msg;
+        toastBox.appendChild(t);
+        requestAnimationFrame(function(){ t.style.transform = 'translateX(0)'; });
+        setTimeout(function(){
+            t.style.transform = 'translateX(140%)';
+            setTimeout(function(){ t.remove(); }, 350);
+        }, 2800);
+    }
+    window._showToast = showToast;
+
+    // ========================
+    // 2. 侧边栏导航切换修复
+    // ========================
+    var navItems = document.querySelectorAll('.nav-item');
+    var contentArea = document.querySelector('.content-area');
+
+    // 自动收集所有页面内容区块
+    var pages = [];
+    if (contentArea) {
+        var children = contentArea.children;
+        for (var i = 0; i < children.length; i++) {
+            var child = children[i];
+            // 跳过明显不是页面的元素（如内联样式的小元素）
+            if (child.offsetHeight > 50 || child.style.display !== 'none') {
+                pages.push(child);
+            }
+        }
+        // 如果没找到足够的，尝试用 section / div[data-page]
+        if (pages.length < 2) {
+            pages = contentArea.querySelectorAll('section, div[class*="page"], div[id*="page"]');
+        }
+    }
+
+    function switchPage(index) {
+        if (!pages[index]) return;
+        // 切换菜单激活状态
+        navItems.forEach(function(n){ n.classList.remove('active'); });
+        if (navItems[index]) navItems[index].classList.add('active');
+        // 切换内容显示
+        for (var j = 0; j < pages.length; j++) {
+            pages[j].style.display = (j === index) ? 'block' : 'none';
+        }
+        // 更新顶部标题
+        var titleEl = document.querySelector('.page-title');
+        if (titleEl && navItems[index]) {
+            var icon = navItems[index].querySelector('i');
+            var text = navItems[index].querySelector('.nav-text');
+            titleEl.innerHTML = '';
+            if (icon) titleEl.appendChild(icon.cloneNode(true));
+            titleEl.appendChild(document.createTextNode(text ? text.textContent.trim() : ''));
+        }
+        // 移动端收起侧边栏
+        var sidebar = document.querySelector('.sidebar');
+        if (sidebar && window.innerWidth < 992) {
+            sidebar.classList.remove('mobile-show');
+        }
+    }
+
+    // 方法二：通过 data-page 属性匹配（优先）
+    function switchByDataPage(pageName) {
+        navItems.forEach(function(n){ n.classList.remove('active'); });
+        var clicked = document.querySelector('.nav-item[data-page="' + pageName + '"]');
+        if (clicked) clicked.classList.add('active');
+
+        if (contentArea) {
+            var allDivs = contentArea.children;
+            for (var k = 0; k < allDivs.length; k++) {
+                var d = allDivs[k];
+                if (d.id === 'page-' + pageName || d.getAttribute('data-page') === pageName) {
+                    d.style.display = 'block';
+                } else if (d.tagName === 'DIV' && (d.id.indexOf('page') === 0 || d.getAttribute('data-page'))) {
+                    d.style.display = 'none';
+                } else if (d.offsetHeight > 100) {
+                    // 没有标记的大区块，也隐藏掉（排除第一个可能是 dashboard 的）
+                    d.style.display = 'none';
+                }
+            }
+            // 确保目标显示
+            var target = contentArea.querySelector('#page-' + pageName) ||
+                         contentArea.querySelector('[data-page="' + pageName + '"]');
+            if (target) target.style.display = 'block';
+        }
+        // 更新标题
+        var titleEl2 = document.querySelector('.page-title');
+        if (titleEl2 && clicked) {
+            var ic = clicked.querySelector('i');
+            var tx = clicked.querySelector('.nav-text');
+            titleEl2.innerHTML = '';
+            if (ic) { var c = ic.cloneNode(true); c.style.marginRight = '10px'; titleEl2.appendChild(c); }
+            titleEl2.appendChild(document.createTextNode(tx ? tx.textContent.trim() : ''));
+        }
+        var sidebar2 = document.querySelector('.sidebar');
+        if (sidebar2 && window.innerWidth < 992) sidebar2.classList.remove('mobile-show');
+    }
+
+    // 绑定侧边栏点击
+    navItems.forEach(function(item, idx) {
+        // 清除旧事件（用克隆替换）
+        var clone = item.cloneNode(true);
+        item.parentNode.replaceChild(clone, item);
+
+        clone.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            var pageName = this.getAttribute('data-page');
+            if (pageName) {
+                switchByDataPage(pageName);
+            } else {
+                switchPage(idx);
+            }
+        });
+    });
+    // 重新获取 navItems（因为克隆替换了）
+    navItems = document.querySelectorAll('.nav-item');
+
+    // 初始化：只显示第一个页面，隐藏其余
+    setTimeout(function(){
+        if (contentArea) {
+            var kids = contentArea.children;
+            for (var m = 0; m < kids.length; m++) {
+                if (m === 0) {
+                    kids[m].style.display = 'block';
+                } else if (kids[m].tagName === 'DIV' && kids[m].offsetHeight > 100) {
+                    kids[m].style.display = 'none';
+                }
+            }
+        }
+        // 确保第一个菜单是激活状态
+        if (navItems[0]) navItems[0].classList.add('active');
+    }, 100);
+
+    // ========================
+    // 3. 通知按钮修复
+    // ========================
+    var notifBtn = document.querySelector('.notification-icon') ||
+                   document.querySelector('[class*="notification"]') ||
+                   document.querySelector('.fa-bell') &&
+                   document.querySelector('.fa-bell').closest('div,button,a,span');
+
+    // 创建通知面板
+    var notifPanel = document.getElementById('_notifPanel');
+    if (!notifPanel) {
+        notifPanel = document.createElement('div');
+        notifPanel.id = '_notifPanel';
+        Object.assign(notifPanel.style, {
+            display:'none', position:'absolute', top:'100%', right:'0',
+            width:'340px', background:'#fff', borderRadius:'12px',
+            boxShadow:'0 8px 30px rgba(0,0,0,0.18)', zIndex:'10000',
+            overflow:'hidden', marginTop:'10px', fontFamily:'inherit'
+        });
+        notifPanel.innerHTML = [
+            '<div style="padding:16px 20px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center">',
+            '  <strong style="color:#2c3e50;font-size:15px">通知消息</strong>',
+            '  <button id="_clearAllNotif" style="background:none;border:none;color:#3498db;cursor:pointer;font-size:13px;font-weight:600">全部已读</button>',
+            '</div>',
+            '<div id="_notifList" style="max-height:320px;overflow-y:auto">',
+            '  <div class="_ni" style="padding:14px 20px;border-bottom:1px solid #f8f8f8;cursor:pointer;transition:background 0.2s;background:#f0f7ff"',
+            '       onmouseenter="this.style.background=\'#e3f0fc\'" onmouseleave="this.style.background=\'#f0f7ff\'">',
+            '    <div style="font-size:14px;font-weight:600;color:#2c3e50">新文章审核通过</div>',
+            '    <div style="font-size:12px;color:#999;margin-top:4px">您提交的文章《广告投放技巧》已通过审核</div>',
+            '    <div style="font-size:11px;color:#ccc;margin-top:6px">5 分钟前</div>',
+            '  </div>',
+            '  <div class="_ni" style="padding:14px 20px;border-bottom:1px solid #f8f8f8;cursor:pointer;transition:background 0.2s;background:#f0f7ff"',
+            '       onmouseenter="this.style.background=\'#e3f0fc\'" onmouseleave="this.style.background=\'#f0f7ff\'">',
+            '    <div style="font-size:14px;font-weight:600;color:#2c3e50">广告收益到账</div>',
+            '    <div style="font-size:12px;color:#999;margin-top:4px">本月广告收益 ¥2,350 已到账</div>',
+            '    <div style="font-size:11px;color:#ccc;margin-top:6px">1 小时前</div>',
+            '  </div>',
+            '  <div class="_ni" style="padding:14px 20px;border-bottom:1px solid #f8f8f8;cursor:pointer;transition:background 0.2s;background:#f0f7ff"',
+            '       onmouseenter="this.style.background=\'#e3f0fc\'" onmouseleave="this.style.background=\'#f0f7ff\'">',
+            '    <div style="font-size:14px;font-weight:600;color:#2c3e50">新用户注册通知</div>',
+            '    <div style="font-size:12px;color:#999;margin-top:4px">今日新增注册用户 28 人</div>',
+            '    <div style="font-size:11px;color:#ccc;margin-top:6px">3 小时前</div>',
+            '  </div>',
+            '</div>',
+            '<div style="padding:14px;text-align:center;border-top:1px solid #f0f0f0">',
+            '  <a href="#" id="_viewAllNotif" style="color:#3498db;text-decoration:none;font-size:13px;font-weight:600">查看全部通知 →</a>',
+            '</div>'
+        ].join('\n');
+
+        // 找到通知按钮的父容器来附加面板
+        var notifParent = null;
+        if (notifBtn) {
+            notifParent = notifBtn;
+            // 确保父元素是 relative 定位
+            var positioned = notifParent;
+            while (positioned && getComputedStyle(positioned).position === 'static') {
+                positioned = positioned.parentElement;
+                if (positioned === document.body) break;
+            }
+            if (positioned && positioned !== document.body) {
+                positioned.style.position = 'relative';
+                positioned.appendChild(notifPanel);
+            } else {
+                notifParent.style.position = 'relative';
+                notifParent.appendChild(notifPanel);
+            }
+        } else {
+            document.body.appendChild(notifPanel);
+        }
+    }
+
+    // 通知按钮点击 → 切换面板
+    if (notifBtn) {
+        var newBtn = notifBtn.cloneNode(true);
+        notifBtn.parentNode.replaceChild(newBtn, notifBtn);
+        newBtn.style.cursor = 'pointer';
+        newBtn.style.transition = 'transform 0.15s';
+        newBtn.style.position = 'relative';
+        newBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var visible = notifPanel.style.display === 'block';
+            notifPanel.style.display = visible ? 'none' : 'block';
+            this.style.transform = 'scale(1.2)';
+            var self = this;
+            setTimeout(function(){ self.style.transform = 'scale(1)'; }, 150);
+        });
+    }
+
+    // 点击其他地方关闭通知面板
+    document.addEventListener('click', function(e) {
+        if (notifPanel && !notifPanel.contains(e.target)) {
+            var bell = e.target.closest('.notification-icon, [class*="notification"]');
+            if (!bell) notifPanel.style.display = 'none';
+        }
+    });
+
+    // 单条通知点击 → 已读
+    var notifItems = document.querySelectorAll('._ni');
+    var notifBadge = document.querySelector('.notification-badge');
+    notifItems.forEach(function(item) {
+        item.addEventListener('click', function() {
+            this.style.background = '#fff';
+            this.onmouseenter = function(){ this.style.background='#f8f9fa'; };
+            this.onmouseleave = function(){ this.style.background='#fff'; };
+            if (notifBadge) {
+                var n = parseInt(notifBadge.textContent) - 1;
+                if (n <= 0) { notifBadge.style.display = 'none'; }
+                else { notifBadge.textContent = n; }
+            }
+            showToast('通知已标记为已读', 'info');
+            setTimeout(function(){ notifPanel.style.display = 'none'; }, 600);
+        });
+    });
+
+    // 全部已读
+    var clearBtn = document.getElementById('_clearAllNotif');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            notifItems.forEach(function(item) {
+                item.style.background = '#fff';
+                item.onmouseenter = function(){ this.style.background='#f8f9fa'; };
+                item.onmouseleave = function(){ this.style.background='#fff'; };
+            });
+            if (notifBadge) notifBadge.style.display = 'none';
+            showToast('所有通知已标记为已读', 'success');
+        });
+    }
+
+    // 查看全部
+    var viewAllBtn = document.getElementById('_viewAllNotif');
+    if (viewAllBtn) {
+        viewAllBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            notifPanel.style.display = 'none';
+            showToast('通知中心功能开发中...', 'info');
+        });
+    }
+
+    // ========================
+    // 4. 所有按钮添加反馈
+    // ========================
+    function fixButtons() {
+        document.querySelectorAll('button, .btn, .action-btn, .login-btn, .register-btn, .forgot-password-btn').forEach(function(btn) {
+            if (btn.getAttribute('data-fixed')) return;
+            btn.setAttribute('data-fixed', '1');
+            var text = (btn.textContent || '').trim();
+
+            // 保存/提交/确定/登录/注册
+            if (/保存|提交|确定|登录|注册|重置密码|发送|修改/i.test(text) && !btn.hasAttribute('data-fixed2')) {
+                btn.setAttribute('data-fixed2', '1');
+                var orig = btn.cloneNode(true);
+                // 不替换，直接加事件
+                btn.addEventListener('click', function(e) {
+                    var form = this.closest('form') || this.closest('.modal-content') || this.closest('.settings-form');
+                    if (form) {
+                        var reqs = form.querySelectorAll('input[required], textarea[required], select[required]');
+                        var empty = false;
+                        reqs.forEach(function(inp) {
+                            if (!inp.value.trim()) {
+                                empty = true;
+                                inp.style.borderColor = '#e74c3c';
+                                inp.style.boxShadow = '0 0 0 3px rgba(231,76,60,0.15)';
+                                setTimeout(function(){ inp.style.borderColor=''; inp.style.boxShadow=''; }, 2500);
+                            }
+                        });
+                        if (empty) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            showToast('请填写所有必填项', 'warning');
+                            return;
+                        }
+                    }
+                    var self = this;
+                    var origHTML = self.innerHTML;
+                    self.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 处理中...';
+                    self.disabled = true;
+                    self.style.opacity = '0.6';
+                    self.style.pointerEvents = 'none';
+                    setTimeout(function(){
+                        self.innerHTML = origHTML;
+                        self.disabled = false;
+                        self.style.opacity = '1';
+                        self.style.pointerEvents = 'auto';
+                        showToast('操作成功！', 'success');
+                        // 关闭弹窗
+                        var modal = self.closest('.modal');
+                        if (modal) modal.style.display = 'none';
+                        // 登录/注册跳转
+                        if (/登录/i.test(origHTML)) {
+                            var loginBox = document.querySelector('.login-container');
+                            var appContainer = document.querySelector('.app-container');
+                            if (loginBox) loginBox.style.display = 'none';
+                            if (appContainer) appContainer.style.display = 'flex';
+                        }
+                        if (/注册/i.test(origHTML)) {
+                            showToast('注册成功，请登录', 'success');
+                            var regBox = document.querySelector('.register-container');
+                            var loginBox2 = document.querySelector('.login-container');
+                            if (regBox) regBox.style.display = 'none';
+                            if (loginBox2) loginBox2.style.display = 'flex';
+                        }
+                    }, 900);
+                });
+            }
+
+            // 删除按钮
+            if (/删除|清空|清除/i.test(text) && !btn.hasAttribute('data-fixed3')) {
+                btn.setAttribute('data-fixed3', '1');
+                btn.addEventListener('click', function(e) {
+                    // 排除"清除所有数据"这种危险操作给原逻辑处理
+                    if (/清除所有数据/i.test(text)) {
+                        if (!confirm('确定要清除所有数据吗？此操作不可恢复！')) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
+                        return;
+                    }
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (confirm('确定要删除此项吗？')) {
+                        var row = this.closest('tr') || this.closest('.template-card') || this.closest('li');
+                        if (row) {
+                            row.style.transition = 'all 0.35s';
+                            row.style.opacity = '0';
+                            row.style.transform = 'translateX(-30px)';
+                            setTimeout(function(){ row.remove(); }, 350);
+                        }
+                        showToast('删除成功', 'success');
+                    }
+                });
+            }
+
+            // 导出/导入/备份/恢复
+            if (/导出|导入|备份|恢复/i.test(text) && !btn.hasAttribute('data-fixed4')) {
+                btn.setAttribute('data-fixed4', '1');
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var t = this.textContent.trim();
+                    showToast(t + '操作已开始...', 'info');
+                    var self = this;
+                    var origHTML = self.innerHTML;
+                    self.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 处理中...';
+                    self.disabled = true;
+                    self.style.opacity = '0.6';
+                    setTimeout(function(){
+                        self.innerHTML = origHTML;
+                        self.disabled = false;
+                        self.style.opacity = '1';
+                        showToast(t + '完成！', 'success');
+                    }, 1500);
+                });
+            }
+        });
+    }
+    // 初始化 + 定时扫描（应对动态生成的按钮）
+    fixButtons();
+    setInterval(fixButtons, 1500);
+
+    // ========================
+    // 5. 侧边栏折叠按钮修复
+    // ========================
+    var toggleBtn = document.querySelector('.toggle-sidebar');
+    if (toggleBtn) {
+        var newToggle = toggleBtn.cloneNode(true);
+        toggleBtn.parentNode.replaceChild(newToggle, toggleBtn);
+        newToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var sidebar = document.querySelector('.sidebar');
+            if (sidebar) sidebar.classList.toggle('collapsed');
+        });
+    }
+
+    // ========================
+    // 6. 登录/注册/忘记密码 页面切换修复
+    // ========================
+    document.querySelectorAll('.login-footer a, .register-footer a, .forgot-password-footer a').forEach(function(link) {
+        var clone = link.cloneNode(true);
+        link.parentNode.replaceChild(clone, link);
+        clone.addEventListener('click', function(e) {
+            e.preventDefault();
+            var text = this.textContent.trim();
+            var loginPage = document.querySelector('.login-container');
+            var regPage = document.querySelector('.register-container');
+            var forgotPage = document.querySelector('.forgot-password-container');
+            if (loginPage) loginPage.style.display = 'none';
+            if (regPage) regPage.style.display = 'none';
+            if (forgotPage) forgotPage.style.display = 'none';
+            if (text.indexOf('注册') > -1 && regPage) regPage.style.display = 'flex';
+            else if (text.indexOf('登录') > -1 && loginPage) loginPage.style.display = 'flex';
+            else if (text.indexOf('忘记') > -1 && forgotPage) forgotPage.style.display = 'flex';
+            else if (text.indexOf('返回') > -1 && loginPage) loginPage.style.display = 'flex';
+        });
+    });
+
+    // ========================
+    // 7. 个人中心 Tab 切换修复
+    // ========================
+    document.querySelectorAll('.profile-tab').forEach(function(tab) {
+        var clone = tab.cloneNode(true);
+        tab.parentNode.replaceChild(clone, tab);
+        clone.addEventListener('click', function(e) {
+            e.preventDefault();
+            // 切换 tab 激活
+            document.querySelectorAll('.profile-tab').forEach(function(t){ t.classList.remove('active'); });
+            this.classList.add('active');
+            // 切换内容
+            var targetId = this.getAttribute('data-tab') || this.getAttribute('href');
+            if (targetId && targetId.indexOf('#') === 0) targetId = targetId.substring(1);
+            document.querySelectorAll('.tab-content').forEach(function(tc){
+                if (tc.id === targetId || tc.getAttribute('data-tab') === targetId) {
+                    tc.style.display = 'block';
+                    tc.classList.add('active');
+                } else {
+                    tc.style.display = 'none';
+                    tc.classList.remove('active');
+                }
+            });
+            // 如果没有 data-tab，按索引切换
+            if (!targetId) {
+                var tabs = document.querySelectorAll('.profile-tab');
+                var contents = document.querySelectorAll('.tab-content');
+                var idx = Array.prototype.indexOf.call(tabs, this);
+                contents.forEach(function(c, i){
+                    c.style.display = (i === idx) ? 'block' : 'none';
+                    c.classList.toggle('active', i === idx);
+                });
+            }
+        });
+    });
+
+    // ========================
+    // 8. 模态框关闭按钮修复
+    // ========================
+    document.querySelectorAll('.close-modal, .modal .btn-secondary, .modal .btn-cancel').forEach(function(btn) {
+        var clone = btn.cloneNode(true);
+        btn.parentNode.replaceChild(clone, btn);
+        clone.addEventListener('click', function(e) {
+            e.preventDefault();
+            var modal = this.closest('.modal');
+            if (modal) {
+                modal.style.display = 'none';
+                showToast('已取消操作', 'info');
+            }
+        });
+    });
+
+    // 点击模态框背景关闭
+    document.querySelectorAll('.modal').forEach(function(modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.style.display = 'none';
+            }
+        });
+    });
+
+    // ========================
+    // 9. 图表时间段切换按钮修复
+    // ========================
+    document.querySelectorAll('.chart-actions button, .chart-actions a, [class*="chart"] button').forEach(function(btn) {
+        if (btn.getAttribute('data-fixed')) return;
+        btn.setAttribute('data-fixed', '1');
+        var clone = btn.cloneNode(true);
+        btn.parentNode.replaceChild(clone, btn);
+        clone.addEventListener('click', function(e) {
+            e.preventDefault();
+            var siblings = this.parentNode.querySelectorAll('button, a');
+            siblings.forEach(function(s){ s.classList.remove('active'); s.style.background=''; s.style.color=''; });
+            this.classList.add('active');
+            this.style.background = '#3498db';
+            this.style.color = '#fff';
+        });
+    });
+
+    // ========================
+    // 10. 密码显示/隐藏修复
+    // ========================
+    document.querySelectorAll('.password-toggle i, [class*="toggle-password"]').forEach(function(icon) {
+        var clone = icon.cloneNode(true);
+        icon.parentNode.replaceChild(clone, icon);
+        clone.style.cursor = 'pointer';
+        clone.addEventListener('click', function(e) {
+            e.preventDefault();
+            var input = this.parentNode.querySelector('input');
+            if (!input) input = this.previousElementSibling;
+            if (input) {
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    this.classList.remove('fa-eye');
+                    this.classList.add('fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    this.classList.remove('fa-eye-slash');
+                    this.classList.add('fa-eye');
+                }
+            }
+        });
+    });
+
+    // ========================
+    // 11. 退出登录修复
+    // ========================
+    var logoutBtn = document.querySelector('.logout-btn');
+    if (logoutBtn) {
+        var newLogout = logoutBtn.cloneNode(true);
+        logoutBtn.parentNode.replaceChild(newLogout, logoutBtn);
+        newLogout.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (confirm('确定要退出登录吗？')) {
+                var appContainer = document.querySelector('.app-container');
+                var loginContainer = document.querySelector('.login-container');
+                if (appContainer) appContainer.style.display = 'none';
+                if (loginContainer) loginContainer.style.display = 'flex';
+                showToast('已退出登录', 'info');
+            }
+        });
+    }
+
+    // ========================
+    // 12. 搜索框回车反馈
+    // ========================
+    document.querySelectorAll('.user-search input, .search input, input[placeholder*="搜索"]').forEach(function(input) {
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                showToast('搜索功能已触发：' + (this.value || '(空)'), 'info');
+            }
+        });
+    });
+
+    // ========================
+    // 13. "添加"按钮 → 打开对应模态框
+    // ========================
+    document.querySelectorAll('.btn-primary, .btn-success').forEach(function(btn) {
+        var text = (btn.textContent || '').trim();
+        if (/添加|新增|新建/i.test(text) && !btn.hasAttribute('data-fixed5')) {
+            btn.setAttribute('data-fixed5', '1');
+            btn.addEventListener('click', function(e) {
+                // 查找对应的模态框
+                var allModals = document.querySelectorAll('.modal');
+                allModals.forEach(function(modal) {
+                    var modalText = (modal.textContent || '').substring(0, 100);
+                    if (modalText.indexOf('文章') > -1 && text.indexOf('文章') > -1) {
+                        modal.style.display = 'flex';
+                    } else if (modalText.indexOf('广告') > -1 && text.indexOf('广告') > -1) {
+                        modal.style.display = 'flex';
+                    } else if (modalText.indexOf('用户') > -1 && text.indexOf('用户') > -1) {
+                        modal.style.display = 'flex';
+                    }
+                });
+            });
+        }
+    });
+
+    console.log('%c✅ 修复脚本已加载', 'color:#2ecc71;font-size:14px;font-weight:bold');
+
+})();
+</script>
+<!-- ==================== 修复脚本结束 ==================== -->
 </body>
 </html>
