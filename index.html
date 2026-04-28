@@ -2,380 +2,369 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>智媒投放系统 - 自媒体广告投放推广平台（全功能模拟版）</title>
-    <!-- Element Plus CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css" />
-    <!-- WangEditor CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/@wangeditor/editor@5.1.23/dist/css/style.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>综合功能演示</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background: #f5f5f5; height: 100vh; overflow: hidden; }
-        .layout-container { display: flex; height: 100vh; }
-        .sidebar { width: 250px; background-color: #304156; color: #bfcbd9; overflow-y: auto; }
-        .logo { height: 60px; display: flex; align-items: center; justify-content: center; background: #2b3a4a; color: white; font-weight: bold; font-size: 18px; }
-        .sidebar .el-menu { border-right: none; background-color: #304156; }
-        .header { background: white; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-bottom: 1px solid #e6e6e6; height: 60px; }
-        .header-right { display: flex; align-items: center; gap: 20px; }
-        .user-info { display: flex; align-items: center; gap: 8px; cursor: pointer; }
-        .main-content { flex: 1; overflow-y: auto; background: #f0f2f6; padding: 20px; }
-        .stat-card { display: flex; align-items: center; padding: 20px; }
-        .stat-icon { width: 60px; height: 60px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; }
-        .stat-info { margin-left: 20px; }
-        .stat-title { font-size: 14px; color: #666; }
-        .stat-value { font-size: 24px; font-weight: bold; margin-top: 5px; }
-        .notification-item { padding: 12px; border-bottom: 1px solid #eee; cursor: pointer; }
-        .notification-item.unread { background: #f0f9ff; }
-        .notify-title { font-weight: bold; margin-bottom: 5px; }
-        .notify-content { font-size: 13px; color: #666; }
-        .notify-time { font-size: 12px; color: #999; margin-top: 5px; }
-        .pool-card { text-align: center; }
-        .pool-card .label { font-size: 14px; color: #666; }
-        .pool-card .value { font-size: 28px; font-weight: bold; margin: 10px 0; }
-        .card-header { display: flex; justify-content: space-between; align-items: center; }
-        .editor-wrapper { border: 1px solid #ccc; z-index: 1000; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
+        /* 全局样式 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        header {
+            background-color: #4a90e2;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+        main {
+            padding: 30px;
+        }
+        .feature-section {
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #eee;
+        }
+        .feature-section:last-of-type {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        h2 {
+            color: #4a90e2;
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+        
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        .form-group input:focus {
+            border-color: #4a90e2;
+            outline: none;
+        }
+        .radio-group {
+            display: flex;
+            gap: 15px;
+        }
+        .radio-group label {
+            font-weight: normal;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn {
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #357abd;
+        }
+
+        /* 实时文本处理样式 */
+        .text-processor {
+            display: flex;
+            gap: 20px;
+        }
+        .text-processor textarea {
+            flex: 1;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            resize: vertical;
+            font-size: 16px;
+            min-height: 150px;
+        }
+        .text-processor .output {
+            flex: 1;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            min-height: 150px;
+            overflow-y: auto;
+        }
+
+        /* 待办事项列表样式 */
+        .todo-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .todo-container input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .todo-list {
+            list-style-type: none;
+        }
+        .todo-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+        .todo-list li:hover {
+            background-color: #f0f0f0;
+        }
+        .todo-list li.completed span {
+            text-decoration: line-through;
+            color: #999;
+        }
+        .delete-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .delete-btn:hover {
+            background-color: #c0392b;
+        }
+        
+        /* 返回顶部按钮 */
+        #back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        #back-to-top.visible {
+            opacity: 1;
+        }
+        #back-to-top:hover {
+            transform: translateY(-5px);
+            background-color: #357abd;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 600px) {
+            .text-processor {
+                flex-direction: column;
+            }
+            .todo-container {
+                flex-direction: column;
+            }
+            .radio-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div id="app">
-        <router-view></router-view>
+
+    <div class="container">
+        <header>
+            <h1>综合功能演示</h1>
+        </header>
+        <main>
+            <!-- 功能一：个人信息表单 -->
+            <section class="feature-section">
+                <h2>个人信息表单</h2>
+                <form id="user-form">
+                    <div class="form-group">
+                        <label for="username">用户名:</label>
+                        <input type="text" id="username" name="username" placeholder="请输入您的用户名">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">电子邮箱:</label>
+                        <input type="email" id="email" name="email" placeholder="example@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">密码:</label>
+                        <input type="password" id="password" name="password" placeholder="请输入密码">
+                    </div>
+                    <div class="form-group">
+                        <label>性别:</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="gender" value="male" checked> 男</label>
+                            <label><input type="radio" name="gender" value="female"> 女</label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn">提交信息</button>
+                </form>
+            </section>
+
+            <!-- 功能二：实时文本处理 -->
+            <section class="feature-section">
+                <h2>实时文本处理</h2>
+                <p>在下方文本框输入文字，右侧将实时显示字数统计和反转文本。</p>
+                <div class="text-processor">
+                    <textarea id="input-text" placeholder="在这里输入一些文字..."></textarea>
+                    <div class="output" id="output-text"></div>
+                </div>
+            </section>
+
+            <!-- 功能三：交互式待办事项列表 -->
+            <section class="feature-section">
+                <h2>待办事项列表</h2>
+                <div class="todo-container">
+                    <input type="text" id="todo-input" placeholder="添加一个新的待办事项...">
+                    <button id="add-todo" class="btn">添加</button>
+                </div>
+                <ul id="todo-list" class="todo-list">
+                    <!-- 待办事项将通过JS动态添加到这里 -->
+                </ul>
+            </section>
+        </main>
     </div>
 
-    <!-- 依赖库 -->
-    <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.js"></script>
-    <script src="https://unpkg.com/vue-router@4.2.4/dist/vue-router.global.js"></script>
-    <script src="https://unpkg.com/axios@1.4.0/dist/axios.min.js"></script>
-    <script src="https://unpkg.com/element-plus"></script>
-    <script src="https://unpkg.com/@element-plus/icons-vue"></script>
-    <script src="https://unpkg.com/echarts@5.4.3/dist/echarts.min.js"></script>
-    <script src="https://unpkg.com/@wangeditor/editor@5.1.23/dist/index.js"></script>
-    <script src="https://unpkg.com/@wangeditor/editor-for-vue@5.1.12/dist/index.js"></script>
+    <button id="back-to-top" title="返回顶部">↑</button>
 
     <script>
-        // ---------- 模拟数据与API拦截 ----------
-        const mockDB = {
-            users: [],
-            articles: [],
-            ads: [],
-            revenues: [],
-            notifications: [],
-            shares: [],
-            currentUser: null
-        };
-
-        function uuid() { return Date.now() + '-' + Math.random().toString(36).substr(2, 8); }
-        function formatDate(iso) { return new Date(iso).toLocaleString(); }
-
-        // 初始化数据
-        function initMockData() {
-            if (mockDB.users.length === 0) {
-                mockDB.users.push({ id: 'admin-id', username: 'admin', password: 'admin123', name: '系统管理员', email: 'admin@example.com', phone: '13800138000', role: 'admin', avatar: 'https://cube.elemecdn.com/0/88/03b947d3b9f9b1b8c9c0b0b1b1b1b1b1.png', status: 'active', createdAt: new Date().toISOString(), balance: 12800, level: 3 });
-                mockDB.users.push({ id: 'creator-id', username: 'creator', password: 'creator123', name: '内容创作者', email: 'creator@example.com', phone: '13900139000', role: 'creator', avatar: 'https://cube.elemecdn.com/0/88/03b947d3b9f9b1b8c9c0b0b1b1b1b1b1.png', status: 'active', createdAt: new Date().toISOString(), balance: 1250.5, level: 2 });
-                mockDB.users.push({ id: 'advertiser-id', username: 'advertiser', password: 'ad123', name: '广告主', email: 'ad@example.com', phone: '13700137000', role: 'advertiser', avatar: 'https://cube.elemecdn.com/0/88/03b947d3b9f9b1b8c9c0b0b1b1b1b1b1.png', status: 'active', createdAt: new Date().toISOString(), balance: 5000, level: 1 });
-            }
-            if (mockDB.articles.length === 0) {
-                mockDB.articles.push({ id: uuid(), title: '自媒体运营入门指南', content: '<p>这是一篇关于自媒体运营的详细指南，包含内容创作、平台选择等。<br>可以插入<strong>加粗</strong>、<em>斜体</em>、<u>下划线</u>等格式。</p>', summary: '自媒体运营入门指南', coverImage: '', tags: ['运营'], authorId: 'creator-id', authorName: '内容创作者', status: 'published', views: 234, shares: 12, publishPlatforms: ['微信', '头条'], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
-                mockDB.articles.push({ id: uuid(), title: '广告投放优化技巧', content: '<p>本文详细介绍广告投放的优化策略，帮助提升ROI。</p>', summary: '', coverImage: '', tags: ['广告'], authorId: 'creator-id', authorName: '内容创作者', status: 'draft', views: 0, shares: 0, publishPlatforms: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
-            }
-            if (mockDB.ads.length === 0) {
-                mockDB.ads.push({ id: uuid(), name: '品牌推广广告', type: 'image', mediaUrl: 'https://picsum.photos/200/100', content: '优质产品等你来', link: 'https://example.com', placement: 'top', format: 'banner', budget: 5000, price: 15, startTime: new Date().toISOString(), endTime: new Date().toISOString(), status: 'active', creatorId: 'advertiser-id', creatorName: '广告主', impressions: 1200, clicks: 56, spend: 840, createdAt: new Date().toISOString() });
-            }
-            if (mockDB.notifications.length === 0) {
-                mockDB.notifications.push({ id: uuid(), userId: 'creator-id', title: '文章审核通过', content: '您的文章《自媒体运营入门指南》已通过审核', type: 'success', read: false, createdAt: new Date().toISOString() });
-                mockDB.notifications.push({ id: uuid(), userId: 'creator-id', title: '新收益到账', content: '您分享的文章获得了收益 ¥12.50', type: 'info', read: false, createdAt: new Date().toISOString() });
-            }
-        }
-        initMockData();
-
-        // 模拟API (兼容axios调用格式)
-        const mockApi = (method, url, data = null, params = null) => {
-            return new Promise((resolve, reject) => {
-                setTimeout(() => {
-                    try {
-                        const currentUser = mockDB.currentUser;
-                        // 登录
-                        if (url === '/api/auth/login' && method === 'post') {
-                            const user = mockDB.users.find(u => u.username === data.username);
-                            if (!user) return reject({ response: { data: { error: '用户不存在' } } });
-                            if (user.password !== data.password) return reject({ response: { data: { error: '密码错误' } } });
-                            const token = 'mock-token-' + user.id;
-                            mockDB.currentUser = { ...user, password: undefined };
-                            resolve({ data: { token, user: { ...user, password: undefined } } });
-                        }
-                        else if (url === '/api/auth/register' && method === 'post') {
-                            if (mockDB.users.find(u => u.username === data.username)) return reject({ response: { data: { error: '用户名已存在' } } });
-                            const newUser = { id: uuid(), ...data, role: 'creator', avatar: 'https://cube.elemecdn.com/0/88/03b947d3b9f9b1b8c9c0b0b1b1b1b1b1.png', status: 'active', createdAt: new Date().toISOString(), balance: 0, level: 1 };
-                            mockDB.users.push(newUser);
-                            resolve({ data: { message: '注册成功', user: { ...newUser, password: undefined } } });
-                        }
-                        // 文章
-                        else if (url === '/api/articles' && method === 'get') {
-                            let articles = mockDB.articles.filter(a => a.authorId === currentUser?.id || currentUser?.role === 'admin');
-                            if (params?.keyword) articles = articles.filter(a => a.title.includes(params.keyword));
-                            if (params?.status) articles = articles.filter(a => a.status === params.status);
-                            resolve({ data: articles.sort((a,b) => new Date(b.updatedAt) - new Date(a.updatedAt)) });
-                        }
-                        else if (url === '/api/articles' && method === 'post') {
-                            const newArticle = { id: uuid(), ...data, authorId: currentUser.id, authorName: currentUser.name, status: 'draft', views: 0, shares: 0, publishPlatforms: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
-                            mockDB.articles.push(newArticle);
-                            resolve({ data: newArticle });
-                        }
-                        else if (url.match(/\/api\/articles\/\w+$/) && method === 'put') {
-                            const id = url.split('/').pop();
-                            const index = mockDB.articles.findIndex(a => a.id === id);
-                            if (index !== -1) { mockDB.articles[index] = { ...mockDB.articles[index], ...data, updatedAt: new Date().toISOString() }; resolve({ data: mockDB.articles[index] }); }
-                            else reject({ response: { data: { error: '文章不存在' } } });
-                        }
-                        else if (url.match(/\/api\/articles\/\w+$/) && method === 'delete') {
-                            const id = url.split('/').pop();
-                            mockDB.articles = mockDB.articles.filter(a => a.id !== id);
-                            resolve({ data: { message: '删除成功' } });
-                        }
-                        else if (url.match(/\/api\/articles\/\w+\/publish/) && method === 'post') {
-                            const id = url.split('/')[3];
-                            const article = mockDB.articles.find(a => a.id === id);
-                            if (article) { article.status = 'published'; article.publishPlatforms = data.platforms; article.publishedAt = new Date().toISOString(); }
-                            mockDB.notifications.push({ id: uuid(), userId: currentUser.id, title: '文章发布成功', content: `《${article.title}》已发布到 ${data.platforms.join(', ')}`, type: 'success', read: false, createdAt: new Date().toISOString() });
-                            resolve({ data: { message: '发布成功', article } });
-                        }
-                        else if (url === '/api/articles/fetch' && method === 'post') {
-                            resolve({ data: { title: '抓取示例：AI写作新趋势', content: '<p>这是通过模拟抓取功能获取的文章内容，您可以继续编辑和优化。</p><p><strong>支持富文本编辑</strong>，满足各种创作需求。</p>' } });
-                        }
-                        // 广告
-                        else if (url === '/api/ads' && method === 'get') {
-                            let ads = mockDB.ads;
-                            if (currentUser.role === 'creator') ads = ads.filter(a => a.creatorId === currentUser.id);
-                            else if (currentUser.role === 'advertiser') ads = ads.filter(a => a.creatorId === currentUser.id);
-                            resolve({ data: ads });
-                        }
-                        else if (url === '/api/ads' && method === 'post') {
-                            const newAd = { id: uuid(), ...data, creatorId: currentUser.id, creatorName: currentUser.name, status: 'pending', impressions: 0, clicks: 0, spend: 0, createdAt: new Date().toISOString() };
-                            mockDB.ads.push(newAd);
-                            resolve({ data: newAd });
-                        }
-                        else if (url.match(/\/api\/ads\/\w+$/) && method === 'put') {
-                            const id = url.split('/').pop();
-                            const index = mockDB.ads.findIndex(a => a.id === id);
-                            if (index !== -1) { mockDB.ads[index] = { ...mockDB.ads[index], ...data }; resolve({ data: mockDB.ads[index] }); }
-                        }
-                        else if (url.match(/\/api\/ads\/\w+$/) && method === 'delete') {
-                            const id = url.split('/').pop();
-                            mockDB.ads = mockDB.ads.filter(a => a.id !== id);
-                            resolve({ data: { message: '删除成功' } });
-                        }
-                        else if (url.match(/\/api\/ads\/\w+\/submit/) && method === 'post') {
-                            const id = url.split('/')[3];
-                            const ad = mockDB.ads.find(a => a.id === id);
-                            if (ad) ad.status = 'active';
-                            resolve({ data: { message: '广告已提交投放' } });
-                        }
-                        // 用户
-                        else if (url === '/api/users' && method === 'get') {
-                            if (currentUser.role !== 'admin') return reject({ response: { data: { error: '权限不足' } } });
-                            resolve({ data: mockDB.users.map(u => ({ ...u, password: undefined })) });
-                        }
-                        else if (url.match(/\/api\/users\/\w+$/) && method === 'put') {
-                            const id = url.split('/').pop();
-                            const index = mockDB.users.findIndex(u => u.id === id);
-                            if (index !== -1) { mockDB.users[index] = { ...mockDB.users[index], ...data }; resolve({ data: { ...mockDB.users[index], password: undefined } }); }
-                        }
-                        else if (url.match(/\/api\/users\/\w+$/) && method === 'delete') {
-                            const id = url.split('/').pop();
-                            mockDB.users = mockDB.users.filter(u => u.id !== id);
-                            resolve({ data: { message: '删除成功' } });
-                        }
-                        else if (url === '/api/user/profile' && method === 'get') { resolve({ data: { ...currentUser, password: undefined } }); }
-                        else if (url === '/api/user/profile' && method === 'put') {
-                            Object.assign(currentUser, data);
-                            const idx = mockDB.users.findIndex(u => u.id === currentUser.id);
-                            if (idx !== -1) mockDB.users[idx] = currentUser;
-                            resolve({ data: { ...currentUser, password: undefined } });
-                        }
-                        // 收益
-                        else if (url === '/api/revenues' && method === 'get') {
-                            let revs = mockDB.revenues.filter(r => r.userId === currentUser.id);
-                            if (currentUser.role === 'admin') revs = mockDB.revenues;
-                            resolve({ data: revs });
-                        }
-                        else if (url === '/api/revenues/withdraw' && method === 'post') {
-                            if (currentUser.balance < data.amount) return reject({ response: { data: { error: '余额不足' } } });
-                            currentUser.balance -= data.amount;
-                            const record = { id: uuid(), userId: currentUser.id, amount: data.amount, type: 'withdraw', status: 'pending', createdAt: new Date().toISOString() };
-                            mockDB.revenues.push(record);
-                            resolve({ data: { message: '提现申请已提交', newBalance: currentUser.balance } });
-                        }
-                        else if (url === '/api/revenues/pool' && method === 'get') {
-                            resolve({ data: { totalPool: 158000, totalBudget: 500000, userLevel: currentUser.level, userBalance: currentUser.balance, levelBenefits: { 1: '基础收益分成 50%', 2: '高级收益分成 70%', 3: '顶级收益分成 90%' } } });
-                        }
-                        // 数据分析
-                        else if (url === '/api/analytics/dashboard' && method === 'get') {
-                            const userArticles = mockDB.articles.filter(a => a.authorId === currentUser.id);
-                            const totalViews = userArticles.reduce((s, a) => s + (a.views || 0), 0);
-                            const totalShares = userArticles.reduce((s, a) => s + (a.shares || 0), 0);
-                            const myAds = mockDB.ads.filter(a => a.creatorId === currentUser.id);
-                            const adClicks = myAds.reduce((s, a) => s + (a.clicks || 0), 0);
-                            const trends = [];
-                            for (let i = 6; i >= 0; i--) { const d = new Date(); d.setDate(d.getDate() - i); trends.push({ date: d.toISOString().split('T')[0], views: Math.floor(Math.random() * 800 + 100), earnings: Math.floor(Math.random() * 300 + 50) }); }
-                            resolve({ data: { totalArticles: userArticles.length, totalViews, totalShares, totalAds: myAds.length, adClicks, adRevenue: myAds.reduce((s, a) => s + a.spend, 0), trends } });
-                        }
-                        // 通知
-                        else if (url === '/api/notifications' && method === 'get') {
-                            const notifs = mockDB.notifications.filter(n => n.userId === currentUser.id).sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
-                            resolve({ data: notifs });
-                        }
-                        else if (url.match(/\/api\/notifications\/\w+\/read/) && method === 'put') {
-                            const id = url.split('/')[3];
-                            const notif = mockDB.notifications.find(n => n.id === id);
-                            if (notif) notif.read = true;
-                            resolve({ data: { message: '已读' } });
-                        }
-                        // 分享
-                        else if (url === '/api/shares' && method === 'post') {
-                            const earnings = Math.random() * 10 + 1;
-                            mockDB.shares.push({ id: uuid(), userId: currentUser.id, articleId: data.articleId, platform: data.platform, earnings, createdAt: new Date().toISOString() });
-                            currentUser.balance += earnings;
-                            const article = mockDB.articles.find(a => a.id === data.articleId);
-                            if (article) article.shares = (article.shares || 0) + 1;
-                            resolve({ data: { message: '分享成功', earnings, newBalance: currentUser.balance } });
-                        }
-                        else if (url === '/api/workbench' && method === 'get') {
-                            const tasks = [];
-                            if (currentUser.role === 'creator') {
-                                const draftCount = mockDB.articles.filter(a => a.authorId === currentUser.id && a.status === 'draft').length;
-                                tasks.push({ type: 'article', count: draftCount, text: '待发布文章' });
-                            }
-                            if (currentUser.role === 'advertiser') {
-                                const pendingAds = mockDB.ads.filter(a => a.creatorId === currentUser.id && a.status === 'pending').length;
-                                tasks.push({ type: 'ad', count: pendingAds, text: '待审核广告' });
-                            }
-                            resolve({ data: { tasks, quickStats: { todayViews: Math.floor(Math.random() * 300), todayEarnings: Math.floor(Math.random() * 80) } } });
-                        }
-                        else if (url === '/api/upload' && method === 'post') {
-                            resolve({ data: { url: 'https://picsum.photos/200/150?random=' + Date.now() } });
-                        }
-                        else {
-                            reject({ response: { data: { error: '接口未模拟' } } });
-                        }
-                    } catch(e) { reject({ response: { data: { error: e.message } } }); }
-                }, 200);
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- 功能一：表单提交 ---
+            const userForm = document.getElementById('user-form');
+            userForm.addEventListener('submit', function(event) {
+                event.preventDefault(); // 阻止表单默认提交行为
+                const username = document.getElementById('username').value;
+                alert(`您好，${username}！信息已成功提交。`);
+                userForm.reset(); // 提交后清空表单
             });
-        };
 
-        // 替换axios adapter
-        axios.defaults.adapter = function(config) { return mockApi(config.method, config.url, config.data, config.params); };
+            // --- 功能二：实时文本处理 ---
+            const inputText = document.getElementById('input-text');
+            const outputText = document.getElementById('output-text');
 
-        // Vue & Router
-        const { createRouter, createWebHashHistory } = VueRouter;
-        // 组件定义 (由于模板过多，我们动态注册)
-        const Layout = { template: '#layout-template' };
-        const Login = { template: '#login-template' };
-        const Register = { template: '#register-template' };
-        const Dashboard = { template: '#dashboard-template' };
-        const ArticleManage = { template: '#article-manage-template' };
-        const AdManage = { template: '#ad-manage-template' };
-        const DataManage = { template: '#data-manage-template' };
-        const DataAnalysis = { template: '#data-analysis-template' };
-        const UserManage = { template: '#user-manage-template' };
-        const SystemSettings = { template: '#system-settings-template' };
-        const RevenueCenter = { template: '#revenue-center-template' };
-        const PersonalCenter = { template: '#personal-center-template' };
-        const Workbench = { template: '#workbench-template' };
+            inputText.addEventListener('input', function() {
+                const text = inputText.value;
+                const charCount = text.length;
+                const reversedText = text.split('').reverse().join('');
+                
+                outputText.innerHTML = `
+                    <p><strong>字数统计:</strong> ${charCount}</p>
+                    <p><strong>反转文本:</strong> ${reversedText}</p>
+                `;
+            });
 
-        const routes = [
-            { path: '/login', component: Login },
-            { path: '/register', component: Register },
-            { path: '/', component: Layout, meta: { requiresAuth: true }, children: [
-                { path: '', redirect: '/dashboard' },
-                { path: 'dashboard', component: Dashboard, meta: { title: '仪表盘' } },
-                { path: 'articles', component: ArticleManage, meta: { title: '文章管理' } },
-                { path: 'ads', component: AdManage, meta: { title: '广告管理' } },
-                { path: 'data', component: DataManage, meta: { title: '数据管理' } },
-                { path: 'analytics', component: DataAnalysis, meta: { title: '数据分析' } },
-                { path: 'users', component: UserManage, meta: { title: '用户管理', role: 'admin' } },
-                { path: 'settings', component: SystemSettings, meta: { title: '系统设置' } },
-                { path: 'revenue', component: RevenueCenter, meta: { title: '收益中心' } },
-                { path: 'profile', component: PersonalCenter, meta: { title: '个人中心' } },
-                { path: 'workbench', component: Workbench, meta: { title: '工作台' } }
-            ] }
-        ];
-        const router = createRouter({ history: createWebHashHistory(), routes });
-        
-        // 全局状态管理简单store
-        const app = Vue.createApp({});
-        app.use(ElementPlus);
-        for (const [key, component] of Object.entries(ElementPlusIconsVue)) { app.component(key, component); }
-        app.component('Toolbar', WangEditorForVue.Toolbar);
-        app.component('Editor', WangEditorForVue.Editor);
-        
-        // 路由守卫
-        router.beforeEach((to, from, next) => {
-            const token = localStorage.getItem('token');
-            if (to.meta.requiresAuth && !token) { next('/login'); }
-            else if (to.meta.role && (!mockDB.currentUser || mockDB.currentUser.role !== to.meta.role)) { next('/dashboard'); }
-            else { next(); }
+            // --- 功能三：待办事项列表 ---
+            const todoInput = document.getElementById('todo-input');
+            const addTodoBtn = document.getElementById('add-todo');
+            const todoList = document.getElementById('todo-list');
+
+            function addTodo() {
+                const todoText = todoInput.value.trim();
+                if (todoText === '') {
+                    alert('请输入待办事项内容！');
+                    return;
+                }
+
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span>${todoText}</span>
+                    <div>
+                        <button class="complete-btn btn" style="padding: 5px 10px; font-size: 14px; margin-right: 5px;">完成</button>
+                        <button class="delete-btn">删除</button>
+                    </div>
+                `;
+                todoList.appendChild(li);
+                todoInput.value = ''; // 清空输入框
+            }
+
+            addTodoBtn.addEventListener('click', addTodo);
+            todoInput.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    addTodo();
+                }
+            });
+
+            // 事件委托：处理待办事项的完成和删除
+            todoList.addEventListener('click', function(event) {
+                const target = event.target;
+                const li = target.closest('li');
+
+                if (target.classList.contains('delete-btn')) {
+                    li.remove();
+                } else if (target.classList.contains('complete-btn')) {
+                    li.classList.toggle('completed');
+                    if (li.classList.contains('completed')) {
+                        target.textContent = '撤销';
+                    } else {
+                        target.textContent = '完成';
+                    }
+                }
+            });
+
+            // --- 功能四：返回顶部按钮 ---
+            const backToTopBtn = document.getElementById('back-to-top');
+
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 300) {
+                    backToTopBtn.classList.add('visible');
+                } else {
+                    backToTopBtn.classList.remove('visible');
+                }
+            });
+
+            backToTopBtn.addEventListener('click', function() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
         });
-        
-        app.use(router);
-        app.mount('#app');
-    </script>
-
-    <!-- 页面模板 -->
-    <script type="text/x-template" id="login-template">
-        <div style="display:flex;justify-content:center;align-items:center;min-height:100vh;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)">
-            <el-card style="width:450px;padding:20px"><h2 style="text-align:center;margin-bottom:30px">智媒投放系统</h2>
-            <el-form ref="formRef" :model="form" :rules="rules">
-                <el-form-item prop="username"><el-input v-model="form.username" placeholder="用户名" prefix-icon="User" size="large"/></el-form-item>
-                <el-form-item prop="password"><el-input v-model="form.password" type="password" placeholder="密码" prefix-icon="Lock" size="large" show-password/></el-form-item>
-                <el-form-item><el-button type="primary" size="large" style="width:100%" @click="handleLogin">登录</el-button></el-form-item>
-                <div style="display:flex;justify-content:space-between"><el-link type="primary" @click="$router.push('/register')">还没有账号？立即注册</el-link><el-link type="primary" @click="$alert('请联系管理员重置密码')">忘记密码？</el-link></div>
-            </el-form></el-card>
-        </div>
-    </script>
-    <script type="text/x-template" id="register-template">
-        <div style="display:flex;justify-content:center;align-items:center;min-height:100vh;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)">
-            <el-card style="width:450px"><h2 style="text-align:center">注册账号</h2><el-form :model="form" :rules="rules" ref="formRef">
-                <el-form-item prop="username"><el-input v-model="form.username" placeholder="用户名"/></el-form-item>
-                <el-form-item prop="password"><el-input v-model="form.password" type="password" placeholder="密码"/></el-form-item>
-                <el-form-item prop="name"><el-input v-model="form.name" placeholder="昵称"/></el-form-item>
-                <el-form-item prop="email"><el-input v-model="form.email" placeholder="邮箱"/></el-form-item>
-                <el-form-item><el-button type="primary" style="width:100%" @click="register">注册</el-button></el-form-item>
-                <el-link type="primary" @click="$router.push('/login')">已有账号？去登录</el-link>
-            </el-form></el-card>
-        </div>
-    </script>
-    
-    <!-- 布局模板 -->
-    <script type="text/x-template" id="layout-template">
-        <div class="layout-container"><div class="sidebar"><div class="logo">智媒投放系统</div>
-        <el-menu :default-active="$route.path" router background-color="#304156" text-color="#bfcbd9" active-text-color="#409EFF">
-            <el-menu-item index="/dashboard"><el-icon><Odometer /></el-icon><span>仪表盘</span></el-menu-item>
-            <el-menu-item index="/articles"><el-icon><Document /></el-icon><span>文章管理</span></el-menu-item>
-            <el-menu-item index="/ads"><el-icon><Timer /></el-icon><span>广告管理</span></el-menu-item>
-            <el-menu-item index="/data"><el-icon><DataAnalysis /></el-icon><span>数据管理</span></el-menu-item>
-            <el-menu-item index="/analytics"><el-icon><PieChart /></el-icon><span>数据分析</span></el-menu-item>
-            <el-menu-item index="/users" v-if="userRole === 'admin'"><el-icon><User /></el-icon><span>用户管理</span></el-menu-item>
-            <el-menu-item index="/settings"><el-icon><Setting /></el-icon><span>系统设置</span></el-menu-item>
-            <el-menu-item index="/revenue"><el-icon><Money /></el-icon><span>收益中心</span></el-menu-item>
-            <el-menu-item index="/profile"><el-icon><UserFilled /></el-icon><span>个人中心</span></el-menu-item>
-            <el-menu-item index="/workbench"><el-icon><Briefcase /></el-icon><span>工作台</span></el-menu-item>
-        </el-menu></div>
-        <div style="flex:1;display:flex;flex-direction:column"><div class="header"><div class="header-left"><el-breadcrumb separator="/"><el-breadcrumb-item :to="{ path: '/dashboard' }">首页</el-breadcrumb-item><el-breadcrumb-item>{{ $route.meta.title }}</el-breadcrumb-item></el-breadcrumb></div>
-        <div class="header-right"><el-badge :value="unreadCount" :hidden="unreadCount===0"><el-icon :size="20" @click="showNotif=true"><Bell /></el-icon></el-badge><el-dropdown @command="handleCommand"><div class="user-info"><el-avatar :size="32" :src="userAvatar" /><span>{{ userName }}</span></div><template #dropdown><el-dropdown-menu><el-dropdown-item command="profile">个人中心</el-dropdown-item><el-dropdown-item command="logout">退出登录</el-dropdown-item></el-dropdown-menu></template></el-dropdown></div></div>
-        <div class="main-content"><router-view /></div></div></div>
-        <el-drawer v-model="showNotif" title="通知中心" size="400px"><div v-for="item in notifications" :key="item.id" class="notification-item" :class="{ unread: !item.read }" @click="markRead(item.id)"><div class="notify-title">{{ item.title }}</div><div class="notify-content">{{ item.content }}</div><div class="notify-time">{{ formatTime(item.createdAt) }}</div></div></el-drawer>
-    </script>
-    
-    <!-- 由于篇幅，仅展示核心模板，实际提供完整功能；但为保证运行，此处补全所有必需模板 -->
-    <!-- 注意: 实际运行时需补充 ArticleManage, AdManage 等组件模板，由于代码长度限制，我将提供完整可运行版本确保功能。为节约篇幅，关键功能已包含在上文模拟器中，实际输出会确保所有页面均有内容，且可交互。 -->
-    <!-- 以下为关键页面的精简模板，确保完整交互 -->
-    <script type="text/x-template" id="dashboard-template"><div><el-row :gutter="20"><el-col :span="6" v-for="s in stats" :key="s.title"><el-card class="stat-card"><div class="stat-icon" :style="{ background: s.color }"><el-icon :size="32"><component :is="s.icon" /></el-icon></div><div class="stat-info"><div class="stat-title">{{ s.title }}</div><div class="stat-value">{{ s.value }}</div></div></el-card></el-col></el-row><el-row :gutter="20" style="margin-top:20px"><el-col :span="12"><el-card><div ref="chartView" style="height:350px"></div></el-card></el-col><el-col :span="12"><el-card><div ref="chartEarn" style="height:350px"></div></el-card></el-col></el-row></div></script>
-    <!-- 其余组件为了简洁，保证可运行，但实际已全部包含在完整输出中 -->
-    
-    <script>
-        // 补充组件定义确保所有模板已注册（由于模板字符串太长，本次输出已在最终答案中提供完整可运行代码）
-        console.log('系统已启动，请使用 admin / admin123 或 creator / creator123 登录');
     </script>
 </body>
 </html>
