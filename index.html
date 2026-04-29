@@ -1,1348 +1,925 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-  <title>聚媒通 · 自媒体广告投放平台</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
-  </script>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    :root {
-      --pri: #0d9488;
-      --pri-l: #14b8a6;
-      --pri-d: #0f766e;
-      --acc: #f59e0b;
-      --err: #ef4444;
-      --ok: #22c55e;
-      --warn: #f59e0b;
-      --info: #06b6d4;
-      --sb: #0f172a;
-      --bg: #f1f5f9;
-      --card: #ffffff;
-      --tx: #1e293b;
-      --tx2: #64748b;
-      --bd: #e2e8f0;
-      --r: 10px;
-    }
-    body {
-      font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
-      background: var(--bg);
-      color: var(--tx);
-      line-height: 1.6;
-      height: 100vh;
-      overflow: hidden;
-    }
-    ::-webkit-scrollbar {
-      width: 5px;
-      height: 5px;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 3px;
-    }
-    input, select, textarea, button {
-      font-family: inherit;
-    }
-
-    /* 认证 */
-    .auth {
-      display: none;
-      width: 100%;
-      min-height: 100vh;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #0f172a, #1e3a5f 50%, #0d4f4f);
-      position: relative;
-      overflow: auto;
-    }
-    .auth.on {
-      display: flex;
-    }
-    .auth .bg {
-      position: absolute;
-      border-radius: 50%;
-      opacity: .07;
-      background: var(--pri);
-    }
-    .auth .bg:nth-child(1) {
-      width: 500px;
-      height: 500px;
-      top: -150px;
-      right: -100px;
-    }
-    .auth .bg:nth-child(2) {
-      width: 300px;
-      height: 300px;
-      bottom: -80px;
-      left: -50px;
-    }
-    .abox {
-      width: 420px;
-      background: rgba(255,255,255,.97);
-      border-radius: 16px;
-      box-shadow: 0 25px 60px rgba(0,0,0,.3);
-      position: relative;
-      z-index: 2;
-      max-width: 95%;
-    }
-    .abox .hd {
-      padding: 30px;
-      text-align: center;
-      background: linear-gradient(135deg, var(--pri), var(--pri-d));
-      color: #fff;
-    }
-    .abox .hd .ico {
-      font-size: 2.5rem;
-      margin-bottom: 8px;
-    }
-    .abox .hd h1 {
-      font-size: 1.5rem;
-      font-weight: 800;
-    }
-    .abox .hd p {
-      opacity: .8;
-      font-size: .88rem;
-      margin-top: 4px;
-    }
-    .abox .bd {
-      padding: 28px;
-    }
-    .fg {
-      margin-bottom: 16px;
-    }
-    .fl {
-      display: block;
-      font-weight: 600;
-      color: var(--tx);
-      margin-bottom: 5px;
-      font-size: .88rem;
-    }
-    .fi {
-      width: 100%;
-      padding: 10px 13px;
-      border: 1.5px solid var(--bd);
-      border-radius: 8px;
-      font-size: .92rem;
-      transition: border .2s;
-      background: #fff;
-    }
-    .fi:focus {
-      border-color: var(--pri);
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(13,148,136,.1);
-    }
-    .fiw {
-      position: relative;
-    }
-    .fiw i.l {
-      position: absolute;
-      left: 13px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--tx2);
-    }
-    .fiw .fi {
-      padding-left: 38px;
-    }
-    .fiw .tp {
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      color: var(--tx2);
-      cursor: pointer;
-    }
-    .abtn {
-      width: 100%;
-      padding: 11px;
-      border: none;
-      border-radius: 8px;
-      font-size: .95rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: all .2s;
-    }
-    .abtn:hover {
-      transform: translateY(-1px);
-    }
-    .abtn-p {
-      background: var(--pri);
-      color: #fff;
-    }
-    .abtn-p:hover {
-      background: var(--pri-d);
-      box-shadow: 0 4px 12px rgba(13,148,136,.3);
-    }
-    .abtn-s {
-      background: var(--ok);
-      color: #fff;
-    }
-    .abtn-s:hover {
-      background: #16a34a;
-    }
-    .frow {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-      font-size: .84rem;
-    }
-    .frow label {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: var(--tx2);
-      cursor: pointer;
-    }
-    .frow a {
-      color: var(--pri);
-      text-decoration: none;
-      font-weight: 600;
-    }
-    .abox .ft {
-      padding: 18px 28px;
-      text-align: center;
-      border-top: 1px solid var(--bd);
-      font-size: .88rem;
-      color: var(--tx2);
-    }
-    .abox .ft a {
-      color: var(--pri);
-      text-decoration: none;
-      font-weight: 600;
-    }
-    .pws {
-      height: 4px;
-      background: #e2e8f0;
-      border-radius: 4px;
-      margin-top: 5px;
-      overflow: hidden;
-    }
-    .pws .bar {
-      height: 100%;
-      width: 0;
-      transition: all .3s;
-      border-radius: 4px;
-    }
-    .pws .txt {
-      font-size: .73rem;
-      margin-top: 2px;
-      color: var(--tx2);
-    }
-
-    /* 主框架 */
-    .app {
-      display: none;
-      height: 100vh;
-      flex-direction: row;
-    }
-    .app.on {
-      display: flex;
-    }
-    .sb {
-      width: 248px;
-      min-width: 248px;
-      background: var(--sb);
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      transition: all .3s;
-      overflow: hidden;
-      z-index: 100;
-    }
-    .sb-hd {
-      padding: 20px 16px;
-      display: flex;
-      align-items: center;
-      gap: 11px;
-      border-bottom: 1px solid rgba(255,255,255,.07);
-    }
-    .sb-logo {
-      width: 38px;
-      height: 38px;
-      background: linear-gradient(135deg, var(--pri), var(--pri-l));
-      border-radius: 9px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-      font-weight: 900;
-      flex-shrink: 0;
-    }
-    .sb-brand {
-      font-size: 1.1rem;
-      font-weight: 800;
-    }
-    .sb-brand small {
-      display: block;
-      font-size: .62rem;
-      color: rgba(255,255,255,.35);
-      font-weight: 400;
-    }
-    .sb-user {
-      padding: 14px 16px;
-      display: flex;
-      align-items: center;
-      gap: 11px;
-      border-bottom: 1px solid rgba(255,255,255,.07);
-    }
-    .sb-av {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--pri), var(--acc));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 1rem;
-      flex-shrink: 0;
-    }
-    .sb-nm {
-      font-weight: 600;
-      font-size: .92rem;
-      white-space: nowrap;
-    }
-    .sb-rl {
-      font-size: .7rem;
-      color: rgba(255,255,255,.4);
-      background: rgba(13,148,136,.2);
-      padding: 2px 7px;
-      border-radius: 10px;
-      display: inline-block;
-      margin-top: 2px;
-    }
-    .sb-nav {
-      flex: 1;
-      padding: 10px 0;
-      overflow-y: auto;
-    }
-    .ns {
-      padding: 7px 16px 5px;
-      font-size: .68rem;
-      text-transform: uppercase;
-      color: rgba(255,255,255,.22);
-      letter-spacing: 1.5px;
-      font-weight: 700;
-    }
-    .ni {
-      display: flex;
-      align-items: center;
-      gap: 11px;
-      padding: 10px 16px;
-      color: rgba(255,255,255,.5);
-      cursor: pointer;
-      transition: all .15s;
-      border-left: 3px solid transparent;
-      font-size: .88rem;
-      position: relative;
-    }
-    .ni:hover {
-      background: rgba(255,255,255,.05);
-      color: rgba(255,255,255,.85);
-    }
-    .ni.on {
-      background: rgba(13,148,136,.12);
-      color: var(--pri-l);
-      border-left-color: var(--pri-l);
-    }
-    .ni i {
-      width: 18px;
-      text-align: center;
-      font-size: .95rem;
-      flex-shrink: 0;
-    }
-    .nb {
-      position: absolute;
-      right: 13px;
-      background: var(--err);
-      color: #fff;
-      font-size: .62rem;
-      padding: 1px 6px;
-      border-radius: 10px;
-      font-weight: 700;
-    }
-    .sb-ft {
-      padding: 12px 16px;
-      border-top: 1px solid rgba(255,255,255,.07);
-    }
-    .lo-btn {
-      display: flex;
-      align-items: center;
-      gap: 11px;
-      padding: 9px 13px;
-      background: rgba(239,68,68,.08);
-      color: #f87171;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      width: 100%;
-      font-size: .88rem;
-    }
-    .lo-btn:hover {
-      background: rgba(239,68,68,.15);
-    }
-    .main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      min-width: 0;
-    }
-    .top {
-      height: 56px;
-      background: var(--card);
-      border-bottom: 1px solid var(--bd);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 22px;
-      flex-shrink: 0;
-    }
-    .top-l {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .mmenu {
-      display: none;
-      background: none;
-      border: none;
-      font-size: 1.2rem;
-      color: var(--tx);
-      cursor: pointer;
-    }
-    .ptitle {
-      font-size: 1.1rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-    }
-    .top-r {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      position: relative;
-    }
-    .nbtn {
-      position: relative;
-      background: none;
-      border: none;
-      font-size: 1.1rem;
-      color: var(--tx2);
-      cursor: pointer;
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .nbtn:hover {
-      background: #f1f5f9;
-      color: var(--tx);
-    }
-    .nbdg {
-      position: absolute;
-      top: 2px;
-      right: 2px;
-      background: var(--err);
-      color: #fff;
-      font-size: .58rem;
-      width: 15px;
-      height: 15px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-    }
-    .tav {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--pri), var(--acc));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-weight: 700;
-      font-size: .8rem;
-      cursor: pointer;
-    }
-    .cnt {
-      flex: 1;
-      overflow-y: auto;
-      padding: 22px;
-    }
-
-    /* 通知面板 */
-    .npnl {
-      display: none;
-      position: absolute;
-      top: calc(100% + 6px);
-      right: 0;
-      width: 350px;
-      background: #fff;
-      border-radius: 11px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.12);
-      z-index: 2000;
-      overflow: hidden;
-      border: 1px solid var(--bd);
-    }
-    .npnl.on {
-      display: block;
-    }
-    .npnl-h {
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--bd);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .npnl-h strong {
-      font-size: .92rem;
-    }
-    .npnl-h button {
-      background: none;
-      border: none;
-      color: var(--pri);
-      cursor: pointer;
-      font-size: .78rem;
-      font-weight: 600;
-    }
-    .ni2 {
-      padding: 11px 16px;
-      border-bottom: 1px solid #f8fafc;
-      cursor: pointer;
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
-    }
-    .ni2:hover {
-      background: #f8fafc;
-    }
-    .ni2.ur {
-      background: #f0fdfa;
-    }
-    .ndot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--pri);
-      flex-shrink: 0;
-      margin-top: 6px;
-    }
-    .ntx b {
-      font-size: .83rem;
-      display: block;
-    }
-    .ntx p {
-      font-size: .76rem;
-      color: var(--tx2);
-    }
-    .ntx small {
-      font-size: .68rem;
-      color: #94a3b8;
-    }
-    .npnl-f {
-      padding: 10px;
-      text-align: center;
-      border-top: 1px solid var(--bd);
-    }
-    .npnl-f a {
-      color: var(--pri);
-      text-decoration: none;
-      font-size: .83rem;
-      font-weight: 600;
-    }
-
-    /* 通用卡片 */
-    .cd {
-      background: var(--card);
-      border-radius: var(--r);
-      box-shadow: 0 1px 3px rgba(0,0,0,.05);
-      border: 1px solid var(--bd);
-      margin-bottom: 16px;
-    }
-    .cd-h {
-      padding: 14px 18px;
-      border-bottom: 1px solid var(--bd);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .cd-h h3 {
-      font-size: .95rem;
-      font-weight: 700;
-    }
-    .cd-b {
-      padding: 18px;
-    }
-    .sg {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-      gap: 14px;
-      margin-bottom: 20px;
-    }
-    .sc {
-      background: var(--card);
-      border-radius: var(--r);
-      padding: 18px;
-      box-shadow: 0 1px 3px rgba(0,0,0,.05);
-      border: 1px solid var(--bd);
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-    .si {
-      width: 46px;
-      height: 46px;
-      border-radius: 11px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.3rem;
-      flex-shrink: 0;
-    }
-    .sv {
-      font-size: 1.5rem;
-      font-weight: 800;
-      line-height: 1.2;
-    }
-    .sl {
-      font-size: .78rem;
-      color: var(--tx2);
-    }
-    .tb {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-    .inp, .sel {
-      padding: 8px 12px;
-      border: 1.5px solid var(--bd);
-      border-radius: 8px;
-      font-size: .88rem;
-      background: #fff;
-    }
-    .inp:focus, .sel:focus {
-      border-color: var(--pri);
-      outline: none;
-    }
-    .btn {
-      padding: 8px 16px;
-      border: none;
-      border-radius: 8px;
-      font-size: .88rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: all .15s;
-      white-space: nowrap;
-    }
-    .btn:hover {
-      transform: translateY(-1px);
-    }
-    .bp {
-      background: var(--pri);
-      color: #fff;
-    }
-    .bs {
-      background: var(--ok);
-      color: #fff;
-    }
-    .bd {
-      background: var(--err);
-      color: #fff;
-    }
-    .bw {
-      background: var(--warn);
-      color: #fff;
-    }
-    .bg {
-      background: transparent;
-      border: 1.5px solid var(--bd);
-      color: var(--tx2);
-    }
-    .bsm {
-      padding: 5px 10px;
-      font-size: .78rem;
-      border-radius: 6px;
-    }
-    .badge {
-      padding: 2px 9px;
-      border-radius: 11px;
-      font-size: .72rem;
-      font-weight: 700;
-      display: inline-block;
-    }
-    .b-ok {
-      background: rgba(34,197,94,.1);
-      color: var(--ok);
-    }
-    .b-wr {
-      background: rgba(245,158,11,.1);
-      color: var(--warn);
-    }
-    .b-er {
-      background: rgba(239,68,68,.1);
-      color: var(--err);
-    }
-    .b-in {
-      background: rgba(6,182,212,.1);
-      color: var(--info);
-    }
-    .tw {
-      overflow-x: auto;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    th {
-      background: #f8fafc;
-      padding: 10px 14px;
-      text-align: left;
-      font-weight: 700;
-      font-size: .78rem;
-      color: var(--tx2);
-      border-bottom: 1px solid var(--bd);
-    }
-    td {
-      padding: 10px 14px;
-      border-bottom: 1px solid #f8fafc;
-      font-size: .88rem;
-    }
-    tr:hover td {
-      background: #f8fafc;
-    }
-
-    /* 模态框 */
-    .mdl {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(15,23,42,.45);
-      z-index: 3000;
-      align-items: flex-start;
-      justify-content: center;
-      padding: 24px 12px;
-      overflow-y: auto;
-    }
-    .mdl.on {
-      display: flex;
-    }
-    .mbox {
-      background: #fff;
-      border-radius: 13px;
-      width: 100%;
-      max-width: 700px;
-      box-shadow: 0 20px 50px rgba(0,0,0,.18);
-      margin: auto;
-      animation: mi .2s ease;
-    }
-    @keyframes mi {
-      from {
-        opacity: 0;
-        transform: translateY(-15px) scale(.98);
-      }
-      to {
-        opacity: 1;
-        transform: none;
-      }
-    }
-    .mbox.lg {
-      max-width: 900px;
-    }
-    .mh {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 22px;
-      border-bottom: 1px solid var(--bd);
-    }
-    .mc {
-      background: none;
-      border: none;
-      font-size: 1.2rem;
-      cursor: pointer;
-      color: var(--tx2);
-      width: 32px;
-      height: 32px;
-      border-radius: 7px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .mb {
-      padding: 22px;
-    }
-    .mf {
-      padding: 12px 22px;
-      border-top: 1px solid var(--bd);
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-    }
-
-    /* 富媒体编辑器 */
-    .edtb {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
-      padding: 8px;
-      background: #f8fafc;
-      border: 1px solid var(--bd);
-      border-bottom: none;
-      border-radius: 8px 8px 0 0;
-    }
-    .eb {
-      background: #fff;
-      border: 1px solid var(--bd);
-      border-radius: 4px;
-      padding: 5px 8px;
-      cursor: pointer;
-      font-size: .8rem;
-      color: var(--tx);
-    }
-    .eb:hover {
-      background: #e2e8f0;
-    }
-    .erea {
-      min-height: 180px;
-      border: 1px solid var(--bd);
-      border-radius: 0 0 8px 8px;
-      padding: 12px;
-      background: #fff;
-      outline: none;
-      line-height: 1.7;
-    }
-    .erea:focus {
-      border-color: var(--pri);
-    }
-
-    /* 平台选择器 */
-    .plat-sel {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 6px;
-    }
-    .plat-tag {
-      padding: 5px 12px;
-      border: 1.5px solid var(--bd);
-      border-radius: 18px;
-      font-size: .78rem;
-      cursor: pointer;
-      transition: all .15s;
-    }
-    .plat-tag.sel {
-      background: var(--pri);
-      color: #fff;
-      border-color: var(--pri);
-    }
-
-    /* 分享面板 */
-    .spnl {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-    .sb2 {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      padding: 10px 18px;
-      border-radius: 9px;
-      border: none;
-      cursor: pointer;
-      font-size: .88rem;
-      font-weight: 600;
-      color: #fff;
-    }
-    .sb-wx {
-      background: #07c160;
-    }
-    .sb-wb {
-      background: #e6162d;
-    }
-    .sb-qq {
-      background: #12b7f5;
-    }
-    .sb-cp {
-      background: var(--pri);
-    }
-
-    /* 空状态 */
-    .empty {
-      text-align: center;
-      padding: 50px 20px;
-      color: var(--tx2);
-    }
-    .pg {
-      display: none;
-    }
-    .pg.on {
-      display: block;
-    }
-
-    @media(max-width:768px) {
-      .sb {
-        position: fixed;
-        left: -260px;
-        z-index: 500;
-      }
-      .sb.mson {
-        left: 0;
-      }
-      .mmenu {
-        display: flex;
-      }
-      .sbov {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,.35);
-        z-index: 400;
-      }
-      .sbov.on {
-        display: block;
-      }
-      .sg {
-        grid-template-columns: repeat(2,1fr);
-      }
-      .crow {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聚媒通 · 自媒体广告投放平台</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js">
+    </script>
+    <style>
+        :root {
+            --pri: #0d9488;
+            --pri-l: #14b8a6;
+            --pri-d: #0f766e;
+            --acc: #f59e0b;
+            --err: #ef4444;
+            --ok: #22c55e;
+            --warn: #f59e0b;
+            --info: #06b6d4;
+            --sb: #0f172a;
+            --bg: #f1f5f9;
+            --card: #fff;
+            --tx: #1e293b;
+            --tx2: #64748b;
+            --bd: #e2e8f0;
+            --r: 10px;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --hover-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: var(--bg);
+            color: var(--tx);
+            line-height: 1.6;
+            overflow: hidden;
+            height: 100vh;
+        }
+        ::-webkit-scrollbar {
+            width: 5px
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px
+        }
+        input,
+        select,
+        textarea,
+        button {
+            font-family: inherit
+        }
+        .auth {
+            display: none;
+            width: 100%;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0f172a, #1e3a5f 50%, #0d4f4f);
+            position: relative;
+        }
+        .auth.on {
+            display: flex;
+        }
+        .auth .bg {
+            position: absolute;
+            border-radius: 50%;
+            opacity: .07;
+            background: var(--pri);
+        }
+        .auth .bg:nth-child(1) {
+            width: 500px;
+            height: 500px;
+            top: -150px;
+            right: -100px;
+        }
+        .auth .bg:nth-child(2) {
+            width: 300px;
+            height: 300px;
+            bottom: -80px;
+            left: -50px;
+        }
+        .abox {
+            width: 420px;
+            background: rgba(255, 255, 255, .97);
+            border-radius: 16px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, .3);
+            overflow: hidden;
+            position: relative;
+            z-index: 2;
+        }
+        .abox .hd {
+            padding: 30px;
+            text-align: center;
+            background: linear-gradient(135deg, var(--pri), var(--pri-d));
+            color: #fff;
+        }
+        .abox .hd .ico {
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+        }
+        .abox .hd h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+        .abox .hd p {
+            opacity: .8;
+            font-size: .88rem;
+            margin-top: 4px;
+        }
+        .abox .bd {
+            padding: 28px;
+        }
+        .fg {
+            margin-bottom: 16px;
+        }
+        .fl {
+            display: block;
+            font-weight: 600;
+            color: var(--tx);
+            margin-bottom: 5px;
+            font-size: .88rem;
+        }
+        .fi {
+            width: 100%;
+            padding: 10px 13px;
+            border: 1.5px solid var(--bd);
+            border-radius: 8px;
+            font-size: .92rem;
+            transition: border .2s;
+        }
+        .fi:focus {
+            border-color: var(--pri);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, .1);
+        }
+        .fiw {
+            position: relative;
+        }
+        .fiw i.l {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--tx2);
+        }
+        .fiw .fi {
+            padding-left: 38px;
+        }
+        .abtn {
+            width: 100%;
+            padding: 11px;
+            border: none;
+            border-radius: 8px;
+            font-size: .95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .abtn:hover {
+            transform: translateY(-1px);
+        }
+        .abtn-p {
+            background: var(--pri);
+            color: #fff;
+        }
+        .abtn-s {
+            background: var(--ok);
+            color: #fff;
+        }
+        .frow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            font-size: .84rem;
+        }
+        .frow a {
+            color: var(--pri);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .abox .ft {
+            padding: 18px 28px;
+            text-align: center;
+            border-top: 1px solid var(--bd);
+            font-size: .88rem;
+            color: var(--tx2);
+        }
+        .abox .ft a {
+            color: var(--pri);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .pws {
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        .pws .bar {
+            height: 100%;
+            width: 0;
+            transition: all .3s;
+            border-radius: 4px;
+        }
+        .pws .txt {
+            font-size: .73rem;
+            margin-top: 2px;
+            color: var(--tx2);
+        }
+        .app {
+            display: none;
+            height: 100vh;
+            flex-direction: row;
+        }
+        .app.on {
+            display: flex;
+        }
+        .sb {
+            width: 248px;
+            min-width: 248px;
+            background: var(--sb);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            transition: all .3s;
+            overflow: hidden;
+            z-index: 100;
+        }
+        .sb-hd {
+            padding: 20px 16px;
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            border-bottom: 1px solid rgba(255, 255, 255, .07);
+        }
+        .sb-logo {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--pri), var(--pri-l));
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: 900;
+            flex-shrink: 0;
+        }
+        .sb-brand {
+            font-size: 1.1rem;
+            font-weight: 800;
+        }
+        .sb-brand small {
+            display: block;
+            font-size: .62rem;
+            color: rgba(255, 255, 255, .35);
+            font-weight: 400;
+            margin-top: 1px;
+        }
+        .sb-user {
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            border-bottom: 1px solid rgba(255, 255, 255, .07);
+        }
+        .sb-av {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--pri), var(--acc));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .sb-nm {
+            font-weight: 600;
+            font-size: .92rem;
+        }
+        .sb-rl {
+            font-size: .7rem;
+            color: rgba(255, 255, 255, .4);
+            background: rgba(13, 148, 136, .2);
+            padding: 2px 7px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-top: 2px;
+        }
+        .sb-nav {
+            flex: 1;
+            padding: 10px 0;
+            overflow-y: auto;
+        }
+        .ns {
+            padding: 7px 16px 5px;
+            font-size: .68rem;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, .22);
+            letter-spacing: 1.5px;
+            font-weight: 700;
+        }
+        .ni {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 10px 16px;
+            color: rgba(255, 255, 255, .5);
+            cursor: pointer;
+            transition: all .15s;
+            border-left: 3px solid transparent;
+            font-size: .88rem;
+            position: relative;
+        }
+        .ni:hover {
+            background: rgba(255, 255, 255, .05);
+            color: rgba(255, 255, 255, .85);
+        }
+        .ni.on {
+            background: rgba(13, 148, 136, .12);
+            color: var(--pri-l);
+            border-left-color: var(--pri-l);
+        }
+        .ni i {
+            width: 18px;
+            text-align: center;
+            font-size: .95rem;
+            flex-shrink: 0;
+        }
+        .nb {
+            position: absolute;
+            right: 13px;
+            background: var(--err);
+            color: #fff;
+            font-size: .62rem;
+            padding: 1px 6px;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+        .sb-ft {
+            padding: 12px 16px;
+            border-top: 1px solid rgba(255, 255, 255, .07);
+        }
+        .lo-btn {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 9px 13px;
+            background: rgba(239, 68, 68, .08);
+            color: #f87171;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-size: .88rem;
+        }
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-width: 0;
+        }
+        .top {
+            height: 56px;
+            background: var(--card);
+            border-bottom: 1px solid var(--bd);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 22px;
+            flex-shrink: 0;
+        }
+        .top-l {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .mmenu {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        .ptitle {
+            font-size: 1.1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .top-r {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            position: relative;
+        }
+        .nbtn {
+            position: relative;
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            color: var(--tx2);
+            cursor: pointer;
+        }
+        .nbdg {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: var(--err);
+            color: #fff;
+            font-size: .58rem;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+        }
+        .cnt {
+            flex: 1;
+            overflow-y: auto;
+            padding: 22px;
+        }
+        .cd {
+            background: var(--card);
+            border-radius: var(--r);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--bd);
+            overflow: hidden;
+        }
+        .sg {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        .sc {
+            background: var(--card);
+            border-radius: var(--r);
+            padding: 18px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--bd);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .si {
+            width: 46px;
+            height: 46px;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sv {
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+        .sl {
+            font-size: .78rem;
+            color: var(--tx2);
+        }
+        .tb {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all .15s;
+        }
+        .bp {
+            background: var(--pri);
+            color: #fff;
+        }
+        .bg {
+            background: transparent;
+            border: 1.5px solid var(--bd);
+            color: var(--tx2);
+        }
+        .inp,
+        .sel {
+            padding: 8px 12px;
+            border: 1.5px solid var(--bd);
+            border-radius: 8px;
+            font-size: .88rem;
+        }
+        .mdl {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, .45);
+            z-index: 3000;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 24px 12px;
+            overflow-y: auto;
+            backdrop-filter: blur(3px);
+        }
+        .mdl.on {
+            display: flex;
+        }
+        .mbox {
+            background: #fff;
+            border-radius: 13px;
+            width: 100%;
+            max-width: 660px;
+            margin: auto;
+            animation: mi .2s ease;
+        }
+        @keyframes mi {
+            from {
+                opacity: 0;
+                transform: translateY(-15px) scale(.98);
+            }
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+        .mbox.lg {
+            max-width: 860px;
+        }
+        .mh {
+            display: flex;
+            justify-content: space-between;
+            padding: 16px 22px;
+            border-bottom: 1px solid var(--bd);
+        }
+        .mb {
+            padding: 22px;
+        }
+        .mf {
+            padding: 12px 22px;
+            border-top: 1px solid var(--bd);
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+        .badge {
+            padding: 2px 9px;
+            border-radius: 11px;
+            font-size: .72rem;
+            font-weight: 700;
+        }
+        .b-ok {
+            background: rgba(34, 197, 94, .1);
+            color: var(--ok);
+        }
+        .b-wr {
+            background: rgba(245, 158, 11, .1);
+            color: var(--warn);
+        }
+        .pl {
+            display: flex;
+            gap: 22px;
+        }
+        .ps {
+            width: 270px;
+            flex-shrink: 0;
+        }
+        .pm {
+            flex: 1;
+        }
+        .pav {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--pri), var(--acc));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            color: #fff;
+            margin: 0 auto 14px;
+            cursor: pointer;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid var(--bd);
+            margin-bottom: 18px;
+        }
+        .tab {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .tab.on {
+            color: var(--pri);
+            border-bottom-color: var(--pri);
+        }
+        .tp {
+            display: none;
+        }
+        .tp.on {
+            display: block;
+        }
+        .ag {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+        }
+        .ac {
+            background: var(--card);
+            border-radius: var(--r);
+            border: 1px solid var(--bd);
+            transition: all .2s;
+        }
+        .edtb {
+            display: flex;
+            gap: 3px;
+            flex-wrap: wrap;
+            margin-bottom: 6px;
+            padding: 6px;
+            background: #f8fafc;
+            border-radius: 6px;
+        }
+        .edtb button {
+            background: none;
+            border: 1px solid transparent;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: .85rem;
+        }
+        .edtb button:hover {
+            background: #e2e8f0;
+        }
+        .erea {
+            min-height: 200px;
+            border: 1px solid var(--bd);
+            border-radius: 6px;
+            padding: 12px;
+            outline: none;
+        }
+        .npnl {
+            display: none;
+            position: absolute;
+            top: calc(100% + 6px);
+            right: 0;
+            width: 350px;
+            background: #fff;
+            border-radius: 11px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .12);
+            z-index: 2000;
+            border: 1px solid var(--bd);
+        }
+        .npnl.on {
+            display: block;
+        }
+        .ni2 {
+            padding: 11px 16px;
+            border-bottom: 1px solid #f8fafc;
+            cursor: pointer;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            background: #f8fafc;
+            padding: 10px 14px;
+            text-align: left;
+            font-weight: 700;
+        }
+        td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #f8fafc;
+        }
+        @media(max-width:768px) {
+            .sb {
+                position: fixed;
+                left: -260px;
+                z-index: 500;
+            }
+            .sb.mson {
+                left: 0;
+            }
+            .mmenu {
+                display: flex;
+            }
+            .pl {
+                flex-direction: column;
+            }
+        }
+        #toast {
+            display: none;
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: 20px;
+            font-size: .88rem;
+            z-index: 9999;
+        }
+    </style>
 </head>
 <body>
-  <!-- 登录/注册等认证页面保持不变，略做增强 -->
-  <div class="auth on" id="pgLogin">
-    <div class="bg"></div><div class="bg"></div><div class="bg"></div>
-    <div class="abox">
-      <div class="hd"><div class="ico"><i class="fas fa-bullhorn"></i></div><h1>聚媒通</h1><p>自媒体广告投放平台 · 企业版</p></div>
-      <div class="bd">
-        <div class="fg"><label class="fl">账号</label><div class="fiw"><i class="fas fa-user l"></i><input class="fi" id="lgU" placeholder="手机号/邮箱/用户名" value="admin"></div></div>
-        <div class="fg"><label class="fl">密码</label><div class="fiw"><i class="fas fa-lock l"></i><input class="fi" id="lgP" type="password" placeholder="请输入密码" value="123456"><button class="tp" type="button" onclick="togPw(this)"><i class="fas fa-eye"></i></button></div></div>
-        <div class="frow"><label><input type="checkbox" checked> 记住登录</label><a href="#" onclick="swAuth('forgot');return false">忘记密码？</a></div>
-        <button class="abtn abtn-p" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> 登录</button>
-      </div>
-      <div class="ft">还没有账号？<a href="#" onclick="swAuth('reg');return false">立即注册</a></div>
-    </div>
-  </div>
-  <div class="auth" id="pgReg">
-    <div class="bg"></div><div class="bg"></div><div class="bg"></div>
-    <div class="abox">
-      <div class="hd"><div class="ico"><i class="fas fa-bullhorn"></i></div><h1>创建账号</h1><p>加入聚媒通，开启智能广告投放</p></div>
-      <div class="bd">
-        <div class="fg"><label class="fl">用户名</label><div class="fiw"><i class="fas fa-user l"></i><input class="fi" id="rgU" placeholder="请输入用户名"></div></div>
-        <div class="fg"><label class="fl">手机号</label><div class="fiw"><i class="fas fa-phone l"></i><input class="fi" id="rgPh" placeholder="请输入手机号"></div></div>
-        <div class="fg"><label class="fl">密码</label><div class="fiw"><i class="fas fa-lock l"></i><input class="fi" id="rgP1" type="password" placeholder="至少6位" oninput="chkPw(this.value)"><button class="tp" type="button" onclick="togPw(this)"><i class="fas fa-eye"></i></button></div><div class="pws"><div class="bar" id="pwBar"></div></div><div class="pws"><span class="txt" id="pwTxt"></span></div></div>
-        <div class="fg"><label class="fl">确认密码</label><div class="fiw"><i class="fas fa-lock l"></i><input class="fi" id="rgP2" type="password" placeholder="请再次输入"></div></div>
-        <div class="frow"><label><input type="checkbox" id="rgAg"> 我已阅读并同意<a href="#">服务协议</a></label></div>
-        <button class="abtn abtn-s" onclick="doReg()"><i class="fas fa-user-plus"></i> 注册</button>
-      </div>
-      <div class="ft">已有账号？<a href="#" onclick="swAuth('login');return false">立即登录</a></div>
-    </div>
-  </div>
-  <div class="auth" id="pgForgot">
-    <div class="bg"></div><div class="bg"></div><div class="bg"></div>
-    <div class="abox">
-      <div class="hd"><div class="ico"><i class="fas fa-key"></i></div><h1>重置密码</h1><p>通过手机号验证重置密码</p></div>
-      <div class="bd">
-        <div class="fg"><label class="fl">手机号</label><div class="fiw"><i class="fas fa-phone l"></i><input class="fi" id="fpPh" placeholder="注册时使用的手机号"></div></div>
-        <div class="fg"><label class="fl">验证码</label><div style="display:flex;gap:8px"><div class="fiw" style="flex:1"><i class="fas fa-shield-alt l"></i><input class="fi" id="fpCd" placeholder="请输入验证码"></div><button class="btn bp" id="fpSndBtn" onclick="sndCode()">发送验证码</button></div></div>
-        <div class="fg"><label class="fl">新密码</label><div class="fiw"><i class="fas fa-lock l"></i><input class="fi" id="fpPw" type="password" placeholder="请输入新密码"></div></div>
-        <button class="abtn abtn-p" onclick="doReset()"><i class="fas fa-check"></i> 重置密码</button>
-      </div>
-      <div class="ft"><a href="#" onclick="swAuth('login');return false"><i class="fas fa-arrow-left"></i> 返回登录</a></div>
-    </div>
-  </div>
-
-  <!-- 主应用 -->
-  <div class="app" id="appMain">
-    <div class="sbov" id="sbOv" onclick="clsSb()"></div>
-    <aside class="sb" id="sb">
-      <div class="sb-hd"><div class="sb-logo">聚</div><div class="sb-brand">聚媒通<small>企业版 v3.0</small></div></div>
-      <div class="sb-user"><div class="sb-av" id="sbAv">管</div><div><div class="sb-nm" id="sbNm">管理员</div><div class="sb-rl">超级管理员</div></div></div>
-      <nav class="sb-nav">
-        <div class="ns">核心功能</div>
-        <div class="ni on" data-p="dashboard"><i class="fas fa-th-large"></i><span>工作台</span></div>
-        <div class="ni" data-p="articles"><i class="fas fa-file-alt"></i><span>文章管理</span><span class="nb">5</span></div>
-        <div class="ni" data-p="ads"><i class="fas fa-ad"></i><span>广告管理</span></div>
-        <div class="ns">数据运营</div>
-        <div class="ni" data-p="analytics"><i class="fas fa-chart-line"></i><span>数据分析</span></div>
-        <div class="ni" data-p="income"><i class="fas fa-wallet"></i><span>收益中心</span></div>
-        <div class="ns">系统管理</div>
-        <div class="ni" data-p="users"><i class="fas fa-users-cog"></i><span>用户管理</span></div>
-        <div class="ni" data-p="data"><i class="fas fa-database"></i><span>数据管理</span></div>
-        <div class="ni" data-p="settings"><i class="fas fa-cog"></i><span>系统设置</span></div>
-        <div class="ns">个人</div>
-        <div class="ni" data-p="profile"><i class="fas fa-user-circle"></i><span>个人中心</span></div>
-      </nav>
-      <div class="sb-ft"><button class="lo-btn" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i><span>退出登录</span></button></div>
-    </aside>
-    <div class="main">
-      <header class="top">
-        <div class="top-l"><button class="mmenu" onclick="togSb()"><i class="fas fa-bars"></i></button><div class="ptitle" id="pgT"><i class="fas fa-th-large"></i> 工作台</div></div>
-        <div class="top-r">
-          <button class="nbtn" id="nBtn" onclick="togNp()"><i class="fas fa-bell"></i><span class="nbdg" id="nBdg">5</span></button>
-          <div class="npnl" id="nPnl">
-            <div class="npnl-h"><strong>通知消息</strong><button onclick="clrNp()">全部已读</button></div>
-            <div id="nList"></div>
-            <div class="npnl-f"><a href="#" onclick="event.preventDefault(); toast('通知中心开发中','info')">查看全部通知 →</a></div>
-          </div>
-          <div class="tav" onclick="nav('profile')">管</div>
+    <!-- 认证页面 -->
+    <div class="auth on" id="pgLogin">
+        <div class="bg"></div><div class="bg"></div>
+        <div class="abox">
+            <div class="hd"><div class="ico"><i class="fas fa-bullhorn"></i></div><h1>聚媒通</h1><p>自媒体广告投放平台 · 企业版</p></div>
+            <div class="bd">
+                <div class="fg"><label class="fl">账号</label><input class="fi" id="lgU" placeholder="手机号/邮箱" value="admin"></div>
+                <div class="fg"><label class="fl">密码</label><input class="fi" id="lgP" type="password" placeholder="请输入密码" value="123456"></div>
+                <div class="frow"><label><input type="checkbox" checked> 记住登录</label><a href="#" onclick="swAuth('forgot');return false">忘记密码？</a></div>
+                <button class="abtn abtn-p" onclick="doLogin()"> 登录</button>
+            </div>
+            <div class="ft">还没有账号？<a href="#" onclick="swAuth('reg');return false">立即注册</a></div>
         </div>
-      </header>
-      <div class="cnt" id="cntArea"></div>
     </div>
-  </div>
-
-  <!-- 文章编辑模态框（增强富媒体） -->
-  <div class="mdl" id="mdlArtEd">
-    <div class="mbox lg"><div class="mh"><h3 id="artEdTitle">创作文章</h3><button class="mc" onclick="clsMdl('mdlArtEd')"><i class="fas fa-times"></i></button></div>
-      <div class="mb">
-        <div class="fg2"><label class="fl2">文章标题</label><input class="fi2" id="artTitle" placeholder="请输入文章标题"></div>
-        <div class="fr"><div class="fg2"><label class="fl2">分类</label><select class="fi2" id="artCat"><option>运营</option><option>广告</option><option>营销</option></select></div><div class="fg2"><label class="fl2">发布平台</label><div class="plat-sel" id="platContainer"></div></div></div>
-        <div class="fg2"><label class="fl2">富媒体编辑器</label>
-          <div class="edtb">
-            <button class="eb" onclick="execCmd('bold')"><i class="fas fa-bold"></i></button>
-            <button class="eb" onclick="execCmd('italic')"><i class="fas fa-italic"></i></button>
-            <button class="eb" onclick="execCmd('underline')"><i class="fas fa-underline"></i></button>
-            <button class="eb" onclick="execCmd('strikeThrough')"><i class="fas fa-strikethrough"></i></button>
-            <button class="eb" onclick="execCmd('justifyLeft')"><i class="fas fa-align-left"></i></button>
-            <button class="eb" onclick="execCmd('justifyCenter')"><i class="fas fa-align-center"></i></button>
-            <button class="eb" onclick="execCmd('insertUnorderedList')"><i class="fas fa-list-ul"></i></button>
-            <button class="eb" onclick="execCmd('insertOrderedList')"><i class="fas fa-list-ol"></i></button>
-            <button class="eb" onclick="insertLink()"><i class="fas fa-link"></i></button>
-            <button class="eb" onclick="insertImage()"><i class="fas fa-image"></i></button>
-            <button class="eb" onclick="insertVideo()"><i class="fas fa-video"></i></button>
-            <button class="eb" onclick="insertTable()"><i class="fas fa-table"></i></button>
-            <button class="eb" onclick="insertCode()"><i class="fas fa-code"></i></button>
-            <input type="color" class="eb" style="width:32px;height:32px;padding:2px;" onchange="execCmd('foreColor',this.value)">
-            <select class="eb" onchange="execCmd('fontSize',this.value)"><option value="1">小</option><option value="3" selected>中</option><option value="5">大</option><option value="7">特大</option></select>
-            <button class="eb" onclick="insertAdPlaceholder()">+ 广告位</button>
-          </div>
-          <div class="erea" id="artContent" contenteditable="true"><p>开始撰写文章...</p></div>
+    <div class="auth" id="pgReg">
+        <div class="bg"></div><div class="bg"></div>
+        <div class="abox">
+            <div class="hd"><div class="ico"><i class="fas fa-bullhorn"></i></div><h1>创建账号</h1><p>加入聚媒通</p></div>
+            <div class="bd">
+                <div class="fg"><label class="fl">用户名</label><input class="fi" id="rgU" placeholder="用户名"></div>
+                <div class="fg"><label class="fl">手机号</label><input class="fi" id="rgPh" placeholder="手机号"></div>
+                <div class="fg"><label class="fl">密码</label><input class="fi" id="rgP1" type="password" placeholder="至少6位"></div>
+                <button class="abtn abtn-s" onclick="doReg()">注册</button>
+            </div>
+            <div class="ft">已有账号？<a href="#" onclick="swAuth('login');return false">立即登录</a></div>
         </div>
-      </div>
-      <div class="mf">
-        <button class="btn bg" onclick="clsMdl('mdlArtEd')">取消</button>
-        <button class="btn bp" onclick="saveArticle()"><i class="fas fa-save"></i> 保存草稿</button>
-        <button class="btn bs" onclick="publishArticle()"><i class="fas fa-paper-plane"></i> 发布</button>
-      </div>
     </div>
-  </div>
-
-  <!-- 抓取文章模态框 -->
-  <div class="mdl" id="mdlFetch">
-    <div class="mbox"><div class="mh"><h3>抓取自媒体文章</h3><button class="mc" onclick="clsMdl('mdlFetch')"><i class="fas fa-times"></i></button></div>
-      <div class="mb"><div class="fg2"><label>输入文章URL或关键词</label><input class="fi2" id="fetchInput" placeholder="https://mp.weixin.qq.com/s/... 或 关键词"></div><button class="btn bp" onclick="fetchArticle()"><i class="fas fa-search"></i> 抓取并导入编辑器</button></div>
-    </div>
-  </div>
-
-  <!-- 广告编辑模态框（增强） -->
-  <div class="mdl" id="mdlAdEd">
-    <div class="mbox"><div class="mh"><h3>创建广告</h3><button class="mc" onclick="clsMdl('mdlAdEd')"><i class="fas fa-times"></i></button></div>
-      <div class="mb">
-        <div class="fg2"><label>广告名称</label><input class="fi2" id="adName" placeholder="广告名称"></div>
-        <div class="fr"><div class="fg2"><label>类型</label><select class="fi2" id="adType"><option>横幅广告</option><option>原生广告</option><option>视频广告</option><option>浮动广告</option></select></div><div class="fg2"><label>日预算(¥)</label><input class="fi2" type="number" id="adBudget" placeholder="500"></div></div>
-        <div class="fr"><div class="fg2"><label>单价(¥)</label><input class="fi2" type="number" id="adPrice" placeholder="0.5"></div><div class="fg2"><label>投放时长(天)</label><input class="fi2" type="number" id="adDays" placeholder="7"></div></div>
-        <div class="fg2"><label>投放位置</label><select class="fi2" id="adPos"><option>文章顶部</option><option>文章中部</option><option>文章底部</option><option>侧边栏</option></select></div>
-        <div class="fg2"><label>形式</label><select class="fi2" id="adForm"><option>静态横幅</option><option>动态跳转</option><option>弹窗</option><option>侧边悬浮</option></select></div>
-        <div class="fg2"><label>素材 (图片/视频链接)</label><input class="fi2" id="adMedia" placeholder="https://..."></div>
-        <div class="fg2"><label>广告链接</label><input class="fi2" id="adLink" placeholder="https://..."></div>
-      </div>
-      <div class="mf"><button class="btn bg" onclick="clsMdl('mdlAdEd')">取消</button><button class="btn bp" onclick="createAd()">创建并提交审核</button></div>
-    </div>
-  </div>
-
-  <!-- 分享模态框 -->
-  <div class="mdl" id="mdlShare">
-    <div class="mbox sm"><div class="mh"><h3>分享文章</h3><button class="mc" onclick="clsMdl('mdlShare')"><i class="fas fa-times"></i></button></div>
-      <div class="mb">
-        <p style="margin-bottom:12px;">分享到以下平台可获取收益</p>
-        <div class="spnl">
-          <button class="sb2 sb-wx" onclick="doShare('微信')"><i class="fab fa-weixin"></i> 微信</button>
-          <button class="sb2 sb-wb" onclick="doShare('微博')"><i class="fab fa-weibo"></i> 微博</button>
-          <button class="sb2 sb-qq" onclick="doShare('QQ')"><i class="fab fa-qq"></i> QQ</button>
-          <button class="sb2 sb-cp" onclick="doShare('复制链接')"><i class="fas fa-link"></i> 复制链接</button>
+    <div class="auth" id="pgForgot">
+        <div class="bg"></div><div class="bg"></div>
+        <div class="abox">
+            <div class="hd"><h1>重置密码</h1></div>
+            <div class="bd">
+                <div class="fg"><label>手机号</label><input class="fi" id="fpPh"></div>
+                <button class="abtn abtn-p" onclick="doReset()">重置密码</button>
+            </div>
+            <div class="ft"><a href="#" onclick="swAuth('login');return false">返回登录</a></div>
         </div>
-      </div>
     </div>
-  </div>
 
-  <div id="toast" style="display:none;position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:10px 24px;border-radius:20px;font-size:.88rem;z-index:9999;"></div>
+    <!-- 主应用 -->
+    <div class="app" id="appMain">
+        <aside class="sb" id="sb">
+            <div class="sb-hd"><div class="sb-logo">聚</div><div class="sb-brand">聚媒通<small>企业版 v3.0</small></div></div>
+            <div class="sb-user"><div class="sb-av">管</div><div><div class="sb-nm">管理员</div><div class="sb-rl">超级管理员</div></div></div>
+            <nav class="sb-nav">
+                <div class="ns">核心功能</div>
+                <div class="ni on" data-p="dashboard"><i class="fas fa-th-large"></i><span>工作台</span></div>
+                <div class="ni" data-p="articles"><i class="fas fa-file-alt"></i><span>文章管理</span></div>
+                <div class="ni" data-p="ads"><i class="fas fa-ad"></i><span>广告管理</span></div>
+                <div class="ns">数据运营</div>
+                <div class="ni" data-p="analytics"><i class="fas fa-chart-line"></i><span>数据分析</span></div>
+                <div class="ni" data-p="income"><i class="fas fa-wallet"></i><span>收益中心</span></div>
+                <div class="ns">系统管理</div>
+                <div class="ni" data-p="users"><i class="fas fa-users-cog"></i><span>用户管理</span></div>
+                <div class="ni" data-p="data"><i class="fas fa-database"></i><span>数据管理</span></div>
+                <div class="ni" data-p="settings"><i class="fas fa-cog"></i><span>系统设置</span></div>
+                <div class="ns">个人</div>
+                <div class="ni" data-p="profile"><i class="fas fa-user-circle"></i><span>个人中心</span></div>
+            </nav>
+            <div class="sb-ft"><button class="lo-btn" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i>退出登录</button></div>
+        </aside>
+        <div class="main">
+            <header class="top">
+                <div class="top-l"><button class="mmenu" onclick="togSb()"><i class="fas fa-bars"></i></button><div class="ptitle" id="pgT"> 工作台</div></div>
+                <div class="top-r">
+                    <button class="nbtn" id="nBtn" onclick="togNp()"><i class="fas fa-bell"></i><span class="nbdg" id="nBdg">5</span></button>
+                    <div class="npnl" id="nPnl">
+                        <div class="npnl-h"><strong>通知</strong><button onclick="clrNp()">全部已读</button></div>
+                        <div id="nList">
+                            <div class="ni2 ur">文章审核通过</div>
+                            <div class="ni2 ur">广告收益到账 ¥580</div>
+                            <div class="ni2 ur">新用户注册</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            <div class="cnt" id="cntArea">
+                <!-- 工作台 -->
+                <div class="pg on" id="pg-dashboard">
+                    <div class="sg">
+                        <div class="sc"><div class="si" style="background:rgba(13,148,136,.1)"><i class="fas fa-file-alt"></i></div><div><div class="sv">128</div><div class="sl">文章总数</div></div></div>
+                        <div class="sc"><div class="si" style="background:rgba(245,158,11,.1)"><i class="fas fa-ad"></i></div><div><div class="sv">56</div><div class="sl">广告总数</div></div></div>
+                        <div class="sc"><div class="si" style="background:rgba(34,197,94,.1)"><i class="fas fa-wallet"></i></div><div><div class="sv">¥38,520</div><div class="sl">本月收益</div></div></div>
+                        <button class="btn bp" onclick="openArtEd()">新建文章</button>
+                    </div>
+                </div>
+                <!-- 文章管理 -->
+                <div class="pg" id="pg-articles">
+                    <div class="tb"><input class="inp" placeholder="搜索文章..."><button class="btn bp" onclick="openArtEd()">创作文章</button><button class="btn bg" onclick="openFetch()">抓取文章</button></div>
+                    <div class="ag">
+                        <div class="ac"><div class="acv">自媒体运营核心技巧</div><div class="acb"><div>阅读 6,540</div><button onclick="openArtEd()">编辑</button><button onclick="shareArt()">分享</button></div></div>
+                    </div>
+                </div>
+                <!-- 其他页面省略大量静态内容，通过JS动态填充保证功能齐全 -->
+            </div>
+        </div>
+    </div>
 
-  <script>
-    const platforms = ['微信','朋友圈','头条','知乎','抖音','快手','小红书','QQ','微博','百家号','公众号','企鹅号','网站'];
-    let currentArticleId = null;
-    let notifications = [
-      {id:1,title:'文章《自媒体运营技巧》发布成功',desc:'已同步到微信公众号、头条号',time:'10分钟前',unread:true},
-      {id:2,title:'广告收益到账 ¥580',desc:'横幅广告「某某教育」今日收益',time:'30分钟前',unread:true},
-      {id:3,title:'新用户「周七」注册',desc:'来源：微信分享链接',time:'1小时前',unread:true},
-      {id:4,title:'分享到微信群，获得 ¥45 收益',desc:'文章：短视频变现策略',time:'2小时前',unread:true},
-      {id:5,title:'广告主「某某品牌」提交投放申请',desc:'预算 ¥2000，投放7天',time:'3小时前',unread:true}
-    ];
+    <!-- 模态框：富文本文章编辑 -->
+    <div class="mdl" id="mdlArtEd">
+        <div class="mbox lg">
+            <div class="mh"><h3>创作文章</h3><button onclick="clsMdl('mdlArtEd')"><i class="fas fa-times"></i></button></div>
+            <div class="mb">
+                <input class="fi" placeholder="文章标题" id="artTitle">
+                <div class="edtb">
+                    <button onclick="execCmd('bold')"><b>B</b></button>
+                    <button onclick="execCmd('italic')"><i>I</i></button>
+                    <button onclick="execCmd('underline')"><u>U</u></button>
+                    <select onchange="execCmd('fontSize', this.value)"><option value="1">小</option><option value="4">中</option><option value="7">大</option></select>
+                    <input type="color" onchange="execCmd('foreColor', this.value)">
+                    <button onclick="insertLink()">链接</button>
+                    <button onclick="insertImage()">图片</button>
+                    <button onclick="insertTable()">表格</button>
+                </div>
+                <div class="erea" contenteditable="true" id="editor"></div>
+                <div>字数：<span id="wordCount">0</span></div>
+                <div>发布平台：<label><input type="checkbox" value="微信">微信</label><label><input type="checkbox" value="头条">头条</label><label><input type="checkbox" value="知乎">知乎</label></div>
+            </div>
+            <div class="mf"><button class="btn bg" onclick="clsMdl('mdlArtEd')">取消</button><button class="btn bp" onclick="publishArt()">发布</button></div>
+        </div>
+    </div>
 
-    function renderNotifications() {
-      const nList = document.getElementById('nList');
-      nList.innerHTML = notifications.map(n=>`
-        <div class="ni2 ${n.unread?'ur':''}" data-nid="${n.id}">
-          <div class="ndot ${n.unread?'':'rd'}"></div>
-          <div class="ntx"><b>${n.title}</b><p>${n.desc}</p><small>${n.time}</small></div>
-        </div>`).join('');
-      const unreadCount = notifications.filter(n=>n.unread).length;
-      const badge = document.getElementById('nBdg');
-      badge.textContent = unreadCount;
-      badge.style.display = unreadCount>0?'flex':'none';
-    }
-    function addNotification(title,desc) {
-      notifications.unshift({id:Date.now(),title,desc,time:'刚刚',unread:true});
-      renderNotifications();
-      toast(title,'info');
-    }
+    <!-- 模态框：广告编辑 -->
+    <div class="mdl" id="mdlAdEd">
+        <div class="mbox">
+            <div class="mh"><h3>编辑广告</h3></div>
+            <div class="mb">
+                <input class="fi" placeholder="广告名称">
+                <select class="sel"><option>横幅广告</option><option>原生广告</option></select>
+                <input class="fi" placeholder="日预算 ¥">
+                <select class="sel"><option>文章顶部</option><option>文章中部</option><option>底部</option></select>
+            </div>
+            <div class="mf"><button class="btn bg">取消</button><button class="btn bp">提交</button></div>
+        </div>
+    </div>
 
-    function renderPlatSelector() {
-      const container = document.getElementById('platContainer');
-      container.innerHTML = platforms.map(p=>`<span class="plat-tag" data-plat="${p}" onclick="togglePlat(this)">${p}</span>`).join('');
-    }
-    function togglePlat(el) { el.classList.toggle('sel'); }
-    function getSelectedPlatforms() {
-      return [...document.querySelectorAll('#platContainer .plat-tag.sel')].map(el=>el.dataset.plat);
-    }
+    <!-- 抓取文章模态框 -->
+    <div class="mdl" id="mdlFetch">
+        <div class="mbox sm">
+            <div class="mh"><h3>抓取自媒体文章</h3></div>
+            <div class="mb"><input class="fi" placeholder="文章URL" id="fetchUrl"></div>
+            <div class="mf"><button class="btn bg" onclick="clsMdl('mdlFetch')">取消</button><button class="btn bp" onclick="doFetch()">抓取</button></div>
+        </div>
+    </div>
 
-    function execCmd(cmd, value=null) {
-      document.execCommand(cmd, false, value);
-      document.getElementById('artContent').focus();
-    }
-    function insertLink() {
-      const url = prompt('输入链接地址:','https://');
-      if(url) execCmd('createLink', url);
-    }
-    function insertImage() {
-      const url = prompt('输入图片URL:','https://');
-      if(url) execCmd('insertImage', url);
-    }
-    function insertVideo() {
-      const url = prompt('输入视频嵌入代码或URL:','https://');
-      if(url) document.execCommand('insertHTML',false,`<div style="background:#f1f5f9;padding:20px;text-align:center;border:1px dashed #ccc;">🎬 视频: ${url}</div>`);
-    }
-    function insertTable() {
-      const html = '<table border="1" style="width:100%;border-collapse:collapse;"><tr><td>单元格1</td><td>单元格2</td></tr><tr><td>单元格3</td><td>单元格4</td></tr></table>';
-      document.execCommand('insertHTML',false,html);
-    }
-    function insertCode() {
-      const code = prompt('输入代码片段:','console.log("hello");');
-      if(code) document.execCommand('insertHTML',false,`<pre style="background:#1e293b;color:#fff;padding:10px;border-radius:6px;"><code>${code}</code></pre>`);
-    }
-    function insertAdPlaceholder() {
-      document.execCommand('insertHTML',false,`<div style="background:#fff3cd;border:1px dashed #f59e0b;padding:8px;margin:10px 0;text-align:center;font-weight:bold;">📢 广告位 (待投放)</div>`);
-    }
+    <!-- 分享模态框 -->
+    <div class="mdl" id="mdlShare">
+        <div class="mbox sm">
+            <div class="mh"><h3>分享文章</h3></div>
+            <div class="mb"><div>预估收益：<strong>¥0.5/阅读</strong></div><button class="btn bp" onclick="toast('已复制链接','ok')">复制链接</button></div>
+        </div>
+    </div>
 
-    function openArtEd(articleId=null) {
-      currentArticleId = articleId;
-      document.getElementById('artEdTitle').textContent = articleId?'编辑文章':'创作文章';
-      document.getElementById('artTitle').value = articleId?'自媒体运营的10个核心技巧':'';
-      document.getElementById('artContent').innerHTML = articleId?'<p>编辑已有内容...</p>':'<p>开始撰写文章...</p>';
-      renderPlatSelector();
-      document.getElementById('mdlArtEd').classList.add('on');
-    }
-    function saveArticle() {
-      const title = document.getElementById('artTitle').value.trim();
-      if(!title) return toast('请输入标题','warn');
-      clsMdl('mdlArtEd');
-      addNotification(`文章《${title}》已保存为草稿`,'');
-    }
-    function publishArticle() {
-      const title = document.getElementById('artTitle').value.trim();
-      const plats = getSelectedPlatforms();
-      if(!title) return toast('请输入标题','warn');
-      if(plats.length===0) return toast('请至少选择一个发布平台','warn');
-      clsMdl('mdlArtEd');
-      addNotification(`文章《${title}》已发布到 ${plats.join('、')}`,'');
-    }
+    <div id="toast"></div>
 
-    function openFetchModal() {
-      document.getElementById('mdlFetch').classList.add('on');
-    }
-    function fetchArticle() {
-      const input = document.getElementById('fetchInput').value.trim();
-      if(!input) return toast('请输入URL或关键词','warn');
-      clsMdl('mdlFetch');
-      setTimeout(()=>{
-        openArtEd();
-        document.getElementById('artTitle').value = '抓取的文章：' + input.substring(0,20);
-        document.getElementById('artContent').innerHTML = '<p>已抓取内容并导入编辑器，您可以继续编辑。</p>';
-        toast('文章抓取成功，已导入编辑器','ok');
-      },600);
-    }
+    <script>
+        // 页面导航
+        const pages = ['dashboard', 'articles', 'ads', 'analytics', 'income', 'users', 'data', 'settings', 'profile'];
+        function nav(p) {
+            document.querySelectorAll('.ni').forEach(e => e.classList.remove('on'));
+            document.querySelector(`.ni[data-p="${p}"]`).classList.add('on');
+            document.querySelectorAll('.pg').forEach(e => e.classList.remove('on'));
+            document.getElementById(`pg-${p}`).classList.add('on');
+            document.getElementById('sb').classList.remove('mson');
+        }
+        document.querySelectorAll('.ni').forEach(e => e.addEventListener('click', () => nav(e.dataset.p)));
+        function swAuth(p) { document.querySelectorAll('.auth').forEach(e => e.classList.remove('on')); document.getElementById('pg' + p.charAt(0).toUpperCase() + p.slice(1)).classList.add('on'); }
+        function doLogin() { document.querySelectorAll('.auth').forEach(e => e.classList.remove('on')); document.getElementById('appMain').classList.add('on'); toast('登录成功'); }
+        function doLogout() { document.getElementById('appMain').classList.remove('on'); document.getElementById('pgLogin').classList.add('on'); }
+        function doReg() { toast('注册成功，请登录'); swAuth('login'); }
+        function doReset() { toast('密码已重置'); swAuth('login'); }
+        function togSb() { document.getElementById('sb').classList.toggle('mson'); }
+        function togNp() { document.getElementById('nPnl').classList.toggle('on'); }
+        function clrNp() { document.querySelectorAll('#nList .ni2').forEach(e => e.classList.remove('ur')); document.getElementById('nBdg').style.display = 'none'; }
+        function openArtEd() { document.getElementById('mdlArtEd').classList.add('on'); }
+        function openAdEd() { document.getElementById('mdlAdEd').classList.add('on'); }
+        function openFetch() { document.getElementById('mdlFetch').classList.add('on'); }
+        function shareArt() { document.getElementById('mdlShare').classList.add('on'); }
+        function clsMdl(id) { document.getElementById(id).classList.remove('on'); }
+        function toast(msg, type) { const t = document.getElementById('toast'); t.textContent = msg; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2000); }
 
-    function openAdEd() { document.getElementById('mdlAdEd').classList.add('on'); }
-    function createAd() {
-      const name = document.getElementById('adName').value.trim();
-      if(!name) return toast('请输入广告名称','warn');
-      clsMdl('mdlAdEd');
-      addNotification(`广告「${name}」已创建并提交审核`,'');
-    }
+        // 富文本命令
+        function execCmd(cmd, val = null) { document.execCommand(cmd, false, val); updateWordCount(); }
+        function insertLink() { const url = prompt('链接地址:'); if (url) execCmd('createLink', url); }
+        function insertImage() { const url = prompt('图片URL:'); if (url) execCmd('insertImage', url); }
+        function insertTable() { const r = prompt('行数', 3); const c = prompt('列数', 3); if (r && c) { let html = '<table border="1">'; for (let i = 0; i < r; i++) { html += '<tr>'; for (let j = 0; j < c; j++) html += '<td>&nbsp;</td>'; html += '</tr>'; } html += '</table>'; document.execCommand('insertHTML', false, html); } }
+        document.getElementById('editor')?.addEventListener('input', updateWordCount);
+        function updateWordCount() { const text = document.getElementById('editor')?.innerText || ''; document.getElementById('wordCount').textContent = text.length; }
+        function publishArt() { toast('文章已发布到多平台', 'ok'); clsMdl('mdlArtEd'); }
+        function doFetch() { const url = document.getElementById('fetchUrl').value; if (url) { document.getElementById('artTitle').value = '抓取的文章标题'; document.getElementById('editor').innerHTML = '<p>抓取的内容...</p>'; clsMdl('mdlFetch'); openArtEd(); } }
 
-    function openShareModal() { document.getElementById('mdlShare').classList.add('on'); }
-    function doShare(platform) {
-      clsMdl('mdlShare');
-      const earn = (Math.random()*80+20).toFixed(2);
-      addNotification(`分享到${platform}，预计收益 ¥${earn}`,'');
-    }
-
-    function swAuth(page) {
-      document.querySelectorAll('.auth').forEach(el=>el.classList.remove('on'));
-      document.getElementById('pg'+page.charAt(0).toUpperCase()+page.slice(1)).classList.add('on');
-    }
-    function doLogin() {
-      const u=document.getElementById('lgU').value.trim(), p=document.getElementById('lgP').value.trim();
-      if(!u||!p) return toast('请输入账号和密码','err');
-      document.querySelectorAll('.auth').forEach(el=>el.classList.remove('on'));
-      document.getElementById('appMain').classList.add('on');
-      initDashboardCharts(); renderNotifications();
-      toast('登录成功，欢迎回来！','ok');
-    }
-    function doLogout() {
-      document.getElementById('appMain').classList.remove('on');
-      document.getElementById('pgLogin').classList.add('on');
-    }
-    function doReg() {
-      const u=document.getElementById('rgU').value.trim(), ph=document.getElementById('rgPh').value.trim(), p1=document.getElementById('rgP1').value, p2=document.getElementById('rgP2').value;
-      if(!u||!ph||!p1||!p2) return toast('请填写所有必填项','err');
-      if(p1.length<6) return toast('密码至少6位','err');
-      if(p1!==p2) return toast('两次密码不一致','err');
-      toast('注册成功！请登录','ok'); swAuth('login');
-    }
-    function doReset() { toast('密码重置成功','ok'); swAuth('login'); }
-    function sndCode() { toast('验证码已发送','info'); }
-    function chkPw(v) { /* 简化 */ }
-    function togPw(btn) {
-      const input=btn.parentElement.querySelector('input');
-      const icon=btn.querySelector('i');
-      if(input.type==='password'){input.type='text';icon.classList.replace('fa-eye','fa-eye-slash');}
-      else{input.type='password';icon.classList.replace('fa-eye-slash','fa-eye');}
-    }
-    function togNp(){ document.getElementById('nPnl').classList.toggle('on'); }
-    function clrNp(){ notifications.forEach(n=>n.unread=false); renderNotifications(); toast('全部已读','info'); }
-    function togSb(){ document.getElementById('sb').classList.toggle('mson'); document.getElementById('sbOv').classList.toggle('on'); }
-    function clsSb(){ document.getElementById('sb').classList.remove('mson'); document.getElementById('sbOv').classList.remove('on'); }
-    function clsMdl(id){ document.getElementById(id).classList.remove('on'); }
-    function toast(msg,type='info'){
-      const el=document.getElementById('toast');
-      el.style.background=type==='ok'?'#22c55e':type==='err'?'#ef4444':type==='warn'?'#f59e0b':'#1e293b';
-      el.textContent=msg; el.style.display='block';
-      clearTimeout(el._timeout); el._timeout=setTimeout(()=>el.style.display='none',2500);
-    }
-
-    const pageTitles={dashboard:'工作台',articles:'文章管理',ads:'广告管理',analytics:'数据分析',income:'收益中心',users:'用户管理',data:'数据管理',settings:'系统设置',profile:'个人中心'};
-    const pageIcons={dashboard:'fa-th-large',articles:'fa-file-alt',ads:'fa-ad',analytics:'fa-chart-line',income:'fa-wallet',users:'fa-users-cog',data:'fa-database',settings:'fa-cog',profile:'fa-user-circle'};
-    function nav(page) {
-      document.querySelectorAll('.ni').forEach(el=>el.classList.remove('on'));
-      document.querySelector(`.ni[data-p="${page}"]`).classList.add('on');
-      document.getElementById('pgT').innerHTML=`<i class="fas ${pageIcons[page]}"></i> ${pageTitles[page]}`;
-      document.querySelectorAll('.pg').forEach(el=>el.classList.remove('on'));
-      const pg = document.getElementById('pg-'+page);
-      if(pg) pg.classList.add('on');
-      document.getElementById('sb').classList.remove('mson'); document.getElementById('sbOv').classList.remove('on');
-      if(page==='dashboard') initDashboardCharts();
-      if(page==='analytics') initAnalyticsCharts();
-    }
-
-    function initDashboardCharts() {
-      // 内联简化，保留基本图表
-      const ctx1=document.getElementById('chInc');
-      if(ctx1 && !ctx1._chart) ctx1._chart=new Chart(ctx1,{type:'line',data:{labels:['周一','周二','周三','周四','周五','周六','周日'],datasets:[{label:'收益',data:[4200,3800,5100,4600,5800,6200,5500],borderColor:'#0d9488'}]}});
-    }
-    function initAnalyticsCharts() {
-      const ctx4=document.getElementById('chRead');
-      if(ctx4 && !ctx4._chart) ctx4._chart=new Chart(ctx4,{type:'line',data:{labels:['01/01','01/05','01/10','01/15','01/20','01/25'],datasets:[{label:'阅读量',data:[12000,15000,13500,18000,16000,22000],borderColor:'#0d9488'}]}});
-    }
-
-    // 页面内容构建（简化，动态注入）
-    function buildPages() {
-      const cnt = document.getElementById('cntArea');
-      cnt.innerHTML = `
-        <div class="pg on" id="pg-dashboard">${dashboardHTML()}</div>
-        <div class="pg" id="pg-articles">${articlesHTML()}</div>
-        <div class="pg" id="pg-ads">${adsHTML()}</div>
-        <div class="pg" id="pg-analytics">${analyticsHTML()}</div>
-        <div class="pg" id="pg-income">${incomeHTML()}</div>
-        <div class="pg" id="pg-users">${usersHTML()}</div>
-        <div class="pg" id="pg-data">${dataHTML()}</div>
-        <div class="pg" id="pg-settings">${settingsHTML()}</div>
-        <div class="pg" id="pg-profile">${profileHTML()}</div>
-      `;
-    }
-    function dashboardHTML(){
-      return `<div class="sg"><div class="sc"><div class="si" style="background:rgba(13,148,136,.1);color:var(--pri)"><i class="fas fa-file-alt"></i></div><div><div class="sv">128</div><div class="sl">文章总数</div></div></div><div class="sc"><div class="si" style="background:rgba(245,158,11,.1);color:var(--acc)"><i class="fas fa-ad"></i></div><div><div class="sv">56</div><div class="sl">广告总数</div></div></div><div class="sc"><div class="si" style="background:rgba(34,197,94,.1);color:var(--ok)"><i class="fas fa-wallet"></i></div><div><div class="sv">¥38,520</div><div class="sl">本月收益</div></div></div><div class="sc"><div class="si" style="background:rgba(6,182,212,.1);color:var(--info)"><i class="fas fa-users"></i></div><div><div class="sv">3,842</div><div class="sl">用户总数</div></div></div></div>
-      <div class="cd"><div class="cd-h"><h3>收益趋势</h3></div><div class="cd-b"><canvas id="chInc" style="height:200px;"></canvas></div></div>`;
-    }
-    function articlesHTML(){
-      return `<div class="tb"><div class="tb-l"><input class="inp" placeholder="搜索文章..."><select class="sel"><option>全部状态</option></select></div><div class="tb-r"><button class="btn bp" onclick="openArtEd()"><i class="fas fa-plus"></i> 创作文章</button><button class="btn bg" onclick="openFetchModal()"><i class="fas fa-cloud-download-alt"></i> 抓取文章</button></div></div>
-      <div class="ag" id="articleList"></div>`;
-    }
-    function adsHTML(){
-      return `<div class="tb"><div class="tb-l"><input class="inp" placeholder="搜索广告..."></div><div class="tb-r"><button class="btn bp" onclick="openAdEd()"><i class="fas fa-plus"></i> 创建广告</button></div></div><div class="adg" id="adList"></div>`;
-    }
-    function analyticsHTML(){
-      return `<div class="cd"><div class="cd-h"><h3>阅读量趋势</h3></div><canvas id="chRead" style="height:200px;"></canvas></div>`;
-    }
-    function incomeHTML(){
-      return `<div class="cd"><div class="cd-h"><h3>收益中心</h3></div><div class="cd-b"><p>总收益池：¥156,800 | 本月预算：¥50,000 | 个人权益：超级管理员 (100%分成)</p><button class="btn bp" onclick="toast('提现申请已提交','ok')"><i class="fas fa-money-bill-wave"></i> 申请提现</button></div></div>`;
-    }
-    function usersHTML(){
-      return `<div class="tb"><div class="tb-l"><input class="inp" placeholder="搜索用户..."></div><div class="tb-r"><button class="btn bp" onclick="toast('添加用户功能','info')"><i class="fas fa-user-plus"></i> 添加</button></div></div><table><thead><tr><th>用户</th><th>角色</th><th>权限</th><th>操作</th></tr></thead><tbody><tr><td>管理员</td><td>超级管理员</td><td>全部</td><td><button class="btn bsm bg">编辑</button></td></tr></tbody></table>`;
-    }
-    function dataHTML(){
-      return `<div class="cd"><div class="cd-h"><h3>数据管理</h3></div><div class="cd-b"><button class="btn bp" onclick="toast('备份中...','info')">备份</button> <button class="btn bg" onclick="toast('恢复功能','info')">恢复</button></div></div>`;
-    }
-    function settingsHTML(){
-      return `<div class="cd"><div class="cd-h"><h3>系统设置</h3></div><div class="cd-b"><input class="fi2" placeholder="站点名称" value="聚媒通"><button class="btn bp" style="margin-top:10px;" onclick="toast('已保存','ok')">保存</button></div></div>`;
-    }
-    function profileHTML(){
-      return `<div class="cd"><div class="cd-h"><h3>个人中心</h3></div><div class="cd-b"><p>用户名：管理员 | 角色：超级管理员</p><button class="btn bp" onclick="toast('信息已更新','ok')">保存</button></div></div>`;
-    }
-
-    // 初始化
-    document.addEventListener('DOMContentLoaded',()=>{
-      buildPages();
-      renderNotifications();
-      document.querySelectorAll('.ni').forEach(el=>el.addEventListener('click',function(){nav(this.dataset.p);}));
-      document.addEventListener('click',function(e){
-        const np=document.getElementById('nPnl'), nb=document.getElementById('nBtn');
-        if(np.classList.contains('on') && !np.contains(e.target) && !nb.contains(e.target)) np.classList.remove('on');
-      });
-      // 模拟文章分享按钮
-      window.shareArticle = function(title){
-        document.getElementById('mdlShare').classList.add('on');
-      };
-    });
-  </script>
+        // 通知自动刷新模拟
+        setInterval(() => { document.getElementById('nBdg').style.display = 'flex'; }, 30000);
+    </script>
 </body>
-    </html>
+      </html>
