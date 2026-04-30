@@ -1,925 +1,632 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>聚媒通 · 自媒体广告投放平台</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js">
-    </script>
-    <style>
-        :root {
-            --pri: #0d9488;
-            --pri-l: #14b8a6;
-            --pri-d: #0f766e;
-            --acc: #f59e0b;
-            --err: #ef4444;
-            --ok: #22c55e;
-            --warn: #f59e0b;
-            --info: #06b6d4;
-            --sb: #0f172a;
-            --bg: #f1f5f9;
-            --card: #fff;
-            --tx: #1e293b;
-            --tx2: #64748b;
-            --bd: #e2e8f0;
-            --r: 10px;
-            --shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            --hover-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
-        }
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
-            background: var(--bg);
-            color: var(--tx);
-            line-height: 1.6;
-            overflow: hidden;
-            height: 100vh;
-        }
-        ::-webkit-scrollbar {
-            width: 5px
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 3px
-        }
-        input,
-        select,
-        textarea,
-        button {
-            font-family: inherit
-        }
-        .auth {
-            display: none;
-            width: 100%;
-            min-height: 100vh;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #0f172a, #1e3a5f 50%, #0d4f4f);
-            position: relative;
-        }
-        .auth.on {
-            display: flex;
-        }
-        .auth .bg {
-            position: absolute;
-            border-radius: 50%;
-            opacity: .07;
-            background: var(--pri);
-        }
-        .auth .bg:nth-child(1) {
-            width: 500px;
-            height: 500px;
-            top: -150px;
-            right: -100px;
-        }
-        .auth .bg:nth-child(2) {
-            width: 300px;
-            height: 300px;
-            bottom: -80px;
-            left: -50px;
-        }
-        .abox {
-            width: 420px;
-            background: rgba(255, 255, 255, .97);
-            border-radius: 16px;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, .3);
-            overflow: hidden;
-            position: relative;
-            z-index: 2;
-        }
-        .abox .hd {
-            padding: 30px;
-            text-align: center;
-            background: linear-gradient(135deg, var(--pri), var(--pri-d));
-            color: #fff;
-        }
-        .abox .hd .ico {
-            font-size: 2.5rem;
-            margin-bottom: 8px;
-        }
-        .abox .hd h1 {
-            font-size: 1.5rem;
-            font-weight: 800;
-        }
-        .abox .hd p {
-            opacity: .8;
-            font-size: .88rem;
-            margin-top: 4px;
-        }
-        .abox .bd {
-            padding: 28px;
-        }
-        .fg {
-            margin-bottom: 16px;
-        }
-        .fl {
-            display: block;
-            font-weight: 600;
-            color: var(--tx);
-            margin-bottom: 5px;
-            font-size: .88rem;
-        }
-        .fi {
-            width: 100%;
-            padding: 10px 13px;
-            border: 1.5px solid var(--bd);
-            border-radius: 8px;
-            font-size: .92rem;
-            transition: border .2s;
-        }
-        .fi:focus {
-            border-color: var(--pri);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(13, 148, 136, .1);
-        }
-        .fiw {
-            position: relative;
-        }
-        .fiw i.l {
-            position: absolute;
-            left: 13px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--tx2);
-        }
-        .fiw .fi {
-            padding-left: 38px;
-        }
-        .abtn {
-            width: 100%;
-            padding: 11px;
-            border: none;
-            border-radius: 8px;
-            font-size: .95rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all .2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        .abtn:hover {
-            transform: translateY(-1px);
-        }
-        .abtn-p {
-            background: var(--pri);
-            color: #fff;
-        }
-        .abtn-s {
-            background: var(--ok);
-            color: #fff;
-        }
-        .frow {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
-            font-size: .84rem;
-        }
-        .frow a {
-            color: var(--pri);
-            text-decoration: none;
-            font-weight: 600;
-        }
-        .abox .ft {
-            padding: 18px 28px;
-            text-align: center;
-            border-top: 1px solid var(--bd);
-            font-size: .88rem;
-            color: var(--tx2);
-        }
-        .abox .ft a {
-            color: var(--pri);
-            text-decoration: none;
-            font-weight: 600;
-        }
-        .pws {
-            height: 4px;
-            background: #e2e8f0;
-            border-radius: 4px;
-            margin-top: 5px;
-            overflow: hidden;
-        }
-        .pws .bar {
-            height: 100%;
-            width: 0;
-            transition: all .3s;
-            border-radius: 4px;
-        }
-        .pws .txt {
-            font-size: .73rem;
-            margin-top: 2px;
-            color: var(--tx2);
-        }
-        .app {
-            display: none;
-            height: 100vh;
-            flex-direction: row;
-        }
-        .app.on {
-            display: flex;
-        }
-        .sb {
-            width: 248px;
-            min-width: 248px;
-            background: var(--sb);
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            transition: all .3s;
-            overflow: hidden;
-            z-index: 100;
-        }
-        .sb-hd {
-            padding: 20px 16px;
-            display: flex;
-            align-items: center;
-            gap: 11px;
-            border-bottom: 1px solid rgba(255, 255, 255, .07);
-        }
-        .sb-logo {
-            width: 38px;
-            height: 38px;
-            background: linear-gradient(135deg, var(--pri), var(--pri-l));
-            border-radius: 9px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            font-weight: 900;
-            flex-shrink: 0;
-        }
-        .sb-brand {
-            font-size: 1.1rem;
-            font-weight: 800;
-        }
-        .sb-brand small {
-            display: block;
-            font-size: .62rem;
-            color: rgba(255, 255, 255, .35);
-            font-weight: 400;
-            margin-top: 1px;
-        }
-        .sb-user {
-            padding: 14px 16px;
-            display: flex;
-            align-items: center;
-            gap: 11px;
-            border-bottom: 1px solid rgba(255, 255, 255, .07);
-        }
-        .sb-av {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--pri), var(--acc));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            font-size: 1rem;
-            flex-shrink: 0;
-        }
-        .sb-nm {
-            font-weight: 600;
-            font-size: .92rem;
-        }
-        .sb-rl {
-            font-size: .7rem;
-            color: rgba(255, 255, 255, .4);
-            background: rgba(13, 148, 136, .2);
-            padding: 2px 7px;
-            border-radius: 10px;
-            display: inline-block;
-            margin-top: 2px;
-        }
-        .sb-nav {
-            flex: 1;
-            padding: 10px 0;
-            overflow-y: auto;
-        }
-        .ns {
-            padding: 7px 16px 5px;
-            font-size: .68rem;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, .22);
-            letter-spacing: 1.5px;
-            font-weight: 700;
-        }
-        .ni {
-            display: flex;
-            align-items: center;
-            gap: 11px;
-            padding: 10px 16px;
-            color: rgba(255, 255, 255, .5);
-            cursor: pointer;
-            transition: all .15s;
-            border-left: 3px solid transparent;
-            font-size: .88rem;
-            position: relative;
-        }
-        .ni:hover {
-            background: rgba(255, 255, 255, .05);
-            color: rgba(255, 255, 255, .85);
-        }
-        .ni.on {
-            background: rgba(13, 148, 136, .12);
-            color: var(--pri-l);
-            border-left-color: var(--pri-l);
-        }
-        .ni i {
-            width: 18px;
-            text-align: center;
-            font-size: .95rem;
-            flex-shrink: 0;
-        }
-        .nb {
-            position: absolute;
-            right: 13px;
-            background: var(--err);
-            color: #fff;
-            font-size: .62rem;
-            padding: 1px 6px;
-            border-radius: 10px;
-            font-weight: 700;
-        }
-        .sb-ft {
-            padding: 12px 16px;
-            border-top: 1px solid rgba(255, 255, 255, .07);
-        }
-        .lo-btn {
-            display: flex;
-            align-items: center;
-            gap: 11px;
-            padding: 9px 13px;
-            background: rgba(239, 68, 68, .08);
-            color: #f87171;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            width: 100%;
-            font-size: .88rem;
-        }
-        .main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            min-width: 0;
-        }
-        .top {
-            height: 56px;
-            background: var(--card);
-            border-bottom: 1px solid var(--bd);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 22px;
-            flex-shrink: 0;
-        }
-        .top-l {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .mmenu {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            cursor: pointer;
-        }
-        .ptitle {
-            font-size: 1.1rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 7px;
-        }
-        .top-r {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            position: relative;
-        }
-        .nbtn {
-            position: relative;
-            background: none;
-            border: none;
-            font-size: 1.1rem;
-            color: var(--tx2);
-            cursor: pointer;
-        }
-        .nbdg {
-            position: absolute;
-            top: 2px;
-            right: 2px;
-            background: var(--err);
-            color: #fff;
-            font-size: .58rem;
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-        }
-        .cnt {
-            flex: 1;
-            overflow-y: auto;
-            padding: 22px;
-        }
-        .cd {
-            background: var(--card);
-            border-radius: var(--r);
-            box-shadow: var(--shadow);
-            border: 1px solid var(--bd);
-            overflow: hidden;
-        }
-        .sg {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-            gap: 14px;
-            margin-bottom: 20px;
-        }
-        .sc {
-            background: var(--card);
-            border-radius: var(--r);
-            padding: 18px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--bd);
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-        .si {
-            width: 46px;
-            height: 46px;
-            border-radius: 11px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .sv {
-            font-size: 1.5rem;
-            font-weight: 800;
-        }
-        .sl {
-            font-size: .78rem;
-            color: var(--tx2);
-        }
-        .tb {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: all .15s;
-        }
-        .bp {
-            background: var(--pri);
-            color: #fff;
-        }
-        .bg {
-            background: transparent;
-            border: 1.5px solid var(--bd);
-            color: var(--tx2);
-        }
-        .inp,
-        .sel {
-            padding: 8px 12px;
-            border: 1.5px solid var(--bd);
-            border-radius: 8px;
-            font-size: .88rem;
-        }
-        .mdl {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, .45);
-            z-index: 3000;
-            align-items: flex-start;
-            justify-content: center;
-            padding: 24px 12px;
-            overflow-y: auto;
-            backdrop-filter: blur(3px);
-        }
-        .mdl.on {
-            display: flex;
-        }
-        .mbox {
-            background: #fff;
-            border-radius: 13px;
-            width: 100%;
-            max-width: 660px;
-            margin: auto;
-            animation: mi .2s ease;
-        }
-        @keyframes mi {
-            from {
-                opacity: 0;
-                transform: translateY(-15px) scale(.98);
-            }
-            to {
-                opacity: 1;
-                transform: none;
-            }
-        }
-        .mbox.lg {
-            max-width: 860px;
-        }
-        .mh {
-            display: flex;
-            justify-content: space-between;
-            padding: 16px 22px;
-            border-bottom: 1px solid var(--bd);
-        }
-        .mb {
-            padding: 22px;
-        }
-        .mf {
-            padding: 12px 22px;
-            border-top: 1px solid var(--bd);
-            display: flex;
-            gap: 8px;
-            justify-content: flex-end;
-        }
-        .badge {
-            padding: 2px 9px;
-            border-radius: 11px;
-            font-size: .72rem;
-            font-weight: 700;
-        }
-        .b-ok {
-            background: rgba(34, 197, 94, .1);
-            color: var(--ok);
-        }
-        .b-wr {
-            background: rgba(245, 158, 11, .1);
-            color: var(--warn);
-        }
-        .pl {
-            display: flex;
-            gap: 22px;
-        }
-        .ps {
-            width: 270px;
-            flex-shrink: 0;
-        }
-        .pm {
-            flex: 1;
-        }
-        .pav {
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--pri), var(--acc));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.2rem;
-            color: #fff;
-            margin: 0 auto 14px;
-            cursor: pointer;
-        }
-        .tabs {
-            display: flex;
-            border-bottom: 2px solid var(--bd);
-            margin-bottom: 18px;
-        }
-        .tab {
-            padding: 10px 20px;
-            background: none;
-            border: none;
-            border-bottom: 2px solid transparent;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        .tab.on {
-            color: var(--pri);
-            border-bottom-color: var(--pri);
-        }
-        .tp {
-            display: none;
-        }
-        .tp.on {
-            display: block;
-        }
-        .ag {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 16px;
-        }
-        .ac {
-            background: var(--card);
-            border-radius: var(--r);
-            border: 1px solid var(--bd);
-            transition: all .2s;
-        }
-        .edtb {
-            display: flex;
-            gap: 3px;
-            flex-wrap: wrap;
-            margin-bottom: 6px;
-            padding: 6px;
-            background: #f8fafc;
-            border-radius: 6px;
-        }
-        .edtb button {
-            background: none;
-            border: 1px solid transparent;
-            padding: 4px 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: .85rem;
-        }
-        .edtb button:hover {
-            background: #e2e8f0;
-        }
-        .erea {
-            min-height: 200px;
-            border: 1px solid var(--bd);
-            border-radius: 6px;
-            padding: 12px;
-            outline: none;
-        }
-        .npnl {
-            display: none;
-            position: absolute;
-            top: calc(100% + 6px);
-            right: 0;
-            width: 350px;
-            background: #fff;
-            border-radius: 11px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, .12);
-            z-index: 2000;
-            border: 1px solid var(--bd);
-        }
-        .npnl.on {
-            display: block;
-        }
-        .ni2 {
-            padding: 11px 16px;
-            border-bottom: 1px solid #f8fafc;
-            cursor: pointer;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th {
-            background: #f8fafc;
-            padding: 10px 14px;
-            text-align: left;
-            font-weight: 700;
-        }
-        td {
-            padding: 10px 14px;
-            border-bottom: 1px solid #f8fafc;
-        }
-        @media(max-width:768px) {
-            .sb {
-                position: fixed;
-                left: -260px;
-                z-index: 500;
-            }
-            .sb.mson {
-                left: 0;
-            }
-            .mmenu {
-                display: flex;
-            }
-            .pl {
-                flex-direction: column;
-            }
-        }
-        #toast {
-            display: none;
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #1e293b;
-            color: #fff;
-            padding: 10px 24px;
-            border-radius: 20px;
-            font-size: .88rem;
-            z-index: 9999;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>悦享网 · 聚媒通广告投放平台</title>
+  <style>
+    :root {
+      --primary: #1677ff;
+      --primary-hover: #4096ff;
+      --bg: #f5f5f5;
+      --card-bg: #fff;
+      --text: #333;
+      --text-secondary: #666;
+      --border: #e8e8e8;
+      --success: #52c41a;
+      --danger: #ff4d4f;
+      --radius: 8px;
+      --shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
+    /* 登录/注册页 */
+    .auth-container {
+      display: flex; justify-content: center; align-items: center; width: 100%; min-height: 100vh; background: linear-gradient(135deg, #f0f5ff 0%, #e6f7ff 100%);
+    }
+    .auth-card {
+      background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); width: 400px; max-width: 90vw;
+    }
+    .auth-card h2 { text-align: center; margin-bottom: 24px; color: #1677ff; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; margin-bottom: 6px; font-weight: 500; }
+    .form-group input {
+      width: 100%; padding: 10px 12px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 14px; transition: border-color 0.2s;
+    }
+    .form-group input:focus { border-color: #1677ff; outline: none; box-shadow: 0 0 0 2px rgba(22,119,255,0.1); }
+    .btn {
+      display: inline-block; padding: 10px 20px; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; transition: all 0.2s;
+      background: #eee; color: #333; text-align: center;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-block { width: 100%; }
+    .text-center { text-align: center; margin-top: 12px; }
+    .text-center a { color: #1677ff; text-decoration: none; cursor: pointer; }
+    .text-center a:hover { text-decoration: underline; }
+    /* 后台框架 */
+    .admin-layout {
+      display: flex; width: 100%; min-height: 100vh;
+    }
+    .sidebar {
+      width: 220px; background: #001529; color: #fff; padding: 20px 0; flex-shrink: 0;
+    }
+    .sidebar .logo {
+      padding: 0 20px 20px; font-size: 18px; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px;
+    }
+    .sidebar .nav-item {
+      display: flex; align-items: center; padding: 12px 20px; cursor: pointer; transition: background 0.2s; color: rgba(255,255,255,0.85); margin: 4px 0;
+    }
+    .sidebar .nav-item:hover, .sidebar .nav-item.active { background: #1677ff; color: #fff; }
+    .sidebar .nav-item i { margin-right: 8px; font-style: normal; }
+    .main-content {
+      flex: 1; display: flex; flex-direction: column; overflow-y: auto;
+    }
+    .topbar {
+      background: #fff; padding: 14px 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center;
+    }
+    .topbar .user-info { display: flex; align-items: center; gap: 16px; }
+    .topbar .notify-badge { position: relative; cursor: pointer; }
+    .topbar .badge {
+      position: absolute; top: -6px; right: -10px; background: #ff4d4f; color: #fff; font-size: 10px; width: 18px; height: 18px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .page-content { padding: 24px; flex: 1; }
+    .card {
+      background: #fff; border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); margin-bottom: 20px;
+    }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .card-header h3 { font-size: 18px; }
+    /* 表格 */
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+    th { background: #fafafa; font-weight: 500; }
+    .tag {
+      display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px;
+    }
+    .tag-primary { background: #e6f7ff; color: #1677ff; }
+    .tag-success { background: #f6ffed; color: #52c41a; }
+    .tag-warning { background: #fffbe6; color: #faad14; }
+    /* 弹窗 */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.45); display: flex; justify-content: center; align-items: center; z-index: 1000;
+    }
+    .modal {
+      background: #fff; border-radius: 12px; padding: 24px; width: 600px; max-width: 90vw; max-height: 80vh; overflow-y: auto; box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
+    .modal h2 { margin-bottom: 20px; }
+    .form-row { display: flex; gap: 16px; }
+    .form-row .form-group { flex: 1; }
+    /* 编辑器模拟 */
+    .editor-toolbar { border: 1px solid #d9d9d9; border-radius: 6px 6px 0 0; padding: 8px; background: #fafafa; display: flex; gap: 8px; }
+    .editor-toolbar button {
+      background: #fff; border: 1px solid #d9d9d9; border-radius: 4px; padding: 4px 10px; cursor: pointer; font-size: 13px;
+    }
+    .editor-area {
+      border: 1px solid #d9d9d9; border-top: none; border-radius: 0 0 6px 6px; min-height: 200px; padding: 12px; outline: none;
+    }
+    .ad-placeholder {
+      background: #fff7e6; border: 1px dashed #fa8c16; padding: 8px; margin: 10px 0; border-radius: 4px; display: flex; align-items: center; gap: 8px;
+    }
+    .ad-placeholder::before { content: '📢'; }
+    /* 通知 */
+    .toast {
+      position: fixed; top: 20px; right: 20px; background: #fff; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 2000;
+      animation: slideIn 0.3s ease;
+    }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  </style>
 </head>
 <body>
-    <!-- 认证页面 -->
-    <div class="auth on" id="pgLogin">
-        <div class="bg"></div><div class="bg"></div>
-        <div class="abox">
-            <div class="hd"><div class="ico"><i class="fas fa-bullhorn"></i></div><h1>聚媒通</h1><p>自媒体广告投放平台 · 企业版</p></div>
-            <div class="bd">
-                <div class="fg"><label class="fl">账号</label><input class="fi" id="lgU" placeholder="手机号/邮箱" value="admin"></div>
-                <div class="fg"><label class="fl">密码</label><input class="fi" id="lgP" type="password" placeholder="请输入密码" value="123456"></div>
-                <div class="frow"><label><input type="checkbox" checked> 记住登录</label><a href="#" onclick="swAuth('forgot');return false">忘记密码？</a></div>
-                <button class="abtn abtn-p" onclick="doLogin()"> 登录</button>
+  <!-- 登录/注册页 (初始显示) -->
+  <div id="authPage" class="auth-container">
+    <div class="auth-card">
+      <h2>聚媒通 · 自媒体广告投放平台</h2>
+      <div id="loginForm">
+        <div class="form-group"><label>账号</label><input type="text" id="loginUsername" placeholder="admin"></div>
+        <div class="form-group"><label>密码</label><input type="password" id="loginPassword" placeholder="123456"></div>
+        <button class="btn btn-primary btn-block" onclick="login()">登录</button>
+        <div class="text-center"><a onclick="showRegister()">还没有账号？立即注册</a></div>
+      </div>
+      <div id="registerForm" style="display:none;">
+        <div class="form-group"><label>用户名</label><input type="text" id="regUsername"></div>
+        <div class="form-group"><label>手机号</label><input type="text" id="regPhone"></div>
+        <div class="form-group"><label>密码</label><input type="password" id="regPassword"></div>
+        <div class="form-group"><label>确认密码</label><input type="password" id="regPassword2"></div>
+        <button class="btn btn-primary btn-block" onclick="register()">注册</button>
+        <div class="text-center"><a onclick="showLogin()">已有账号？立即登录</a></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 后台主界面 (默认隐藏) -->
+  <div id="adminPage" class="admin-layout" style="display:none;">
+    <div class="sidebar">
+      <div class="logo">📡 悦享网 · 聚媒通</div>
+      <div class="nav-item active" data-page="dashboard" onclick="switchPage('dashboard', this)">📊 工作台</div>
+      <div class="nav-item" data-page="articles" onclick="switchPage('articles', this)">📄 文章管理</div>
+      <div class="nav-item" data-page="ads" onclick="switchPage('ads', this)">💰 广告管理</div>
+      <div class="nav-item" data-page="revenue" onclick="switchPage('revenue', this)">📈 收益中心</div>
+      <div class="nav-item" onclick="logout()">🚪 退出登录</div>
+    </div>
+    <div class="main-content">
+      <div class="topbar">
+        <div>👋 欢迎，<span id="currentUser"></span></div>
+        <div class="user-info">
+          <div class="notify-badge" onclick="showNotifications()">
+            🔔 <span class="badge" id="notifyBadge">0</span>
+          </div>
+          <span>超级管理员</span>
+        </div>
+      </div>
+      <div class="page-content" id="pageContent"></div>
+    </div>
+  </div>
+
+  <!-- 通用弹窗容器 -->
+  <div id="modalContainer"></div>
+  <!-- Toast -->
+  <div id="toastContainer" style="position:fixed; top:20px; right:20px; z-index:2000;"></div>
+
+  <script>
+    // ==================== 初始化数据存储 ====================
+    const DB_KEY = 'yuexiang_platform_db';
+    function getDB() {
+      let db = localStorage.getItem(DB_KEY);
+      if (!db) {
+        db = {
+          users: [{ username: 'admin', password: '123456', phone: '13800000000' }],
+          currentUser: null,
+          articles: [
+            { id: 1, title: '自媒体运营技巧', content: '这是关于自媒体运营的核心内容...<div class="ad-placeholder" data-ad-id="1">广告位：原生广告-某某教育</div>继续文章内容...', category: '运营', status: '已发布', date: '2026-04-20', platforms: ['微信','头条'] },
+            { id: 2, title: '短视频变现策略', content: '短视频如何高效变现？<div class="ad-placeholder" data-ad-id="2">广告位：横幅广告-某某品牌</div>详细分析...', category: '营销', status: '草稿', date: '2026-04-21', platforms: [] }
+          ],
+          ads: [
+            { id: 1, name: '某某教育', type: '原生广告', position: '文章中部', budget: 2000, price: 100, duration: 7, status: '投放中', link: 'https://example.com/edu', material: 'https://via.placeholder.com/728x90.png?text=某某教育' },
+            { id: 2, name: '某某品牌', type: '横幅广告', position: '文章顶部', budget: 5000, price: 200, duration: 14, status: '待审核', link: 'https://example.com/brand', material: 'https://via.placeholder.com/468x60.png?text=某某品牌' }
+          ],
+          notifications: [
+            { id:1, title:'文章《自媒体运营技巧》发布成功', desc:'已同步到微信、头条', time:'10分钟前', unread:true},
+            { id:2, title:'广告收益到账 ¥580', desc:'某某教育今日收益', time:'30分钟前', unread:true}
+          ],
+          nextArticleId: 3,
+          nextAdId: 3
+        };
+        saveDB(db);
+      }
+      return db;
+    }
+    function saveDB(db) { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+
+    // ==================== 全局工具函数 ====================
+    function toast(msg, type='info') {
+      const container = document.getElementById('toastContainer');
+      const div = document.createElement('div');
+      div.className = 'toast';
+      div.style.background = type==='success' ? '#f6ffed' : type==='error' ? '#fff2f0' : '#fff';
+      div.style.borderLeft = `4px solid ${type==='success'?'#52c41a':type==='error'?'#ff4d4f':'#1677ff'}`;
+      div.textContent = msg;
+      container.appendChild(div);
+      setTimeout(() => div.remove(), 3000);
+    }
+
+    function openModal(title, contentHtml, onSave) {
+      const container = document.getElementById('modalContainer');
+      container.innerHTML = `
+        <div class="modal-overlay" onclick="if(event.target===this) closeModal()">
+          <div class="modal">
+            <h2>${title}</h2>
+            <div id="modalBody">${contentHtml}</div>
+            <div style="text-align:right; margin-top:20px;">
+              <button class="btn" onclick="closeModal()">取消</button>
+              <button class="btn btn-primary" id="modalSaveBtn">保存</button>
             </div>
-            <div class="ft">还没有账号？<a href="#" onclick="swAuth('reg');return false">立即注册</a></div>
-        </div>
-    </div>
-    <div class="auth" id="pgReg">
-        <div class="bg"></div><div class="bg"></div>
-        <div class="abox">
-            <div class="hd"><div class="ico"><i class="fas fa-bullhorn"></i></div><h1>创建账号</h1><p>加入聚媒通</p></div>
-            <div class="bd">
-                <div class="fg"><label class="fl">用户名</label><input class="fi" id="rgU" placeholder="用户名"></div>
-                <div class="fg"><label class="fl">手机号</label><input class="fi" id="rgPh" placeholder="手机号"></div>
-                <div class="fg"><label class="fl">密码</label><input class="fi" id="rgP1" type="password" placeholder="至少6位"></div>
-                <button class="abtn abtn-s" onclick="doReg()">注册</button>
-            </div>
-            <div class="ft">已有账号？<a href="#" onclick="swAuth('login');return false">立即登录</a></div>
-        </div>
-    </div>
-    <div class="auth" id="pgForgot">
-        <div class="bg"></div><div class="bg"></div>
-        <div class="abox">
-            <div class="hd"><h1>重置密码</h1></div>
-            <div class="bd">
-                <div class="fg"><label>手机号</label><input class="fi" id="fpPh"></div>
-                <button class="abtn abtn-p" onclick="doReset()">重置密码</button>
-            </div>
-            <div class="ft"><a href="#" onclick="swAuth('login');return false">返回登录</a></div>
-        </div>
-    </div>
+          </div>
+        </div>`;
+      document.getElementById('modalSaveBtn').addEventListener('click', () => {
+        if (onSave) onSave();
+        closeModal();
+      });
+    }
+    function closeModal() { document.getElementById('modalContainer').innerHTML = ''; }
 
-    <!-- 主应用 -->
-    <div class="app" id="appMain">
-        <aside class="sb" id="sb">
-            <div class="sb-hd"><div class="sb-logo">聚</div><div class="sb-brand">聚媒通<small>企业版 v3.0</small></div></div>
-            <div class="sb-user"><div class="sb-av">管</div><div><div class="sb-nm">管理员</div><div class="sb-rl">超级管理员</div></div></div>
-            <nav class="sb-nav">
-                <div class="ns">核心功能</div>
-                <div class="ni on" data-p="dashboard"><i class="fas fa-th-large"></i><span>工作台</span></div>
-                <div class="ni" data-p="articles"><i class="fas fa-file-alt"></i><span>文章管理</span></div>
-                <div class="ni" data-p="ads"><i class="fas fa-ad"></i><span>广告管理</span></div>
-                <div class="ns">数据运营</div>
-                <div class="ni" data-p="analytics"><i class="fas fa-chart-line"></i><span>数据分析</span></div>
-                <div class="ni" data-p="income"><i class="fas fa-wallet"></i><span>收益中心</span></div>
-                <div class="ns">系统管理</div>
-                <div class="ni" data-p="users"><i class="fas fa-users-cog"></i><span>用户管理</span></div>
-                <div class="ni" data-p="data"><i class="fas fa-database"></i><span>数据管理</span></div>
-                <div class="ni" data-p="settings"><i class="fas fa-cog"></i><span>系统设置</span></div>
-                <div class="ns">个人</div>
-                <div class="ni" data-p="profile"><i class="fas fa-user-circle"></i><span>个人中心</span></div>
-            </nav>
-            <div class="sb-ft"><button class="lo-btn" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i>退出登录</button></div>
-        </aside>
-        <div class="main">
-            <header class="top">
-                <div class="top-l"><button class="mmenu" onclick="togSb()"><i class="fas fa-bars"></i></button><div class="ptitle" id="pgT"> 工作台</div></div>
-                <div class="top-r">
-                    <button class="nbtn" id="nBtn" onclick="togNp()"><i class="fas fa-bell"></i><span class="nbdg" id="nBdg">5</span></button>
-                    <div class="npnl" id="nPnl">
-                        <div class="npnl-h"><strong>通知</strong><button onclick="clrNp()">全部已读</button></div>
-                        <div id="nList">
-                            <div class="ni2 ur">文章审核通过</div>
-                            <div class="ni2 ur">广告收益到账 ¥580</div>
-                            <div class="ni2 ur">新用户注册</div>
-                        </div>
-                    </div>
-                </div>
-            </header>
-            <div class="cnt" id="cntArea">
-                <!-- 工作台 -->
-                <div class="pg on" id="pg-dashboard">
-                    <div class="sg">
-                        <div class="sc"><div class="si" style="background:rgba(13,148,136,.1)"><i class="fas fa-file-alt"></i></div><div><div class="sv">128</div><div class="sl">文章总数</div></div></div>
-                        <div class="sc"><div class="si" style="background:rgba(245,158,11,.1)"><i class="fas fa-ad"></i></div><div><div class="sv">56</div><div class="sl">广告总数</div></div></div>
-                        <div class="sc"><div class="si" style="background:rgba(34,197,94,.1)"><i class="fas fa-wallet"></i></div><div><div class="sv">¥38,520</div><div class="sl">本月收益</div></div></div>
-                        <button class="btn bp" onclick="openArtEd()">新建文章</button>
-                    </div>
-                </div>
-                <!-- 文章管理 -->
-                <div class="pg" id="pg-articles">
-                    <div class="tb"><input class="inp" placeholder="搜索文章..."><button class="btn bp" onclick="openArtEd()">创作文章</button><button class="btn bg" onclick="openFetch()">抓取文章</button></div>
-                    <div class="ag">
-                        <div class="ac"><div class="acv">自媒体运营核心技巧</div><div class="acb"><div>阅读 6,540</div><button onclick="openArtEd()">编辑</button><button onclick="shareArt()">分享</button></div></div>
-                    </div>
-                </div>
-                <!-- 其他页面省略大量静态内容，通过JS动态填充保证功能齐全 -->
-            </div>
+    function updateNotifications() {
+      const db = getDB();
+      const unread = db.notifications.filter(n => n.unread).length;
+      const badge = document.getElementById('notifyBadge');
+      if (badge) {
+        badge.textContent = unread;
+        badge.style.display = unread > 0 ? 'flex' : 'none';
+      }
+    }
+
+    function showNotifications() {
+      const db = getDB();
+      const list = db.notifications.map(n => `<div style="padding:8px;border-bottom:1px solid #f0f0f0;"><strong>${n.title}</strong><div style="color:#666;font-size:12px;">${n.desc} · ${n.time}</div></div>`).join('');
+      openModal('消息通知', `<div style="max-height:300px;overflow-y:auto;">${list || '暂无通知'}</div>`, () => {
+        db.notifications.forEach(n => n.unread = false);
+        saveDB(db);
+        updateNotifications();
+      });
+    }
+
+    function addNotification(title, desc) {
+      const db = getDB();
+      db.notifications.unshift({ id: Date.now(), title, desc, time: '刚刚', unread: true });
+      saveDB(db);
+      updateNotifications();
+    }
+
+    // ==================== 鉴权 ====================
+    function login() {
+      const username = document.getElementById('loginUsername').value.trim();
+      const password = document.getElementById('loginPassword').value.trim();
+      const db = getDB();
+      const user = db.users.find(u => u.username === username && u.password === password);
+      if (user) {
+        db.currentUser = username;
+        saveDB(db);
+        document.getElementById('authPage').style.display = 'none';
+        document.getElementById('adminPage').style.display = 'flex';
+        document.getElementById('currentUser').textContent = username;
+        switchPage('dashboard');
+        updateNotifications();
+        toast('登录成功', 'success');
+      } else {
+        toast('账号或密码错误', 'error');
+      }
+    }
+    function register() {
+      const username = document.getElementById('regUsername').value.trim();
+      const phone = document.getElementById('regPhone').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const password2 = document.getElementById('regPassword2').value;
+      if (!username || !password) return toast('请填写完整信息', 'error');
+      if (password !== password2) return toast('两次密码不一致', 'error');
+      const db = getDB();
+      if (db.users.find(u => u.username === username)) return toast('用户名已存在', 'error');
+      db.users.push({ username, password, phone });
+      saveDB(db);
+      toast('注册成功，请登录', 'success');
+      showLogin();
+    }
+    function showRegister() {
+      document.getElementById('loginForm').style.display = 'none';
+      document.getElementById('registerForm').style.display = 'block';
+    }
+    function showLogin() {
+      document.getElementById('loginForm').style.display = 'block';
+      document.getElementById('registerForm').style.display = 'none';
+    }
+    function logout() {
+      const db = getDB();
+      db.currentUser = null;
+      saveDB(db);
+      document.getElementById('authPage').style.display = 'flex';
+      document.getElementById('adminPage').style.display = 'none';
+    }
+
+    // ==================== 页面路由 ====================
+    function switchPage(page, el) {
+      document.querySelectorAll('.sidebar .nav-item').forEach(item => item.classList.remove('active'));
+      if (el) el.classList.add('active');
+      const content = document.getElementById('pageContent');
+      switch (page) {
+        case 'dashboard': content.innerHTML = renderDashboard(); break;
+        case 'articles': content.innerHTML = renderArticles(); break;
+        case 'ads': content.innerHTML = renderAds(); break;
+        case 'revenue': content.innerHTML = renderRevenue(); break;
+        default: content.innerHTML = renderDashboard();
+      }
+    }
+
+    // ==================== 工作台 ====================
+    function renderDashboard() {
+      const db = getDB();
+      const articleCount = db.articles.length;
+      const published = db.articles.filter(a => a.status === '已发布').length;
+      const adCount = db.ads.length;
+      const runningAds = db.ads.filter(a => a.status === '投放中').length;
+      const notifications = db.notifications.slice(0, 5);
+      return `
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap:16px; margin-bottom:24px;">
+          <div class="card"><h3>📄 文章总数</h3><p style="font-size:32px;color:#1677ff;">${articleCount}</p></div>
+          <div class="card"><h3>✅ 已发布</h3><p style="font-size:32px;color:#52c41a;">${published}</p></div>
+          <div class="card"><h3>💰 广告总数</h3><p style="font-size:32px;color:#fa8c16;">${adCount}</p></div>
+          <div class="card"><h3>📢 投放中</h3><p style="font-size:32px;color:#1677ff;">${runningAds}</p></div>
         </div>
-    </div>
-
-    <!-- 模态框：富文本文章编辑 -->
-    <div class="mdl" id="mdlArtEd">
-        <div class="mbox lg">
-            <div class="mh"><h3>创作文章</h3><button onclick="clsMdl('mdlArtEd')"><i class="fas fa-times"></i></button></div>
-            <div class="mb">
-                <input class="fi" placeholder="文章标题" id="artTitle">
-                <div class="edtb">
-                    <button onclick="execCmd('bold')"><b>B</b></button>
-                    <button onclick="execCmd('italic')"><i>I</i></button>
-                    <button onclick="execCmd('underline')"><u>U</u></button>
-                    <select onchange="execCmd('fontSize', this.value)"><option value="1">小</option><option value="4">中</option><option value="7">大</option></select>
-                    <input type="color" onchange="execCmd('foreColor', this.value)">
-                    <button onclick="insertLink()">链接</button>
-                    <button onclick="insertImage()">图片</button>
-                    <button onclick="insertTable()">表格</button>
-                </div>
-                <div class="erea" contenteditable="true" id="editor"></div>
-                <div>字数：<span id="wordCount">0</span></div>
-                <div>发布平台：<label><input type="checkbox" value="微信">微信</label><label><input type="checkbox" value="头条">头条</label><label><input type="checkbox" value="知乎">知乎</label></div>
-            </div>
-            <div class="mf"><button class="btn bg" onclick="clsMdl('mdlArtEd')">取消</button><button class="btn bp" onclick="publishArt()">发布</button></div>
+        <div class="card">
+          <div class="card-header"><h3>🔔 最新消息</h3></div>
+          ${notifications.map(n => `<div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><strong>${n.title}</strong> <span style="color:#999;font-size:12px;">${n.time}</span></div>`).join('') || '暂无消息'}
         </div>
-    </div>
+        <div class="card">
+          <div class="card-header"><h3>📝 快捷操作</h3></div>
+          <button class="btn btn-primary" onclick="switchPage('articles'); openArticleEditor();">✏️ 创作文章</button>
+          <button class="btn" style="margin-left:8px;" onclick="switchPage('ads'); openAdEditor();">➕ 新建广告</button>
+        </div>`;
+    }
 
-    <!-- 模态框：广告编辑 -->
-    <div class="mdl" id="mdlAdEd">
-        <div class="mbox">
-            <div class="mh"><h3>编辑广告</h3></div>
-            <div class="mb">
-                <input class="fi" placeholder="广告名称">
-                <select class="sel"><option>横幅广告</option><option>原生广告</option></select>
-                <input class="fi" placeholder="日预算 ¥">
-                <select class="sel"><option>文章顶部</option><option>文章中部</option><option>底部</option></select>
-            </div>
-            <div class="mf"><button class="btn bg">取消</button><button class="btn bp">提交</button></div>
+    // ==================== 文章管理 ====================
+    function renderArticles() {
+      const db = getDB();
+      const rows = db.articles.map(a => `
+        <tr>
+          <td>${a.title}</td>
+          <td><span class="tag tag-primary">${a.category || '无'}</span></td>
+          <td><span class="tag ${a.status==='已发布'?'tag-success':'tag-warning'}">${a.status}</span></td>
+          <td>${a.platforms?.join(', ') || '-'}</td>
+          <td>${a.date}</td>
+          <td>
+            <button class="btn" style="padding:4px 8px;font-size:12px;" onclick="editArticle(${a.id})">编辑</button>
+            <button class="btn" style="padding:4px 8px;font-size:12px;color:#ff4d4f;" onclick="deleteArticle(${a.id})">删除</button>
+            ${a.status==='草稿' ? `<button class="btn btn-primary" style="padding:4px 8px;font-size:12px;" onclick="publishArticle(${a.id})">发布</button>` : ''}
+          </td>
+        </tr>`).join('');
+      return `
+        <div class="card">
+          <div class="card-header">
+            <h3>文章管理</h3>
+            <button class="btn btn-primary" onclick="openArticleEditor()">➕ 新建文章</button>
+          </div>
+          <table>
+            <thead><tr><th>标题</th><th>分类</th><th>状态</th><th>发布平台</th><th>日期</th><th>操作</th></tr></thead>
+            <tbody>${rows || '<tr><td colspan="6">暂无文章</td></tr>'}</tbody>
+          </table>
+        </div>`;
+    }
+
+    function openArticleEditor(articleId = null) {
+      const db = getDB();
+      const article = articleId ? db.articles.find(a => a.id === articleId) : null;
+      const title = article ? article.title : '';
+      const content = article ? article.content : '';
+      const category = article ? article.category : '运营';
+      const platforms = article ? article.platforms : [];
+      const platformOptions = ['微信', '微博', '头条', '知乎', '抖音', '快手', '小红书', 'QQ', '百家号', '公众号'].map(p =>
+        `<label style="margin-right:12px;"><input type="checkbox" value="${p}" ${platforms.includes(p)?'checked':''}> ${p}</label>`).join('');
+      const contentHtml = `
+        <div class="form-group"><label>文章标题</label><input type="text" id="articleTitle" value="${title}"></div>
+        <div class="form-row">
+          <div class="form-group"><label>分类</label>
+            <select id="articleCategory"><option>运营</option><option>广告</option><option>营销</option><option>科技</option><option>生活</option></select>
+          </div>
+          <div class="form-group"><label>发布平台</label><div id="articlePlatforms">${platformOptions}</div></div>
         </div>
-    </div>
-
-    <!-- 抓取文章模态框 -->
-    <div class="mdl" id="mdlFetch">
-        <div class="mbox sm">
-            <div class="mh"><h3>抓取自媒体文章</h3></div>
-            <div class="mb"><input class="fi" placeholder="文章URL" id="fetchUrl"></div>
-            <div class="mf"><button class="btn bg" onclick="clsMdl('mdlFetch')">取消</button><button class="btn bp" onclick="doFetch()">抓取</button></div>
+        <div class="form-group">
+          <label>文章内容（点击下方按钮插入广告位）</label>
+          <div class="editor-toolbar">
+            <button onclick="insertAdPlaceholder()">📢 插入广告</button>
+          </div>
+          <div id="articleContent" class="editor-area" contenteditable="true">${content}</div>
         </div>
-    </div>
-
-    <!-- 分享模态框 -->
-    <div class="mdl" id="mdlShare">
-        <div class="mbox sm">
-            <div class="mh"><h3>分享文章</h3></div>
-            <div class="mb"><div>预估收益：<strong>¥0.5/阅读</strong></div><button class="btn bp" onclick="toast('已复制链接','ok')">复制链接</button></div>
-        </div>
-    </div>
-
-    <div id="toast"></div>
-
-    <script>
-        // 页面导航
-        const pages = ['dashboard', 'articles', 'ads', 'analytics', 'income', 'users', 'data', 'settings', 'profile'];
-        function nav(p) {
-            document.querySelectorAll('.ni').forEach(e => e.classList.remove('on'));
-            document.querySelector(`.ni[data-p="${p}"]`).classList.add('on');
-            document.querySelectorAll('.pg').forEach(e => e.classList.remove('on'));
-            document.getElementById(`pg-${p}`).classList.add('on');
-            document.getElementById('sb').classList.remove('mson');
+      `;
+      openModal(article ? '编辑文章' : '新建文章', contentHtml, () => {
+        const newTitle = document.getElementById('articleTitle').value.trim();
+        const newContent = document.getElementById('articleContent').innerHTML;
+        const newCategory = document.getElementById('articleCategory').value;
+        const selectedPlatforms = [...document.querySelectorAll('#articlePlatforms input:checked')].map(i => i.value);
+        if (!newTitle) return toast('标题不能为空', 'error');
+        if (article) {
+          article.title = newTitle;
+          article.content = newContent;
+          article.category = newCategory;
+          article.platforms = selectedPlatforms;
+        } else {
+          db.articles.push({
+            id: db.nextArticleId++,
+            title: newTitle,
+            content: newContent,
+            category: newCategory,
+            status: '草稿',
+            date: new Date().toISOString().slice(0,10),
+            platforms: selectedPlatforms
+          });
         }
-        document.querySelectorAll('.ni').forEach(e => e.addEventListener('click', () => nav(e.dataset.p)));
-        function swAuth(p) { document.querySelectorAll('.auth').forEach(e => e.classList.remove('on')); document.getElementById('pg' + p.charAt(0).toUpperCase() + p.slice(1)).classList.add('on'); }
-        function doLogin() { document.querySelectorAll('.auth').forEach(e => e.classList.remove('on')); document.getElementById('appMain').classList.add('on'); toast('登录成功'); }
-        function doLogout() { document.getElementById('appMain').classList.remove('on'); document.getElementById('pgLogin').classList.add('on'); }
-        function doReg() { toast('注册成功，请登录'); swAuth('login'); }
-        function doReset() { toast('密码已重置'); swAuth('login'); }
-        function togSb() { document.getElementById('sb').classList.toggle('mson'); }
-        function togNp() { document.getElementById('nPnl').classList.toggle('on'); }
-        function clrNp() { document.querySelectorAll('#nList .ni2').forEach(e => e.classList.remove('ur')); document.getElementById('nBdg').style.display = 'none'; }
-        function openArtEd() { document.getElementById('mdlArtEd').classList.add('on'); }
-        function openAdEd() { document.getElementById('mdlAdEd').classList.add('on'); }
-        function openFetch() { document.getElementById('mdlFetch').classList.add('on'); }
-        function shareArt() { document.getElementById('mdlShare').classList.add('on'); }
-        function clsMdl(id) { document.getElementById(id).classList.remove('on'); }
-        function toast(msg, type) { const t = document.getElementById('toast'); t.textContent = msg; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2000); }
+        saveDB(db);
+        switchPage('articles');
+        toast('文章已保存', 'success');
+      });
+      // 设置分类默认值
+      setTimeout(() => {
+        const select = document.getElementById('articleCategory');
+        if (select && article) select.value = article.category;
+      }, 0);
+    }
 
-        // 富文本命令
-        function execCmd(cmd, val = null) { document.execCommand(cmd, false, val); updateWordCount(); }
-        function insertLink() { const url = prompt('链接地址:'); if (url) execCmd('createLink', url); }
-        function insertImage() { const url = prompt('图片URL:'); if (url) execCmd('insertImage', url); }
-        function insertTable() { const r = prompt('行数', 3); const c = prompt('列数', 3); if (r && c) { let html = '<table border="1">'; for (let i = 0; i < r; i++) { html += '<tr>'; for (let j = 0; j < c; j++) html += '<td>&nbsp;</td>'; html += '</tr>'; } html += '</table>'; document.execCommand('insertHTML', false, html); } }
-        document.getElementById('editor')?.addEventListener('input', updateWordCount);
-        function updateWordCount() { const text = document.getElementById('editor')?.innerText || ''; document.getElementById('wordCount').textContent = text.length; }
-        function publishArt() { toast('文章已发布到多平台', 'ok'); clsMdl('mdlArtEd'); }
-        function doFetch() { const url = document.getElementById('fetchUrl').value; if (url) { document.getElementById('artTitle').value = '抓取的文章标题'; document.getElementById('editor').innerHTML = '<p>抓取的内容...</p>'; clsMdl('mdlFetch'); openArtEd(); } }
+    function insertAdPlaceholder() {
+      const db = getDB();
+      const ads = db.ads.filter(a => a.status === '投放中' || a.status === '待审核');
+      if (ads.length === 0) return toast('暂无可用广告，请先创建广告', 'error');
+      const options = ads.map(a => `<option value="${a.id}">${a.name} (${a.type})</option>`).join('');
+      const selectHtml = `<select id="adSelect">${options}</select>`;
+      openModal('选择要插入的广告', `<div class="form-group"><label>选择广告</label>${selectHtml}</div>`, () => {
+        const adId = document.getElementById('adSelect').value;
+        const ad = db.ads.find(a => a.id == adId);
+        if (ad) {
+          const editor = document.getElementById('articleContent');
+          if (editor) {
+            editor.focus();
+            const placeholder = document.createElement('div');
+            placeholder.className = 'ad-placeholder';
+            placeholder.setAttribute('data-ad-id', ad.id);
+            placeholder.textContent = `广告位：${ad.type}-${ad.name}`;
+            // 插入选区或末尾
+            const sel = window.getSelection();
+            if (sel.rangeCount && editor.contains(sel.anchorNode)) {
+              const range = sel.getRangeAt(0);
+              range.insertNode(placeholder);
+              range.collapse(false);
+            } else {
+              editor.appendChild(placeholder);
+            }
+            toast('广告位已插入', 'success');
+          }
+        }
+      });
+    }
 
-        // 通知自动刷新模拟
-        setInterval(() => { document.getElementById('nBdg').style.display = 'flex'; }, 30000);
-    </script>
+    function editArticle(id) { openArticleEditor(id); }
+    function deleteArticle(id) {
+      if (!confirm('确定删除这篇文章吗？')) return;
+      const db = getDB();
+      db.articles = db.articles.filter(a => a.id !== id);
+      saveDB(db);
+      switchPage('articles');
+      toast('文章已删除', 'success');
+    }
+    function publishArticle(id) {
+      const db = getDB();
+      const article = db.articles.find(a => a.id === id);
+      if (!article) return;
+      article.status = '已发布';
+      saveDB(db);
+      addNotification(`文章《${article.title}》发布成功`, `已同步到${article.platforms?.join('、') || '网站'}`);
+      switchPage('articles');
+      toast('文章发布成功，收益计算中', 'success');
+    }
+
+    // ==================== 广告管理 ====================
+    function renderAds() {
+      const db = getDB();
+      const rows = db.ads.map(ad => `
+        <tr>
+          <td>${ad.name}</td>
+          <td><span class="tag tag-primary">${ad.type}</span></td>
+          <td>${ad.position}</td>
+          <td>¥${ad.budget}</td>
+          <td>¥${ad.price}/天</td>
+          <td><span class="tag ${ad.status==='投放中'?'tag-success':ad.status==='待审核'?'tag-warning':''}">${ad.status}</span></td>
+          <td>
+            <button class="btn" style="padding:4px 8px;font-size:12px;" onclick="editAd(${ad.id})">编辑</button>
+            <button class="btn" style="padding:4px 8px;font-size:12px;color:#ff4d4f;" onclick="deleteAd(${ad.id})">删除</button>
+            ${ad.status==='待审核' ? `<button class="btn btn-primary" style="padding:4px 8px;font-size:12px;" onclick="approveAd(${ad.id})">通过审核</button>` : ''}
+          </td>
+        </tr>`).join('');
+      return `
+        <div class="card">
+          <div class="card-header">
+            <h3>广告管理</h3>
+            <button class="btn btn-primary" onclick="openAdEditor()">➕ 创建广告</button>
+          </div>
+          <table>
+            <thead><tr><th>广告名称</th><th>类型</th><th>位置</th><th>预算</th><th>单价</th><th>状态</th><th>操作</th></tr></thead>
+            <tbody>${rows || '<tr><td colspan="7">暂无广告</td></tr>'}</tbody>
+          </table>
+        </div>`;
+    }
+
+    function openAdEditor(adId = null) {
+      const db = getDB();
+      const ad = adId ? db.ads.find(a => a.id === adId) : null;
+      const name = ad ? ad.name : '';
+      const type = ad ? ad.type : '横幅广告';
+      const position = ad ? ad.position : '文章顶部';
+      const budget = ad ? ad.budget : 1000;
+      const price = ad ? ad.price : 50;
+      const duration = ad ? ad.duration : 7;
+      const link = ad ? ad.link : '';
+      const material = ad ? ad.material : '';
+      const contentHtml = `
+        <div class="form-row">
+          <div class="form-group"><label>广告名称</label><input type="text" id="adName" value="${name}"></div>
+          <div class="form-group"><label>类型</label>
+            <select id="adType"><option>横幅广告</option><option>原生广告</option><option>视频广告</option><option>浮动广告</option></select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>投放位置</label>
+            <select id="adPosition"><option>文章顶部</option><option>文章中部</option><option>文章底部</option><option>侧边栏</option></select>
+          </div>
+          <div class="form-group"><label>状态</label>
+            <select id="adStatus"><option>待审核</option><option>投放中</option></select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>日预算(¥)</label><input type="number" id="adBudget" value="${budget}"></div>
+          <div class="form-group"><label>单价(¥)</label><input type="number" id="adPrice" value="${price}"></div>
+          <div class="form-group"><label>投放时长(天)</label><input type="number" id="adDuration" value="${duration}"></div>
+        </div>
+        <div class="form-group"><label>广告链接</label><input type="text" id="adLink" value="${link}"></div>
+        <div class="form-group"><label>素材链接 (图片/视频)</label><input type="text" id="adMaterial" value="${material}"></div>
+      `;
+      openModal(ad ? '编辑广告' : '创建广告', contentHtml, () => {
+        const newName = document.getElementById('adName').value.trim();
+        if (!newName) return toast('广告名称不能为空', 'error');
+        const newAd = {
+          name: newName,
+          type: document.getElementById('adType').value,
+          position: document.getElementById('adPosition').value,
+          budget: Number(document.getElementById('adBudget').value),
+          price: Number(document.getElementById('adPrice').value),
+          duration: Number(document.getElementById('adDuration').value),
+          link: document.getElementById('adLink').value,
+          material: document.getElementById('adMaterial').value,
+          status: document.getElementById('adStatus').value
+        };
+        if (ad) {
+          Object.assign(ad, newAd);
+        } else {
+          newAd.id = db.nextAdId++;
+          db.ads.push(newAd);
+        }
+        saveDB(db);
+        switchPage('ads');
+        toast('广告已保存', 'success');
+      });
+      setTimeout(() => {
+        if (ad) {
+          document.getElementById('adType').value = ad.type;
+          document.getElementById('adPosition').value = ad.position;
+          document.getElementById('adStatus').value = ad.status;
+        }
+      }, 0);
+    }
+
+    function editAd(id) { openAdEditor(id); }
+    function deleteAd(id) {
+      if (!confirm('确定删除该广告吗？')) return;
+      const db = getDB();
+      db.ads = db.ads.filter(a => a.id !== id);
+      saveDB(db);
+      switchPage('ads');
+      toast('广告已删除', 'success');
+    }
+    function approveAd(id) {
+      const db = getDB();
+      const ad = db.ads.find(a => a.id === id);
+      if (ad) {
+        ad.status = '投放中';
+        saveDB(db);
+        addNotification(`广告「${ad.name}」审核通过`, '开始投放');
+        switchPage('ads');
+        toast('广告已开始投放', 'success');
+      }
+    }
+
+    // ==================== 收益中心（简单展示）====================
+    function renderRevenue() {
+      const db = getDB();
+      const totalEarnings = db.ads.filter(a => a.status === '投放中').reduce((sum, a) => sum + a.price * a.duration, 0);
+      return `
+        <div class="card">
+          <h3>收益概览</h3>
+          <p>累计收益：<strong style="font-size:24px;color:#52c41a;">¥${totalEarnings}</strong></p>
+          <p>广告投放数量：${db.ads.filter(a => a.status === '投放中').length}</p>
+        </div>`;
+    }
+
+    // ==================== 初始化 ====================
+    // 如果已登录直接进后台
+    (function init() {
+      const db = getDB();
+      if (db.currentUser) {
+        document.getElementById('authPage').style.display = 'none';
+        document.getElementById('adminPage').style.display = 'flex';
+        document.getElementById('currentUser').textContent = db.currentUser;
+        switchPage('dashboard');
+        updateNotifications();
+      }
+    })();
+  </script>
 </body>
-      </html>
+    </html>
