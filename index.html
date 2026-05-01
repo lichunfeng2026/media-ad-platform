@@ -1,488 +1,726 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>悦享网 · 聚媒通管理后台</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        :root {
-            --primary: #0d9488; --primary-light: #14b8a6; --primary-dark: #0f766e;
-            --accent: #f59e0b; --sidebar-bg: #0f172a; --bg: #f1f5f9; --card-bg: #ffffff;
-            --text: #1e293b; --text-secondary: #64748b; --border: #e2e8f0;
-            --radius: 10px; --shadow: 0 1px 5px rgba(0,0,0,0.05);
-        }
-        body { font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; }
-        /* ========== 登录页 ========== */
-        .auth-container {
-            width: 100%; min-height: 100vh; display: flex; align-items: center; justify-content: center;
-            background: linear-gradient(135deg, #0f172a, #1e3a5f 50%, #0d4f4f);
-        }
-        .auth-card {
-            width: 420px; max-width: 90vw; background: rgba(255,255,255,0.97); border-radius: 16px;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.3); padding: 30px;
-        }
-        .auth-card h2 { text-align: center; color: var(--primary); margin-bottom: 20px; }
-        .form-group { margin-bottom: 16px; }
-        .form-label { display: block; font-weight: 600; margin-bottom: 5px; }
-        .form-input { width: 100%; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 0.92rem; }
-        .form-input:focus { border-color: var(--primary); outline: none; }
-        .btn { width: 100%; padding: 10px; border: none; border-radius: 6px; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
-        .btn-primary { background: var(--primary); color: #fff; }
-        .btn-primary:hover { background: var(--primary-dark); }
-        .btn-secondary { background: #22c55e; color: #fff; }
-        .btn-secondary:hover { background: #16a34a; }
-        .password-strength { height: 6px; background: #eee; border-radius: 3px; margin-top: 4px; }
-        .strength-bar { height: 100%; width: 0; transition: 0.3s; }
-        .auth-links { display: flex; justify-content: space-between; margin: 10px 0; font-size: 0.85rem; }
-        .auth-links a { color: var(--primary); text-decoration: none; cursor: pointer; }
-        .auth-links a:hover { text-decoration: underline; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>悦享网 · 聚媒通广告投放平台</title>
+  <!-- 图表库 -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <!-- 图标库 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    :root {
+      --primary: #1677ff; --primary-hover: #4096ff; --bg: #f0f2f5;
+      --card-bg: #ffffff; --text: #333333; --text-light: #666666;
+      --border: #e8e8e8; --success: #52c41a; --danger: #ff4d4f; --warning: #faad14;
+      --radius: 8px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg); color: var(--text); min-height: 100vh;
+    }
+    /* 登录/注册 */
+    .auth-container {
+      display: flex; justify-content: center; align-items: center;
+      min-height: 100vh; background: linear-gradient(135deg, #f0f5ff 0%, #e6f7ff 100%);
+    }
+    .auth-card {
+      background: #fff; padding: 40px; border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1); width: 420px; max-width: 90vw;
+    }
+    .auth-card h2 { text-align: center; margin-bottom: 24px; color: #1677ff; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; margin-bottom: 6px; font-weight: 500; }
+    .form-group input, .form-group select {
+      width: 100%; padding: 10px 12px; border: 1px solid #d9d9d9;
+      border-radius: 6px; font-size: 14px; transition: border-color 0.2s; background: #fff;
+    }
+    .form-group input:focus, .form-group select:focus {
+      border-color: #1677ff; outline: none; box-shadow: 0 0 0 2px rgba(22,119,255,0.1);
+    }
+    .btn {
+      display: inline-block; padding: 10px 20px; border: none; border-radius: 6px;
+      font-size: 14px; cursor: pointer; transition: 0.2s; text-align: center;
+    }
+    .btn-primary { background: var(--primary); color: #fff; } .btn-primary:hover { background: var(--primary-hover); }
+    .btn-success { background: var(--success); color: #fff; } .btn-success:hover { opacity: 0.9; }
+    .btn-danger { background: var(--danger); color: #fff; } .btn-danger:hover { opacity: 0.9; }
+    .btn-block { width: 100%; margin-top: 8px; }
+    .text-center { text-align: center; margin-top: 16px; font-size: 13px; }
+    .text-center a { color: #1677ff; text-decoration: none; cursor: pointer; }
+    .text-center a:hover { text-decoration: underline; }
+    .demo-hint { background: #f6ffed; border: 1px solid #b7eb8f; padding: 8px 12px; border-radius: 6px; margin-bottom: 16px; font-size: 12px; color: #389e0d; }
+    .strength-bar { height: 6px; background: #eee; border-radius: 3px; margin-top: 4px; overflow: hidden; }
+    .strength-fill { height: 100%; width: 0; transition: 0.3s; }
 
-        /* ========== 后台布局 ========== */
-        .app-container { display: flex; width: 100%; height: 100vh; position: relative; }
-        .sidebar {
-            width: 250px; background: var(--sidebar-bg); color: #fff; flex-shrink: 0;
-            display: flex; flex-direction: column; transition: width 0.3s; overflow: hidden; z-index: 90;
-        }
-        .sidebar.closed { width: 0 !important; }
-        .sidebar-header { padding: 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .sidebar-logo { width: 36px; height: 36px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 900; }
-        .sidebar-brand { font-weight: 800; white-space: nowrap; }
-        .sidebar-user { padding: 12px 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .sidebar-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-weight: 800; }
-        .sidebar-nav { flex: 1; padding: 8px 0; overflow-y: auto; }
-        .nav-item { display: flex; align-items: center; gap: 10px; padding: 11px 18px; margin: 2px 8px; border-radius: 8px; cursor: pointer; color: rgba(255,255,255,0.75); font-size: 0.9rem; transition: 0.15s; }
-        .nav-item:hover, .nav-item.active { background: var(--primary); color: #fff; }
-        .sidebar-footer { padding: 12px 16px; border-top: 1px solid rgba(255,255,255,0.1); }
-        .logout-btn { width: 100%; background: rgba(239,68,68,0.1); color: #f87171; border: none; border-radius: 8px; padding: 9px; cursor: pointer; }
-
-        /* 侧边栏切换按钮 (独立固定) */
-        .sidebar-toggle-btn {
-            position: absolute; top: 12px; left: 12px; z-index: 200;
-            width: 36px; height: 36px; background: var(--primary); color: #fff;
-            border: 2px solid rgba(255,255,255,0.2); border-radius: 6px;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; font-size: 1.4rem; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-            transition: left 0.3s, background 0.2s;
-        }
-        .sidebar-toggle-btn:hover { background: var(--primary-dark); }
-        .sidebar.closed + .sidebar-toggle-btn { left: 12px; }
-        /* 主内容区 */
-        .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .topbar { background: var(--card-bg); padding: 12px 24px; box-shadow: var(--shadow); display: flex; justify-content: space-between; align-items: center; }
-        .notification-badge { position: relative; cursor: pointer; margin-left: 12px; }
-        .badge { position: absolute; top: -6px; right: -10px; background: #ef4444; color: #fff; font-size: 10px; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        .page-content { flex: 1; padding: 24px; overflow-y: auto; }
-        .card { background: var(--card-bg); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); margin-bottom: 20px; }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 10px; text-align: left; border-bottom: 1px solid var(--border); }
-        th { background: #f8fafc; font-weight: 600; }
-        .tag { padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; }
-        .tag-success { background: #dcfce7; color: #16a34a; }
-        .tag-warning { background: #fffbeb; color: #d97706; }
-        .btn-sm { padding: 4px 10px; font-size: 0.8rem; border: none; border-radius: 4px; cursor: pointer; }
-        .btn-sm-primary { background: var(--primary); color: #fff; }
-        .btn-sm-danger { background: #fee2e2; color: #dc2626; }
-        .editor-toolbar { border: 1px solid var(--border); border-radius: 6px 6px 0 0; padding: 8px; background: #f8fafc; display: flex; flex-wrap: wrap; gap: 5px; }
-        .editor-toolbar button { width: 28px; height: 28px; border: 1px solid #cbd5e1; border-radius: 4px; background: #fff; cursor: pointer; }
-        .editor-area { border: 1px solid var(--border); border-top: none; border-radius: 0 0 6px 6px; min-height: 220px; padding: 12px; outline: none; }
-        .ad-placeholder { background: #fffbeb; border: 1px dashed var(--accent); padding: 6px 10px; margin: 8px 0; border-radius: 4px; }
-        .modal-mask { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-        .modal-box { background: #fff; border-radius: 12px; padding: 24px; width: 700px; max-width: 90vw; max-height: 80vh; overflow-y: auto; }
-        .toast { position: fixed; top: 20px; right: 20px; background: #fff; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 2000; animation: slideIn 0.3s; }
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-    </style>
+    /* 后台布局 */
+    .admin-layout { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 220px; background: #001529; color: #fff; flex-shrink: 0;
+      transition: width 0.3s; overflow: hidden; display: flex; flex-direction: column;
+    }
+    .sidebar.collapsed { width: 0; }
+    .sidebar .logo { padding: 16px; font-size: 18px; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .nav-item {
+      display: flex; align-items: center; padding: 12px 20px; cursor: pointer;
+      transition: background 0.2s; color: rgba(255,255,255,0.85); margin: 4px 0; font-size: 14px;
+    }
+    .nav-item:hover, .nav-item.active { background: #1677ff; color: #fff; }
+    .nav-item i { margin-right: 8px; width: 20px; text-align: center; }
+    .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .topbar {
+      background: #fff; padding: 14px 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .sidebar-toggle {
+      position: fixed; top: 10px; left: 10px; z-index: 1000;
+      width: 36px; height: 36px; background: var(--primary); color: #fff;
+      border: none; border-radius: 6px; cursor: pointer; font-size: 1.2rem;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .sidebar.collapsed ~ .sidebar-toggle { left: 10px; }
+    .notif-badge {
+      position: relative; cursor: pointer;
+    }
+    .badge {
+      position: absolute; top: -6px; right: -10px; background: var(--danger);
+      color: #fff; font-size: 10px; width: 18px; height: 18px;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    }
+    .page-content { flex: 1; padding: 24px; overflow-y: auto; }
+    .card {
+      background: #fff; border-radius: var(--radius); padding: 20px;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.05); margin-bottom: 20px;
+    }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+    th { background: #fafafa; font-weight: 500; }
+    .tag { padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+    .tag-primary { background: #e6f7ff; color: #1677ff; } .tag-success { background: #f6ffed; color: #52c41a; }
+    .tag-warning { background: #fffbe6; color: #faad14; } .tag-danger { background: #fff2f0; color: #ff4d4f; }
+    .btn-sm { padding: 4px 12px; font-size: 12px; border-radius: 4px; }
+    .modal-mask {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.45); display: flex; justify-content: center; align-items: center; z-index: 2000;
+    }
+    .modal-box {
+      background: #fff; border-radius: 12px; padding: 24px; width: 700px; max-width: 90vw;
+      max-height: 80vh; overflow-y: auto; box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
+    .toast {
+      position: fixed; top: 20px; right: 20px; background: #fff; padding: 12px 20px;
+      border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 3000; animation: slideIn 0.3s;
+    }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .editor-toolbar {
+      display: flex; flex-wrap: wrap; gap: 4px; border: 1px solid #d9d9d9;
+      border-radius: 6px 6px 0 0; padding: 8px; background: #fafafa;
+    }
+    .editor-toolbar button, .editor-toolbar select, .editor-toolbar input[type="color"] {
+      height: 28px; border: 1px solid #ccc; border-radius: 4px; background: #fff; cursor: pointer; font-size: 13px;
+    }
+    .editor-area {
+      border: 1px solid #d9d9d9; border-top: none; border-radius: 0 0 6px 6px;
+      min-height: 220px; padding: 12px; outline: none;
+    }
+    .ad-placeholder {
+      background: #fff7e6; border: 1px dashed #fa8c16; padding: 6px 10px;
+      margin: 8px 0; border-radius: 4px; display: inline-block;
+    }
+  </style>
 </head>
 <body>
+
+<!-- 登录/注册页面 -->
 <div id="authPage" class="auth-container">
-    <div class="auth-card">
-        <h2>悦享网 · 聚媒通</h2>
-        <div id="loginForm">
-            <div class="demo-hint" style="background:#f0fdf4;border:1px solid #bbf7d0;padding:8px 12px;border-radius:6px;margin-bottom:16px;color:#166534;">🔑 演示账号： admin/123456</div>
-            <div class="form-group"><label class="form-label">账号</label><input type="text" id="loginUsername" class="form-input" value="admin"></div>
-            <div class="form-group"><label class="form-label">密码</label><input type="password" id="loginPassword" class="form-input" value="123456"></div>
-            <div class="auth-links"><a id="forgotPasswordLink">忘记密码？</a></div>
-            <button class="btn btn-primary" id="loginBtn">登 录</button>
-            <div class="auth-links"><a id="showRegisterLink">还没有账号？立即注册</a></div>
-        </div>
-        <div id="registerForm" style="display:none;">
-            <div class="form-group"><label class="form-label">用户名</label><input type="text" id="regUsername" class="form-input"></div>
-            <div class="form-group"><label class="form-label">手机号</label><input type="text" id="regPhone" class="form-input"></div>
-            <div class="form-group"><label class="form-label">密码</label><input type="password" id="regPassword" class="form-input" oninput="checkPasswordStrength(this.value)"></div>
-            <div class="password-strength"><div id="strengthBar" class="strength-bar"></div></div>
-            <small id="strengthText"></small>
-            <div class="form-group"><label class="form-label">确认密码</label><input type="password" id="regPassword2" class="form-input"></div>
-            <button class="btn btn-secondary" id="registerBtn">注 册</button>
-            <div class="auth-links"><a id="showLoginLink">已有账号？立即登录</a></div>
-        </div>
-        <div id="forgotPasswordForm" style="display:none;">
-            <div class="form-group"><label class="form-label">注册手机号/邮箱</label><input type="text" id="forgotContact" class="form-input"></div>
-            <button class="btn btn-primary" id="resetPasswordBtn">重置密码</button>
-            <div class="auth-links"><a id="backToLoginLink">返回登录</a></div>
-        </div>
+  <div class="auth-card">
+    <h2>聚媒通 · 自媒体广告投放平台</h2>
+    <div id="loginForm">
+      <div class="demo-hint"><i class="fas fa-info-circle"></i> 演示账号：admin / 123456</div>
+      <div class="form-group"><label>账号</label><input type="text" id="loginUsername" value="admin"></div>
+      <div class="form-group"><label>密码</label><input type="password" id="loginPassword" value="123456"></div>
+      <div class="text-center"><a id="showForgot">忘记密码？</a></div>
+      <button class="btn btn-primary btn-block" id="loginBtn">登 录</button>
+      <div class="text-center"><a id="showRegisterLink">还没有账号？立即注册</a></div>
     </div>
+    <div id="registerForm" style="display:none;">
+      <div class="form-group"><label>用户名</label><input type="text" id="regUsername"></div>
+      <div class="form-group"><label>手机号</label><input type="text" id="regPhone"></div>
+      <div class="form-group"><label>密码</label><input type="password" id="regPassword" oninput="checkStrength(this.value)"></div>
+      <div class="strength-bar"><div id="regStrengthFill" class="strength-fill"></div></div>
+      <small id="strengthText"></small>
+      <div class="form-group"><label>确认密码</label><input type="password" id="regPassword2"></div>
+      <button class="btn btn-primary btn-block" id="registerBtn">注 册</button>
+      <div class="text-center"><a id="showLoginLink">已有账号？立即登录</a></div>
+    </div>
+    <div id="forgotForm" style="display:none;">
+      <div class="form-group"><label>注册手机号/邮箱</label><input type="text" id="forgotContact"></div>
+      <button class="btn btn-primary btn-block" id="resetBtn">重置密码</button>
+      <div class="text-center"><a id="backLoginLink">返回登录</a></div>
+    </div>
+  </div>
 </div>
 
-<div class="app-container" id="appContainer" style="display:none;">
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <div class="sidebar-logo"><i class="fas fa-satellite"></i></div>
-            <div class="sidebar-brand">悦享·聚媒通</div>
-        </div>
-        <div class="sidebar-user">
-            <div class="sidebar-avatar" id="sidebarAvatar">管</div>
-            <div><strong id="sidebarUserName">管理员</strong><br><small id="sidebarUserRole">超级管理员</small></div>
-        </div>
-        <nav class="sidebar-nav" id="sidebarNav"></nav>
-        <div class="sidebar-footer"><button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> 退出登录</button></div>
-    </aside>
-    <!-- 修复后的侧边栏按钮 -->
-    <div class="sidebar-toggle-btn" id="sidebarToggleBtn"><i class="fas fa-times"></i></div>
-
-    <div class="main-content">
-        <div class="topbar">
-            <div><span id="welcomeText">👋 欢迎</span></div>
-            <div class="notification-badge" id="notificationBadge">
-                <i class="fas fa-bell" style="font-size:1.2rem;"></i>
-                <span class="badge" id="notifCount" style="display:none;">0</span>
-            </div>
-        </div>
-        <div class="page-content" id="pageContent"></div>
+<!-- 后台主界面 -->
+<div id="adminPage" class="admin-layout" style="display:none;">
+  <button class="sidebar-toggle" id="sidebarToggleBtn"><i class="fas fa-bars"></i></button>
+  <div class="sidebar" id="sidebar">
+    <div class="logo">📡 悦享·聚媒通</div>
+    <nav id="sidebarNav"></nav>
+  </div>
+  <div class="main-content">
+    <div class="topbar">
+      <div>👋 欢迎，<strong id="currentUser"></strong> <small id="userRoleBadge"></small></div>
+      <div class="notif-badge" id="notifBell">
+        <i class="fas fa-bell fa-lg"></i>
+        <span class="badge" id="notifCount" style="display:none;">0</span>
+      </div>
     </div>
+    <div class="page-content" id="pageContent"></div>
+  </div>
 </div>
 
 <div id="modalContainer"></div>
-<div id="toastContainer" style="position:fixed;top:20px;right:20px;z-index:2000;"></div>
+<div id="toastContainer" style="position:fixed; top:20px; right:20px; z-index:3000;"></div>
 
 <script>
 (function() {
-    // ==================== 数据存储 (与上一版完全一致) ====================
-    const DB_KEY = 'yuexiang_full_db_v3';
-    function getDefaultDB() {
-        return {
-            users: [
-                { username:'admin', password:'123456', role:'admin', phone:'13800000000', balance:10000 },
-                { username:'creator1', password:'123456', role:'creator', phone:'13900000001', balance:2000 },
-                { username:'advertiser1', password:'123456', role:'advertiser', phone:'13900000002', balance:5000 },
-                { username:'sharer1', password:'123456', role:'sharer', phone:'13900000003', balance:800 }
-            ],
-            currentUser: null,
-            articles: [
-                { id:1,title:'自媒体运营技巧',content:'<p>核心在于内容质量……<div class="ad-placeholder" data-ad-id="1">广告位：某某教育</div></p>',author:'creator1',category:'运营',status:'published',date:'2026-04-15',platforms:['微信公众号','头条号'],views:6540,ads:1 },
-                { id:2,title:'短视频变现策略',content:'<p>短视频如何高效变现……</p>',author:'creator1',category:'营销',status:'draft',date:'2026-04-18',platforms:[],views:0,ads:0 }
-            ],
-            ads: [
-                { id:1,name:'某某教育',type:'原生广告',position:'文章中部',budget:500,price:100,duration:7,status:'active',link:'#',advertiser:'advertiser1',impressions:15600,clicks:2340,revenue:2340 },
-                { id:2,name:'营销工具Pro',type:'横幅广告',position:'文章顶部',budget:300,price:80,duration:14,status:'pending',link:'#',advertiser:'advertiser1',impressions:0,clicks:0,revenue:0 }
-            ],
-            shares: [],
-            notifications: [
-                { id:1, title:'系统通知', desc:'欢迎使用悦享网·聚媒通', time:'刚刚', type:'system', unread:true },
-                { id:2, title:'收益到账', desc:'广告收益 ¥580 已结算', time:'30分钟前', type:'revenue', unread:true }
-            ],
-            nextArticleId:3, nextAdId:3, nextShareId:1, nextNotifId:3,
-            siteName:'悦享网', maxAdsPerArticle:3
-        };
-    }
-    function getDB() {
-        let db = localStorage.getItem(DB_KEY);
-        if(!db){ db=getDefaultDB(); saveDB(db); return db; }
-        try{ return JSON.parse(db); }catch(e){ db=getDefaultDB(); saveDB(db); return db; }
-    }
-    function saveDB(db){ localStorage.setItem(DB_KEY, JSON.stringify(db)); }
-
-    // ==================== 工具 ====================
-    function toast(msg, type='info'){
-        const container = document.getElementById('toastContainer');
-        const div = document.createElement('div'); div.className='toast';
-        div.style.borderLeft = `4px solid ${type==='success'?'#16a34a':type==='error'?'#dc2626':'#0d9488'}`;
-        div.innerHTML = `<span>${type==='success'?'✅':type==='error'?'❌':'ℹ️'}</span> ${msg}`;
-        container.appendChild(div); setTimeout(()=>div.remove(),3000);
-    }
-    function openModal(title, contentHtml, onSave){
-        const container = document.getElementById('modalContainer');
-        container.innerHTML = `<div class="modal-mask" id="modalMask"><div class="modal-box"><h2>${title}</h2><div id="modalBody">${contentHtml}</div><div style="text-align:right;margin-top:20px;"><button class="btn-sm" onclick="document.getElementById('modalContainer').innerHTML=''">取消</button><button class="btn-sm btn-sm-primary" id="modalSaveBtn" style="margin-left:8px;">保存</button></div></div></div>`;
-        document.getElementById('modalSaveBtn').addEventListener('click', ()=>{ if(onSave)onSave(); container.innerHTML=''; });
-        document.getElementById('modalMask').addEventListener('click', function(e){ if(e.target===this)container.innerHTML=''; });
-    }
-    function checkPasswordStrength(pw){
-        const bar = document.getElementById('strengthBar');
-        const text = document.getElementById('strengthText');
-        if(!bar) return;
-        let strength=0;
-        if(pw.length>=6) strength++;
-        if(pw.length>=10) strength++;
-        if(/[A-Z]/.test(pw)) strength++;
-        if(/[0-9]/.test(pw)) strength++;
-        if(/[^A-Za-z0-9]/.test(pw)) strength++;
-        const percent = strength*20;
-        bar.style.width = percent+'%';
-        if(strength<=2){ bar.style.background='#ef4444'; text.textContent='弱'; }
-        else if(strength<=4){ bar.style.background='#f59e0b'; text.textContent='中'; }
-        else { bar.style.background='#10b981'; text.textContent='强'; }
-    }
-    function addNotification(title, desc, type='system'){
-        const db = getDB();
-        db.notifications.unshift({ id: db.nextNotifId++, title, desc, time: '刚刚', type, unread:true });
-        saveDB(db);
-        updateNotificationBadge();
-    }
-    function updateNotificationBadge(){
-        const db = getDB();
-        const unread = db.notifications.filter(n=>n.unread).length;
-        const badge = document.getElementById('notifCount');
-        badge.textContent = unread;
-        badge.style.display = unread > 0 ? 'flex' : 'none';
-    }
-
-    // ==================== 角色权限 ====================
-    const rolePermissions = {
-        admin: ['dashboard','articles','ads','revenue','users','settings','shares'],
-        creator: ['dashboard','articles','revenue','shares'],
-        advertiser: ['dashboard','ads','revenue'],
-        sharer: ['dashboard','shares','revenue']
+  // ---------- 数据库 ----------
+  const DB_KEY = 'jumeitong_full_db';
+  function defaultDB() {
+    return {
+      users: [
+        { username:'admin', password:'123456', phone:'13800000000', role:'admin', balance:100000 },
+        { username:'creator1', password:'123456', phone:'13900000001', role:'creator', balance:5000 },
+        { username:'advertiser1', password:'123456', phone:'13900000002', role:'advertiser', balance:20000 },
+        { username:'sharer1', password:'123456', phone:'13900000003', role:'sharer', balance:300 }
+      ],
+      currentUser: null,
+      articles: [
+        { id:1, title:'自媒体运营技巧', content:'<p>核心内容质量...</p><div class="ad-placeholder" data-ad-id="1">广告位：某某教育</div>', author:'creator1', category:'运营', status:'published', date:'2026-04-20', platforms:['微信公众号','头条号'], views:6540, ads:1, locked:false },
+        { id:2, title:'短视频变现策略', content:'<p>短视频变现...</p>', author:'creator1', category:'营销', status:'draft', date:'2026-04-21', platforms:[], views:0, ads:0, locked:false }
+      ],
+      ads: [
+        { id:1, name:'某某教育', type:'原生广告', position:'文章中部', budget:2000, price:100, duration:7, status:'active', link:'#', advertiser:'advertiser1', impressions:15600, clicks:2340, revenue:2340 },
+        { id:2, name:'某某品牌', type:'横幅广告', position:'文章顶部', budget:5000, price:200, duration:14, status:'pending', link:'#', advertiser:'advertiser1', impressions:0, clicks:0, revenue:0 }
+      ],
+      shares: [],
+      notifications: [
+        { id:1, title:'欢迎使用聚媒通', desc:'系统已启动', time:'刚刚', type:'system', unread:true },
+        { id:2, title:'收益到账', desc:'广告收益 ¥580', time:'30分钟前', type:'revenue', unread:true }
+      ],
+      nextId: { article:3, ad:3, share:1, notif:3 },
+      siteName:'悦享网', maxAdsPerArticle:3
     };
-    function getUserMenu(){
-        const db = getDB();
-        const role = db.currentUser?.role || 'admin';
-        return rolePermissions[role] || [];
-    }
+  }
+  function getDB() {
+    let db = localStorage.getItem(DB_KEY);
+    if(!db) { db = defaultDB(); saveDB(db); return db; }
+    try { return JSON.parse(db); } catch(e) { db = defaultDB(); saveDB(db); return db; }
+  }
+  function saveDB(db) { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
 
-    // ==================== 侧边栏控制 (修复版) ====================
-    function initSidebar(){
-        const sidebar = document.getElementById('sidebar');
-        const toggleBtn = document.getElementById('sidebarToggleBtn');
-        const icon = toggleBtn.querySelector('i');
-        let collapsed = localStorage.getItem('sidebar_collapsed') === 'true';
-        if(collapsed){
-            sidebar.classList.add('closed');
-            icon.className = 'fas fa-bars';
-        } else {
-            icon.className = 'fas fa-times';
-        }
-        toggleBtn.addEventListener('click', function(e){
-            e.stopPropagation();
-            const isClosed = sidebar.classList.toggle('closed');
-            icon.className = isClosed ? 'fas fa-bars' : 'fas fa-times';
-            localStorage.setItem('sidebar_collapsed', isClosed);
-        });
-    }
-    function renderSidebarNav(){
-        const menu = getUserMenu();
-        const navItems = {
-            dashboard: { icon:'fa-chart-pie', text:'工作台' },
-            articles: { icon:'fa-file-alt', text:'文章管理' },
-            ads: { icon:'fa-ad', text:'广告管理' },
-            revenue: { icon:'fa-coins', text:'收益中心' },
-            shares: { icon:'fa-share-alt', text:'分享管理' },
-            users: { icon:'fa-users', text:'用户管理' },
-            settings: { icon:'fa-cog', text:'系统设置' }
-        };
-        let html = '';
-        menu.forEach(key => {
-            if(navItems[key]) html += `<div class="nav-item" data-page="${key}"><i class="fas ${navItems[key].icon}"></i> ${navItems[key].text}</div>`;
-        });
-        document.getElementById('sidebarNav').innerHTML = html;
-        document.querySelectorAll('.nav-item[data-page]').forEach(item=>{
-            item.addEventListener('click', function(){ switchPage(this.dataset.page); });
-        });
-    }
+  // 工具
+  function toast(msg, type='info') {
+    const container = document.getElementById('toastContainer');
+    const div = document.createElement('div'); div.className='toast';
+    div.style.borderLeft = `4px solid ${type==='success'?'#52c41a':type==='error'?'#ff4d4f':'#1677ff'}`;
+    div.textContent = msg; container.appendChild(div);
+    setTimeout(()=>div.remove(), 3000);
+  }
+  function openModal(title, content, onSave) {
+    const container = document.getElementById('modalContainer');
+    container.innerHTML = `
+      <div class="modal-mask" id="modalMask">
+        <div class="modal-box"><h2 style="margin-bottom:20px;">${title}</h2><div id="modalBody">${content}</div>
+        <div style="text-align:right;margin-top:20px;">
+          <button class="btn" onclick="document.getElementById('modalContainer').innerHTML=''">取消</button>
+          <button class="btn btn-primary" id="modalSaveBtn">保存</button>
+        </div></div>
+      </div>`;
+    document.getElementById('modalSaveBtn').addEventListener('click', ()=>{ if(onSave) onSave(); container.innerHTML=''; });
+    document.getElementById('modalMask').addEventListener('click', (e)=>{ if(e.target===e.currentTarget) container.innerHTML=''; });
+  }
+  function addNotification(title, desc, type='system') {
+    const db = getDB();
+    db.notifications.unshift({ id: db.nextId.notif++, title, desc, time:'刚刚', type, unread:true });
+    saveDB(db);
+    updateNotifBadge();
+  }
+  function updateNotifBadge() {
+    const db = getDB();
+    const unread = db.notifications.filter(n=>n.unread).length;
+    const badge = document.getElementById('notifCount');
+    badge.textContent = unread;
+    badge.style.display = unread>0?'flex':'none';
+  }
 
-    // ==================== 登录/注册/忘记密码 ====================
-    function doLogin(){
-        const username = document.getElementById('loginUsername').value.trim();
-        const password = document.getElementById('loginPassword').value.trim();
-        if(!username||!password){ toast('请输入账号和密码','error'); return; }
-        const db = getDB();
-        const user = db.users.find(u=>u.username===username && u.password===password);
-        if(user){
-            db.currentUser = user; saveDB(db);
-            document.getElementById('authPage').style.display='none';
-            document.getElementById('appContainer').style.display='flex';
-            document.getElementById('welcomeText').textContent = `👋 欢迎，${user.username}`;
-            document.getElementById('sidebarUserName').textContent = user.username;
-            document.getElementById('sidebarAvatar').textContent = user.username.charAt(0);
-            document.getElementById('sidebarUserRole').textContent = user.role==='admin'?'超级管理员':user.role==='creator'?'创作者':user.role==='advertiser'?'广告主':'分享者';
-            renderSidebarNav();
-            updateNotificationBadge();
-            switchPage('dashboard');
-            toast('登录成功','success');
-            addNotification('登录提醒', `${user.username} 登录了系统`);
-        } else { toast('账号或密码错误','error'); }
-    }
-    function doRegister(){
-        const username = document.getElementById('regUsername').value.trim();
-        const phone = document.getElementById('regPhone').value.trim();
-        const password = document.getElementById('regPassword').value;
-        const password2 = document.getElementById('regPassword2').value;
-        if(!username||!password||!phone){ toast('请填写完整信息','error'); return; }
-        if(password!==password2){ toast('两次密码不一致','error'); return; }
-        const db = getDB();
-        if(db.users.find(u=>u.username===username)){ toast('用户名已存在','error'); return; }
-        db.users.push({ username, password, role:'creator', phone, email:'', balance:0 });
-        saveDB(db);
-        toast('注册成功，请登录','success');
-        document.getElementById('loginForm').style.display='block';
-        document.getElementById('registerForm').style.display='none';
-    }
-    function forgotPassword(){
-        const contact = document.getElementById('forgotContact').value.trim();
-        if(!contact){ toast('请输入手机号或邮箱','error'); return; }
-        const db = getDB();
-        const user = db.users.find(u=>u.phone===contact || u.email===contact);
-        if(user){
-            user.password = 'reset123'; saveDB(db);
-            toast('密码已重置为 reset123','success');
-            document.getElementById('loginForm').style.display='block';
-            document.getElementById('forgotPasswordForm').style.display='none';
-        } else { toast('未找到该账号','error'); }
-    }
-    function logout(){
-        const db = getDB(); db.currentUser = null; saveDB(db);
-        document.getElementById('authPage').style.display='flex';
-        document.getElementById('appContainer').style.display='none';
-    }
-
-    // ==================== 页面切换 ====================
-    function switchPage(page){
-        document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
-        document.querySelector(`.nav-item[data-page="${page}"]`)?.classList.add('active');
-        const content = document.getElementById('pageContent');
-        switch(page){
-            case 'dashboard': content.innerHTML = renderDashboard(); initDashboardCharts(); break;
-            case 'articles': content.innerHTML = renderArticles(); break;
-            case 'ads': content.innerHTML = renderAds(); break;
-            case 'revenue': content.innerHTML = renderRevenue(); initRevenueCharts(); break;
-            case 'shares': content.innerHTML = renderShares(); break;
-            case 'users': content.innerHTML = renderUsers(); break;
-            case 'settings': content.innerHTML = renderSettings(); break;
-        }
-    }
-
-    // ==================== 通知面板 ====================
-    document.getElementById('notificationBadge').addEventListener('click', ()=>{
-        const db = getDB();
-        const notifs = db.notifications.slice(0,30);
-        const list = notifs.map(n=>`
-            <div style="padding:10px 0; border-bottom:1px solid var(--border); ${n.unread?'background:#f0fdf4':''}">
-                <strong>[${n.type==='system'?'系统':n.type==='revenue'?'收益':'其他'}] ${n.title}</strong>
-                <div style="color:var(--text-secondary);">${n.desc} <small>${n.time}</small></div>
-            </div>`).join('');
-        openModal('消息通知', list, ()=>{
-            db.notifications.forEach(n=>n.unread=false);
-            saveDB(db);
-            updateNotificationBadge();
-        });
+  // 权限
+  const menus = {
+    admin: ['dashboard','articles','ads','revenue','shares','users','settings'],
+    creator: ['dashboard','articles','revenue','shares'],
+    advertiser: ['dashboard','ads','revenue'],
+    sharer: ['dashboard','shares','revenue']
+  };
+  const menuLabels = {
+    dashboard: ['工作台','fa-chart-pie'],
+    articles: ['文章管理','fa-file-alt'],
+    ads: ['广告管理','fa-ad'],
+    revenue: ['收益中心','fa-coins'],
+    shares: ['分享管理','fa-share-alt'],
+    users: ['用户管理','fa-users'],
+    settings: ['系统设置','fa-cog']
+  };
+  function buildSidebar() {
+    const db = getDB();
+    const role = db.currentUser?.role || 'admin';
+    const allowed = menus[role] || menus.admin;
+    let html = '';
+    allowed.forEach(key => {
+      html += `<div class="nav-item" data-page="${key}"><i class="fas ${menuLabels[key][1]}"></i> ${menuLabels[key][0]}</div>`;
     });
+    document.getElementById('sidebarNav').innerHTML = html;
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', ()=> switchPage(item.dataset.page));
+    });
+  }
 
-    // ==================== 工作台 ====================
-    function renderDashboard(){
-        const db = getDB();
-        const arts = db.articles.length; const pub = db.articles.filter(a=>a.status==='published').length;
-        const ads = db.ads.length; const activeAds = db.ads.filter(a=>a.status==='active').length;
-        const revenue = db.ads.reduce((s,a)=>s+(a.revenue||0),0);
-        return `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:20px;">
-            <div class="card" style="text-align:center;"><h3>📄 文章</h3><p style="font-size:2rem;color:var(--primary);">${arts}</p></div>
-            <div class="card" style="text-align:center;"><h3>✅ 已发布</h3><p style="font-size:2rem;color:#16a34a;">${pub}</p></div>
-            <div class="card" style="text-align:center;"><h3>💰 广告</h3><p style="font-size:2rem;color:#d97706;">${ads}</p></div>
-            <div class="card" style="text-align:center;"><h3>📢 投放中</h3><p style="font-size:2rem;color:var(--primary);">${activeAds}</p></div>
-            <div class="card" style="text-align:center;"><h3>💵 收益</h3><p style="font-size:1.5rem;color:#dc2626;">¥${revenue}</p></div>
+  // 侧边栏折叠
+  const sidebarToggle = document.getElementById('sidebarToggleBtn');
+  const sidebar = document.getElementById('sidebar');
+  sidebarToggle.addEventListener('click', ()=>{
+    sidebar.classList.toggle('collapsed');
+    const icon = sidebarToggle.querySelector('i');
+    icon.className = sidebar.classList.contains('collapsed') ? 'fas fa-bars' : 'fas fa-times';
+    localStorage.setItem('sidebar_collapsed', sidebar.classList.contains('collapsed')?'1':'0');
+  });
+  if(localStorage.getItem('sidebar_collapsed')==='1') {
+    sidebar.classList.add('collapsed');
+    sidebarToggle.querySelector('i').className = 'fas fa-bars';
+  }
+
+  // 登录/注册/忘记密码
+  function doLogin() {
+    const username = document.getElementById('loginUsername').value.trim();
+    const password = document.getElementById('loginPassword').value.trim();
+    if(!username||!password) return toast('请输入账号密码','error');
+    const db = getDB();
+    const user = db.users.find(u=>u.username===username && u.password===password);
+    if(!user) return toast('账号或密码错误','error');
+    db.currentUser = user; saveDB(db);
+    document.getElementById('authPage').style.display='none';
+    document.getElementById('adminPage').style.display='flex';
+    document.getElementById('currentUser').textContent = user.username;
+    document.getElementById('userRoleBadge').textContent = user.role==='admin'?'管理员':user.role==='creator'?'创作者':user.role==='advertiser'?'广告主':'分享者';
+    buildSidebar(); updateNotifBadge(); switchPage('dashboard');
+    toast('登录成功','success');
+    addNotification('登录提醒', `${user.username} 登录系统`);
+  }
+  function doRegister() {
+    const username = document.getElementById('regUsername').value.trim();
+    const phone = document.getElementById('regPhone').value.trim();
+    const password = document.getElementById('regPassword').value;
+    const password2 = document.getElementById('regPassword2').value;
+    if(!username||!password||!phone) return toast('请填写完整','error');
+    if(password!==password2) return toast('两次密码不一致','error');
+    const db = getDB();
+    if(db.users.find(u=>u.username===username)) return toast('用户名已存在','error');
+    db.users.push({ username, password, phone, role:'creator', balance:0 });
+    saveDB(db);
+    toast('注册成功，请登录','success');
+    showLoginForm();
+  }
+  function resetPassword() {
+    const contact = document.getElementById('forgotContact').value.trim();
+    if(!contact) return toast('请输入手机号或邮箱','error');
+    const db = getDB();
+    const user = db.users.find(u=>u.phone===contact || u.email===contact);
+    if(!user) return toast('未找到账号','error');
+    user.password = 'reset123'; saveDB(db);
+    toast('密码已重置为 reset123','success');
+    showLoginForm();
+  }
+  function showLoginForm() {
+    document.getElementById('loginForm').style.display='block';
+    document.getElementById('registerForm').style.display='none';
+    document.getElementById('forgotForm').style.display='none';
+  }
+  function logout() {
+    const db = getDB(); db.currentUser = null; saveDB(db);
+    document.getElementById('authPage').style.display='flex';
+    document.getElementById('adminPage').style.display='none';
+    toast('已退出','info');
+  }
+  window.checkStrength = function(pw) {
+    const bar = document.getElementById('regStrengthFill');
+    const text = document.getElementById('strengthText');
+    let s=0;
+    if(pw.length>=6)s++; if(pw.length>=10)s++; if(/[A-Z]/.test(pw))s++; if(/[0-9]/.test(pw))s++; if(/[^A-Za-z0-9]/.test(pw))s++;
+    bar.style.width = (s*20)+'%';
+    if(s<=2){ bar.style.background='#ff4d4f'; text.textContent='弱'; }
+    else if(s<=4){ bar.style.background='#faad14'; text.textContent='中'; }
+    else { bar.style.background='#52c41a'; text.textContent='强'; }
+  };
+
+  // 页面切换
+  function switchPage(page) {
+    document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+    document.querySelector(`.nav-item[data-page="${page}"]`)?.classList.add('active');
+    const content = document.getElementById('pageContent');
+    switch(page) {
+      case 'dashboard': content.innerHTML = renderDashboard(); initDashboardChart(); break;
+      case 'articles': content.innerHTML = renderArticles(); break;
+      case 'ads': content.innerHTML = renderAds(); break;
+      case 'revenue': content.innerHTML = renderRevenue(); initRevenueChart(); break;
+      case 'shares': content.innerHTML = renderShares(); break;
+      case 'users': content.innerHTML = renderUsers(); break;
+      case 'settings': content.innerHTML = renderSettings(); break;
+      default: content.innerHTML = renderDashboard();
+    }
+  }
+
+  // 通知面板
+  document.getElementById('notifBell').addEventListener('click', ()=>{
+    const db = getDB();
+    const notifs = db.notifications.slice(0,30);
+    let html = '';
+    notifs.forEach(n=>{
+      html += `<div style="padding:10px 0;border-bottom:1px solid #f0f0f0;${n.unread?'background:#e6f7ff':''}">
+        <strong>[${n.type==='system'?'系统':n.type==='revenue'?'收益':'审核'}] ${n.title}</strong>
+        <div style="color:#666;">${n.desc} <small>${n.time}</small></div>
+      </div>`;
+    });
+    openModal('消息通知', html, ()=>{
+      db.notifications.forEach(n=>n.unread=false);
+      saveDB(db); updateNotifBadge();
+    });
+  });
+
+  // 工作台
+  function renderDashboard() {
+    const db = getDB();
+    const articles=db.articles.length, published=db.articles.filter(a=>a.status==='published').length;
+    const ads=db.ads.length, active=db.ads.filter(a=>a.status==='active').length;
+    const revenue=db.ads.reduce((s,a)=>s+a.revenue,0);
+    return `
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:20px;">
+        <div class="card"><h3>📄 文章</h3><p style="font-size:2rem;color:#1677ff;">${articles}</p></div>
+        <div class="card"><h3>✅ 已发布</h3><p style="font-size:2rem;color:#52c41a;">${published}</p></div>
+        <div class="card"><h3>💰 广告</h3><p style="font-size:2rem;color:#fa8c16;">${ads}</p></div>
+        <div class="card"><h3>📢 投放中</h3><p style="font-size:2rem;color:#1677ff;">${active}</p></div>
+        <div class="card"><h3>💵 总收益</h3><p style="font-size:1.5rem;color:#ff4d4f;">¥${revenue}</p></div>
+      </div>
+      <div class="card"><h3>📊 收益趋势</h3><canvas id="trendChart" height="200"></canvas></div>`;
+  }
+  function initDashboardChart() {
+    setTimeout(()=>{
+      const ctx = document.getElementById('trendChart');
+      if(ctx) new Chart(ctx, { type:'line', data:{ labels:['1月','2月','3月','4月','5月','6月'], datasets:[{ label:'收益', data:[3200,4500,5800,6200,7800,getDB().ads.reduce((s,a)=>s+a.revenue,0)], borderColor:'#1677ff' }] } });
+    },100);
+  }
+
+  // 文章管理 (含丰富编辑器)
+  function renderArticles() {
+    const db = getDB();
+    const user = db.currentUser;
+    let articles = user.role==='admin' ? db.articles : db.articles.filter(a=>a.author===user.username);
+    let rows = '';
+    articles.forEach(a=>{
+      rows += `<tr>
+        <td>${a.title}</td><td>${a.category}</td>
+        <td><span class="tag ${a.status==='published'?'tag-success':a.status==='draft'?'tag-warning':a.status==='reviewing'?'tag-primary':'tag-danger'}">${a.status==='published'?'已发布':a.status==='draft'?'草稿':a.status==='reviewing'?'审核中':'已锁定'}</span></td>
+        <td>${a.platforms?.join(', ')||'-'}</td><td>${a.views}</td>
+        <td>
+          <button class="btn btn-sm btn-primary" onclick="editArticle(${a.id})" ${a.locked?'disabled':''}>编辑</button>
+          <button class="btn btn-sm" onclick="previewArticle(${a.id})">预览</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteArticle(${a.id})">删除</button>
+          ${a.status==='draft'?`<button class="btn btn-sm btn-success" onclick="publishArticle(${a.id})">发布</button>`:''}
+          ${a.status==='reviewing'&&user.role==='admin'?`<button class="btn btn-sm btn-primary" onclick="approveArticle(${a.id})">通过</button>`:''}
+          <button class="btn btn-sm" onclick="toggleLockArticle(${a.id})">${a.locked?'解锁':'锁定'}</button>
+        </td>
+      </tr>`;
+    });
+    return `<div class="card"><div class="card-header"><h3>文章管理</h3>
+      <div><button class="btn btn-primary" onclick="newArticle()">➕ 新建</button>
+      <button class="btn" onclick="fetchArticle()">🌐 抓取文章</button></div></div>
+      <table><thead><tr><th>标题</th><th>分类</th><th>状态</th><th>平台</th><th>阅读</th><th>操作</th></tr></thead><tbody>${rows||'<tr><td colspan="6">暂无文章</td></tr>'}</tbody></table></div>`;
+  }
+
+  window.newArticle = function() { openArticleEditor(); };
+  window.editArticle = function(id) { openArticleEditor(id); };
+  window.previewArticle = function(id) {
+    const db = getDB(); const a = db.articles.find(a=>a.id===id);
+    if(a) openModal('预览：'+a.title, `<div style="padding:20px;">${a.content}</div>`, null);
+  };
+  window.deleteArticle = function(id) {
+    if(!confirm('删除文章？')) return;
+    const db = getDB(); db.articles = db.articles.filter(a=>a.id!==id); saveDB(db); switchPage('articles'); toast('已删除','success');
+  };
+  window.publishArticle = function(id) {
+    const db = getDB(); const a = db.articles.find(a=>a.id===id);
+    if(!a) return;
+    a.status = 'published'; saveDB(db);
+    addNotification('文章发布', `《${a.title}》已发布到悦享网，同步至 ${a.platforms?.join(',')||'无'}`);
+    switchPage('articles'); toast('发布成功','success');
+  };
+  window.approveArticle = function(id) {
+    const db = getDB(); const a = db.articles.find(a=>a.id===id); if(a) a.status='published'; saveDB(db); switchPage('articles'); toast('已通过','success');
+  };
+  window.toggleLockArticle = function(id) {
+    const db = getDB(); const a = db.articles.find(a=>a.id===id); a.locked=!a.locked; saveDB(db); switchPage('articles');
+  };
+  window.fetchArticle = function() {
+    openModal('抓取文章', `<input type="text" id="fetchUrl" class="form-input" placeholder="输入文章URL"><div id="fetchResult"></div><button class="btn btn-primary" onclick="doFetch()">抓取</button>`, null);
+  };
+  window.doFetch = async function() {
+    const url = document.getElementById('fetchUrl').value.trim();
+    if(!url) return toast('输入URL','error');
+    try {
+      const res = await fetch(url); const text = await res.text();
+      const doc = new DOMParser().parseFromString(text, 'text/html');
+      const content = doc.querySelector('article')?.innerHTML || doc.body.innerText;
+      document.getElementById('fetchResult').innerHTML = `<textarea style="width:100%;height:200px;">${content}</textarea><button class="btn btn-primary" onclick="useFetched()">使用并编辑</button>`;
+    } catch(e) { toast('抓取失败，可能跨域','error'); }
+  };
+  window.useFetched = function() {
+    const content = document.querySelector('#fetchResult textarea').value;
+    openArticleEditor(null, content);
+  };
+
+  function openArticleEditor(id, preContent) {
+    const db = getDB();
+    const article = id ? db.articles.find(a=>a.id===id) : null;
+    const title = article?.title || '';
+    const content = preContent || article?.content || '';
+    const category = article?.category || '运营';
+    const platforms = article?.platforms || [];
+    const platformOpts = ['微信公众号','头条号','知乎','抖音','快手','小红书','微博','百家号'].map(p=>`
+      <label><input type="checkbox" value="${p}" ${platforms.includes(p)?'checked':''}> ${p}</label>`).join('');
+    const html = `
+      <div class="form-group"><label>标题</label><input type="text" id="artTitle" class="form-input" value="${title}"></div>
+      <div class="form-group"><label>分类</label><select id="artCat" class="form-input"><option>运营</option><option>营销</option><option>科技</option><option>生活</option></select></div>
+      <div class="form-group"><label>发布平台</label><div>${platformOpts}</div></div>
+      <div class="form-group"><label>内容</label>
+        <div class="editor-toolbar" id="toolbar">
+          <button onclick="execCmd('bold')"><b>B</b></button>
+          <button onclick="execCmd('italic')"><i>I</i></button>
+          <button onclick="execCmd('underline')"><u>U</u></button>
+          <button onclick="execCmd('strikeThrough')"><s>S</s></button>
+          <select onchange="execCmd('fontSize', this.value)"><option value="1">小</option><option value="3" selected>中</option><option value="5">大</option><option value="7">特大</option></select>
+          <input type="color" onchange="execCmd('foreColor', this.value)" title="字体颜色">
+          <input type="color" onchange="execCmd('hiliteColor', this.value)" title="背景色">
+          <button onclick="insertLink()"><i class="fas fa-link"></i></button>
+          <button onclick="insertImage()"><i class="fas fa-image"></i></button>
+          <button onclick="insertVideo()"><i class="fas fa-video"></i></button>
+          <button onclick="execCmd('insertOrderedList')">1.</button>
+          <button onclick="execCmd('insertUnorderedList')">•</button>
+          <button onclick="execCmd('formatBlock','<pre>')"><i class="fas fa-code"></i></button>
+          <button onclick="execCmd('formatBlock','<blockquote>')">❝</button>
+          <button onclick="execCmd('removeFormat')"><i class="fas fa-remove-format"></i></button>
+          <button onclick="insertAdPlaceholder()">📢 插入广告</button>
         </div>
-        <div class="card"><h3>📊 收益趋势</h3><canvas id="trendChart" height="200"></canvas></div>`;
-    }
-    function initDashboardCharts(){
-        setTimeout(()=>{
-            const ctx = document.getElementById('trendChart');
-            if(ctx) new Chart(ctx, { type:'line', data:{ labels:['1月','2月','3月','4月','5月','6月'], datasets:[{ label:'收益', data:[3200,4500,5800,6200,7800,getDB().ads.reduce((s,a)=>s+a.revenue,0)], borderColor:'#0d9488' }] } });
-        },100);
-    }
-
-    // ==================== 文章管理 ====================
-    function renderArticles(){
-        const db = getDB();
-        const user = db.currentUser;
-        let articles = user.role==='admin' ? db.articles : db.articles.filter(a=>a.author===user.username);
-        const rows = articles.map(a=>`<tr><td>${a.title}</td><td>${a.category}</td><td><span class="tag ${a.status==='published'?'tag-success':'tag-warning'}">${a.status==='published'?'已发布':'草稿'}</span></td><td>${a.platforms?.join(',')||'-'}</td><td>${a.views||0}</td><td><button class="btn-sm btn-sm-primary" onclick="openArticleEditor(${a.id})">编辑</button><button class="btn-sm btn-sm-danger" onclick="deleteArticle(${a.id})">删除</button></td></tr>`).join('');
-        return `<div class="card"><div class="card-header"><h3>文章管理</h3><div><button class="btn-sm btn-sm-primary" onclick="openArticleEditor()">➕ 新建文章</button><button class="btn-sm btn-sm-primary" style="margin-left:5px;" onclick="fetchArticle()">🌐 抓取文章</button></div></div><table><thead><tr><th>标题</th><th>分类</th><th>状态</th><th>平台</th><th>阅读</th><th>操作</th></tr></thead><tbody>${rows||'<tr><td colspan="6">暂无文章</td></tr>'}</tbody></table></div>`;
-    }
-    window.openArticleEditor = function(id){
-        const db = getDB();
-        const article = id ? db.articles.find(a=>a.id===id) : null;
-        const title = article?.title||''; const content = article?.content||''; const category = article?.category||'运营';
-        const html = `<div class="form-group"><label>标题</label><input type="text" id="artTitle" class="form-input" value="${title}"></div><div class="form-group"><label>分类</label><select id="artCategory" class="form-input"><option>运营</option><option>营销</option><option>科技</option><option>生活</option></select></div><div class="form-group"><label>内容</label>
-            <div class="editor-toolbar">
-                <button onclick="execCmd('bold')"><b>B</b></button><button onclick="execCmd('italic')"><i>I</i></button><button onclick="execCmd('underline')"><u>U</u></button>
-                <select onchange="execCmd('fontSize', this.value)"><option value="1">小</option><option value="3" selected>中</option><option value="5">大</option></select>
-                <input type="color" onchange="execCmd('foreColor', this.value)"><button onclick="insertLink()">🔗</button><button onclick="insertImage()">🖼️</button><button onclick="insertVideo()">🎬</button>
-                <button onclick="execCmd('insertOrderedList')">1.</button><button onclick="execCmd('insertUnorderedList')">•</button><button onclick="execCmd('formatBlock','<pre>')"><></button><button onclick="execCmd('formatBlock','<blockquote>')">“</button>
-            </div>
-            <div id="articleContent" class="editor-area" contenteditable="true">${content}</div></div>`;
-        openModal(article?'编辑文章':'新建文章', html, ()=>{
-            const newTitle = document.getElementById('artTitle').value.trim();
-            const newContent = document.getElementById('articleContent').innerHTML;
-            const newCategory = document.getElementById('artCategory').value;
-            if(!newTitle) return toast('标题不能为空','error');
-            if(article){
-                article.title=newTitle; article.content=newContent; article.category=newCategory;
-            } else {
-                db.articles.push({ id:db.nextArticleId++, title:newTitle, content:newContent, category:newCategory, status:'draft', date:new Date().toISOString().slice(0,10), author:db.currentUser.username, platforms:[], views:0, ads:0 });
-            }
-            saveDB(db); switchPage('articles'); toast('文章已保存','success');
-            addNotification('文章保存', `文章《${newTitle}》已保存`);
+        <div id="articleContent" class="editor-area" contenteditable="true">${content}</div>
+      </div>`;
+    openModal(article?'编辑文章':'新建文章', html, ()=>{
+      const newTitle = document.getElementById('artTitle').value.trim();
+      const newContent = document.getElementById('articleContent').innerHTML;
+      const newCat = document.getElementById('artCat').value;
+      const selectedPlatforms = [...document.querySelectorAll('#modalBody input[type=checkbox]:checked')].map(i=>i.value);
+      if(!newTitle) return toast('标题不能为空','error');
+      if(article) {
+        article.title = newTitle; article.content = newContent;
+        article.category = newCat; article.platforms = selectedPlatforms;
+      } else {
+        db.articles.push({
+          id: db.nextId.article++, title: newTitle, content: newContent,
+          category: newCat, status: 'draft', date: new Date().toISOString().slice(0,10),
+          author: db.currentUser.username, platforms: selectedPlatforms, views:0, ads:0, locked:false
         });
-    };
-    window.execCmd = function(cmd, val){ document.execCommand(cmd, false, val); };
-    window.insertLink = function(){ const url = prompt('链接URL:'); if(url) execCmd('createLink', url); };
-    window.insertImage = function(){ const url = prompt('图片URL:'); if(url) execCmd('insertImage', url); };
-    window.insertVideo = function(){ const url = prompt('视频iframe代码或URL:'); if(url) document.execCommand('insertHTML', false, `<iframe width="560" height="315" src="${url}" frameborder="0" allowfullscreen></iframe>`); };
-    window.deleteArticle = function(id){ if(!confirm('删除？')) return; const db=getDB(); db.articles=db.articles.filter(a=>a.id!==id); saveDB(db); switchPage('articles'); toast('已删除','success'); };
-    window.fetchArticle = function(){
-        openModal('抓取文章', '<div class="form-group"><label>文章URL</label><input type="text" id="fetchUrl" class="form-input"></div><div id="fetchResult"></div><button class="btn-sm btn-sm-primary" onclick="doFetch()">抓取</button>', ()=>{});
-    };
-    window.doFetch = async function(){
-        const url = document.getElementById('fetchUrl').value.trim();
-        if(!url) return toast('输入URL','error');
-        try{
-            const res = await fetch(url); const html = await res.text();
-            const doc = new DOMParser().parseFromString(html, 'text/html');
-            const article = doc.querySelector('article')?.innerHTML || doc.body.innerText;
-            document.getElementById('fetchResult').innerHTML = `<textarea style="width:100%;height:200px;">${article}</textarea><button class="btn-sm btn-sm-primary" onclick="window.openArticleEditor(); setTimeout(()=>document.getElementById('articleContent').innerHTML=document.querySelector('#fetchResult textarea').value,300)">使用内容</button>`;
-        } catch(e){ toast('抓取失败，可能跨域','error'); }
-    };
-
-    // ==================== 其他页面 (保持原样) ====================
-    function renderAds(){ /* 与上一版相同 */ }
-    function renderRevenue(){ /* 与上一版相同 */ }
-    function renderShares(){ /* 与上一版相同 */ }
-    function renderUsers(){ /* 与上一版相同 */ }
-    function renderSettings(){ /* 与上一版相同 */ }
-
-    // ==================== 初始化 ====================
-    document.addEventListener('DOMContentLoaded', function(){
-        initSidebar();
-        document.getElementById('loginBtn').addEventListener('click', doLogin);
-        document.getElementById('registerBtn').addEventListener('click', doRegister);
-        document.getElementById('logoutBtn').addEventListener('click', logout);
-        document.getElementById('showRegisterLink').addEventListener('click', ()=>{ document.getElementById('loginForm').style.display='none'; document.getElementById('registerForm').style.display='block'; });
-        document.getElementById('showLoginLink').addEventListener('click', ()=>{ document.getElementById('loginForm').style.display='block'; document.getElementById('registerForm').style.display='none'; });
-        document.getElementById('forgotPasswordLink').addEventListener('click', ()=>{ document.getElementById('loginForm').style.display='none'; document.getElementById('forgotPasswordForm').style.display='block'; });
-        document.getElementById('backToLoginLink').addEventListener('click', ()=>{ document.getElementById('loginForm').style.display='block'; document.getElementById('forgotPasswordForm').style.display='none'; });
-        document.getElementById('resetPasswordBtn').addEventListener('click', forgotPassword);
-        // 恢复登录状态
-        const db = getDB();
-        if(db.currentUser){
-            document.getElementById('authPage').style.display='none';
-            document.getElementById('appContainer').style.display='flex';
-            document.getElementById('welcomeText').textContent = `👋 欢迎，${db.currentUser.username}`;
-            document.getElementById('sidebarUserName').textContent = db.currentUser.username;
-            document.getElementById('sidebarAvatar').textContent = db.currentUser.username.charAt(0);
-            document.getElementById('sidebarUserRole').textContent = db.currentUser.role==='admin'?'超级管理员':db.currentUser.role==='creator'?'创作者':db.currentUser.role==='advertiser'?'广告主':'分享者';
-            renderSidebarNav(); updateNotificationBadge(); switchPage('dashboard');
-        }
+      }
+      saveDB(db); switchPage('articles'); toast('保存成功','success');
     });
+  }
+  window.execCmd = function(cmd, val) { document.execCommand(cmd, false, val); };
+  window.insertLink = function() { const url = prompt('链接URL:'); if(url) execCmd('createLink', url); };
+  window.insertImage = function() { const url = prompt('图片URL:'); if(url) execCmd('insertImage', url); };
+  window.insertVideo = function() { const url = prompt('视频iframe代码或URL:'); if(url) document.execCommand('insertHTML', false, `<iframe width="560" height="315" src="${url}" frameborder="0" allowfullscreen></iframe>`); };
+  window.insertAdPlaceholder = function() {
+    const db = getDB();
+    const ads = db.ads.filter(a=>a.status==='active');
+    if(!ads.length) return toast('无可用广告','error');
+    const opts = ads.map(a=>`<option value="${a.id}">${a.name} (${a.type})</option>`).join('');
+    openModal('插入广告', `<select id="adSelect" class="form-input">${opts}</select>`, ()=>{
+      const adId = document.getElementById('adSelect').value;
+      const ad = db.ads.find(a=>a.id==adId);
+      if(ad) {
+        const editor = document.getElementById('articleContent');
+        const ph = document.createElement('div'); ph.className='ad-placeholder';
+        ph.setAttribute('data-ad-id', ad.id); ph.textContent = `📢 ${ad.name} (${ad.type})`;
+        editor.focus();
+        const sel = window.getSelection();
+        if(sel.rangeCount) { const range=sel.getRangeAt(0); range.insertNode(ph); range.collapse(false); }
+        else editor.appendChild(ph);
+        toast('广告已插入','success');
+      }
+    });
+  };
+
+  // 广告管理
+  function renderAds() {
+    const db = getDB();
+    const user = db.currentUser;
+    let ads = user.role==='admin' ? db.ads : db.ads.filter(a=>a.advertiser===user.username);
+    let rows = '';
+    ads.forEach(a=>{
+      rows += `<tr>
+        <td>${a.name}</td><td>${a.type}</td><td>${a.position}</td><td>¥${a.budget}</td>
+        <td>${a.impressions}</td><td>¥${a.revenue}</td>
+        <td><span class="tag ${a.status==='active'?'tag-success':a.status==='pending'?'tag-warning':'tag-danger'}">${a.status==='active'?'投放中':a.status==='pending'?'待审核':a.status==='paused'?'已暂停':'已结束'}</span></td>
+        <td>
+          <button class="btn btn-sm" onclick="editAd(${a.id})">编辑</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteAd(${a.id})">删除</button>
+          ${a.status==='pending'&&user.role==='admin'?`<button class="btn btn-sm btn-primary" onclick="approveAd(${a.id})">审核通过</button>`:''}
+          ${a.status==='active'?`<button class="btn btn-sm" onclick="pauseAd(${a.id})">暂停</button>`:''}
+          ${a.status==='paused'?`<button class="btn btn-sm" onclick="resumeAd(${a.id})">恢复</button>`:''}
+        </td>
+      </tr>`;
+    });
+    return `<div class="card"><div class="card-header"><h3>广告管理</h3><button class="btn btn-primary" onclick="newAd()">➕ 新建广告</button></div>
+      <table><thead><tr><th>名称</th><th>类型</th><th>位置</th><th>预算</th><th>曝光</th><th>收益</th><th>状态</th><th>操作</th></tr></thead><tbody>${rows||'<tr><td colspan="8">暂无广告</td></tr>'}</tbody></table></div>`;
+  }
+  window.newAd = function() { openAdEditor(); };
+  window.editAd = function(id) { openAdEditor(id); };
+  window.deleteAd = function(id) { if(!confirm('删除广告？')) return; const db=getDB(); db.ads=db.ads.filter(a=>a.id!==id); saveDB(db); switchPage('ads'); toast('已删除','success'); };
+  window.approveAd = function(id) { const db=getDB(); const a=db.ads.find(a=>a.id===id); a.status='active'; saveDB(db); addNotification('广告审核', `广告${a.name}已通过`); switchPage('ads'); toast('审核通过','success'); };
+  window.pauseAd = function(id) { const db=getDB(); const a=db.ads.find(a=>a.id===id); a.status='paused'; saveDB(db); switchPage('ads'); };
+  window.resumeAd = function(id) { const db=getDB(); const a=db.ads.find(a=>a.id===id); a.status='active'; saveDB(db); switchPage('ads'); };
+  function openAdEditor(id) {
+    const db = getDB();
+    const ad = id ? db.ads.find(a=>a.id===id) : null;
+    const html = `
+      <div class="form-group"><label>名称</label><input type="text" id="adName" class="form-input" value="${ad?.name||''}"></div>
+      <div class="form-group"><label>类型</label><select id="adType" class="form-input"><option>横幅广告</option><option>原生广告</option><option>视频广告</option></select></div>
+      <div class="form-group"><label>位置</label><select id="adPos" class="form-input"><option>文章顶部</option><option>文章中部</option><option>文章底部</option></select></div>
+      <div class="form-group"><label>预算(¥)</label><input type="number" id="adBudget" class="form-input" value="${ad?.budget||1000}"></div>
+      <div class="form-group"><label>单价(¥/天)</label><input type="number" id="adPrice" class="form-input" value="${ad?.price||100}"></div>
+      <div class="form-group"><label>时长(天)</label><input type="number" id="adDuration" class="form-input" value="${ad?.duration||7}"></div>
+      <div class="form-group"><label>链接</label><input type="text" id="adLink" class="form-input" value="${ad?.link||''}"></div>`;
+    openModal(ad?'编辑广告':'新建广告', html, ()=>{
+      const name = document.getElementById('adName').value.trim();
+      if(!name) return toast('名称必填','error');
+      const newAd = {
+        name, type: document.getElementById('adType').value,
+        position: document.getElementById('adPos').value,
+        budget: +document.getElementById('adBudget').value,
+        price: +document.getElementById('adPrice').value,
+        duration: +document.getElementById('adDuration').value,
+        link: document.getElementById('adLink').value,
+        advertiser: db.currentUser.username,
+        status: 'pending', impressions:0, clicks:0, revenue:0
+      };
+      if(ad) Object.assign(ad, newAd);
+      else { newAd.id = db.nextId.ad++; db.ads.push(newAd); }
+      saveDB(db); switchPage('ads'); toast('广告已保存','success');
+    });
+  }
+
+  // 收益中心
+  function renderRevenue() {
+    const db = getDB();
+    const user = db.currentUser;
+    let totalRevenue = db.ads.filter(a=>a.status==='active').reduce((s,a)=>s+a.revenue,0);
+    let myRevenue = 0;
+    if(user.role==='creator') myRevenue = db.articles.filter(a=>a.author===user.username).reduce((s,a)=>s+(a.ads||0)*100*0.5, 0);
+    else if(user.role==='advertiser') myRevenue = db.ads.filter(a=>a.advertiser===user.username).reduce((s,a)=>s+a.revenue,0);
+    else if(user.role==='sharer') myRevenue = db.shares.filter(s=>s.sharer===user.username).reduce((s,s)=>s+s.earnings,0);
+    else myRevenue = totalRevenue;
+    return `<div class="card"><h3>收益概览</h3><p>平台总收益：<strong>¥${totalRevenue}</strong></p><p>我的收益：<strong style="color:#ff4d4f;">¥${myRevenue}</strong></p>
+    <p>可提现余额：¥${user.balance}</p><button class="btn btn-primary" onclick="withdraw()">申请提现</button></div>
+    <div class="card"><h3>收益趋势</h3><canvas id="revenueChart" height="200"></canvas></div>`;
+  }
+  window.withdraw = function() {
+    const db = getDB(); const user = db.currentUser;
+    const amount = prompt(`当前余额 ¥${user.balance}，输入提现金额：`);
+    if(amount && +amount<=user.balance && +amount>0) {
+      user.balance -= +amount; saveDB(db);
+      addNotification('提现申请', `提现 ¥${amount} 已提交`); toast('提现申请成功','success');
+      switchPage('revenue');
+    } else toast('金额无效','error');
+  };
+  function initRevenueChart() {
+    setTimeout(()=>{
+      const ctx = document.getElementById('revenueChart');
+      if(ctx) new Chart(ctx, { type:'bar', data:{ labels:['广告1','广告2'], datasets:[{ label:'收益', data:[2340,0] }] } });
+    },100);
+  }
+
+  // 分享管理
+  function renderShares() {
+    const db = getDB();
+    let rows = '';
+    db.shares.forEach(s=>{
+      rows += `<tr><td>${s.articleTitle}</td><td>${s.sharer}</td><td>${s.platform}</td><td>${s.clicks}</td><td>¥${s.earnings}</td></tr>`;
+    });
+    return `<div class="card"><h3>分享记录</h3><table><thead><tr><th>文章</th><th>分享者</th><th>平台</th><th>点击</th><th>收益</th></tr></thead><tbody>${rows||'<tr><td colspan="5">暂无分享</td></tr>'}</tbody></table></div>`;
+  }
+
+  // 用户管理 (admin)
+  function renderUsers() {
+    const db = getDB();
+    if(db.currentUser.role!=='admin') return '<div class="card">权限不足</div>';
+    let rows = '';
+    db.users.forEach(u=>{
+      rows += `<tr><td>${u.username}</td><td>${u.role}</td><td>${u.phone}</td><td>¥${u.balance}</td></tr>`;
+    });
+    return `<div class="card"><h3>用户管理</h3><table><thead><tr><th>用户名</th><th>角色</th><th>手机</th><th>余额</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  }
+
+  // 系统设置
+  function renderSettings() {
+    const db = getDB();
+    return `<div class="card"><h3>基本设置</h3>
+      <div class="form-group"><label>站点名称</label><input type="text" id="siteName" class="form-input" value="${db.siteName}"></div>
+      <div class="form-group"><label>每篇文章最大广告数</label><input type="number" id="maxAds" class="form-input" value="${db.maxAdsPerArticle}"></div>
+      <button class="btn btn-primary" onclick="saveSettings()">保存</button></div>`;
+  }
+  window.saveSettings = function() {
+    const db = getDB();
+    db.siteName = document.getElementById('siteName').value.trim();
+    db.maxAdsPerArticle = +document.getElementById('maxAds').value;
+    saveDB(db); toast('设置已保存','success');
+  };
+
+  // 事件绑定
+  document.addEventListener('DOMContentLoaded', ()=>{
+    document.getElementById('loginBtn').addEventListener('click', doLogin);
+    document.getElementById('registerBtn').addEventListener('click', doRegister);
+    document.getElementById('resetBtn').addEventListener('click', resetPassword);
+    document.getElementById('showRegisterLink').addEventListener('click', ()=>{
+      document.getElementById('loginForm').style.display='none';
+      document.getElementById('registerForm').style.display='block';
+      document.getElementById('forgotForm').style.display='none';
+    });
+    document.getElementById('showLoginLink').addEventListener('click', showLoginForm);
+    document.getElementById('showForgot').addEventListener('click', ()=>{
+      document.getElementById('loginForm').style.display='none';
+      document.getElementById('forgotForm').style.display='block';
+      document.getElementById('registerForm').style.display='none';
+    });
+    document.getElementById('backLoginLink').addEventListener('click', showLoginForm);
+    document.getElementById('logoutBtn')?.addEventListener('click', logout);
+    // 如果已登录
+    const db = getDB();
+    if(db.currentUser) {
+      document.getElementById('authPage').style.display='none';
+      document.getElementById('adminPage').style.display='flex';
+      document.getElementById('currentUser').textContent = db.currentUser.username;
+      document.getElementById('userRoleBadge').textContent = db.currentUser.role==='admin'?'管理员':db.currentUser.role==='creator'?'创作者':db.currentUser.role==='advertiser'?'广告主':'分享者';
+      buildSidebar(); updateNotifBadge(); switchPage('dashboard');
+    }
+  });
 })();
 </script>
 </body>
