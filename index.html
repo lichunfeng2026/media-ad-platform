@@ -3,133 +3,183 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>悦享网 · 聚媒通广告投放平台</title>
+  <title>悦享网 · 聚媒通全功能管理后台</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
     :root {
-      --primary: #1677ff; --primary-hover: #4096ff; --bg: #f0f2f5; --card-bg: #fff;
-      --text: #333; --text-light: #666; --border: #e8e8e8;
-      --success: #52c41a; --danger: #ff4d4f; --warning: #faad14; --radius: 8px;
+      --primary: #0d9488; --primary-hover: #14b8a6; --primary-dark: #0f766e;
+      --accent: #f59e0b; --bg: #f1f5f9; --card-bg: #ffffff;
+      --text: #1e293b; --text-light: #64748b; --border: #e2e8f0;
+      --success: #16a34a; --danger: #dc2626; --warning: #d97706;
+      --radius: 10px; --shadow: 0 1px 5px rgba(0,0,0,0.04);
     }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-    .auth-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #f0f5ff 0%, #e6f7ff 100%); }
-    .auth-card { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); width: 420px; max-width: 90vw; }
-    .auth-card h2 { text-align: center; margin-bottom: 24px; color: var(--primary); }
-    .form-group { margin-bottom: 16px; }
-    .form-group label { display: block; margin-bottom: 6px; font-weight: 500; }
-    .form-group input, .form-group select { width: 100%; padding: 10px 12px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 14px; background: #fff; }
-    .form-group input:focus, .form-group select:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 2px rgba(22,119,255,0.1); }
-    .btn { display: inline-block; padding: 10px 20px; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; transition: 0.2s; }
-    .btn-primary { background: var(--primary); color: #fff; } .btn-primary:hover { background: var(--primary-hover); }
-    .btn-success { background: var(--success); color: #fff; } .btn-success:hover { opacity: 0.9; }
-    .btn-danger { background: var(--danger); color: #fff; } .btn-danger:hover { opacity: 0.9; }
-    .btn-block { width: 100%; margin-top: 8px; }
-    .text-center { text-align: center; margin-top: 16px; font-size: 13px; }
-    .text-center a { color: var(--primary); text-decoration: none; cursor: pointer; }
-    .text-center a:hover { text-decoration: underline; }
-    .demo-hint { background: #f6ffed; border: 1px solid #b7eb8f; padding: 8px 12px; border-radius: 6px; margin-bottom: 16px; font-size: 12px; color: #389e0d; }
-    .strength-bar { height: 6px; background: #eee; border-radius: 3px; margin-top: 4px; overflow: hidden; }
-    .strength-fill { height: 100%; width: 0; transition: 0.3s; }
-    .admin-layout { display: flex; min-height: 100vh; position: relative; }
-    .sidebar { width: 220px; background: #001529; color: #fff; flex-shrink: 0; transition: width 0.3s; overflow: hidden; display: flex; flex-direction: column; }
-    .sidebar.collapsed { width: 0; }
-    .sidebar .logo { padding: 16px; font-size: 18px; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.1); }
-    .nav-item { display: flex; align-items: center; padding: 12px 20px; cursor: pointer; transition: background 0.2s; color: rgba(255,255,255,0.85); margin: 4px 0; font-size: 14px; }
-    .nav-item:hover, .nav-item.active { background: var(--primary); color: #fff; }
-    .nav-item i { margin-right: 8px; width: 20px; text-align: center; }
-    .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-    .topbar { background: #fff; padding: 14px 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
-    .sidebar-toggle { position: fixed; top: 10px; left: 10px; z-index: 1000; width: 36px; height: 36px; background: var(--primary); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-    .notif-badge { position: relative; cursor: pointer; }
-    .badge { position: absolute; top: -6px; right: -10px; background: var(--danger); color: #fff; font-size: 10px; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-    .page-content { flex: 1; padding: 24px; overflow-y: auto; }
-    .card { background: #fff; border-radius: var(--radius); padding: 20px; box-shadow: 0 1px 5px rgba(0,0,0,0.05); margin-bottom: 20px; }
-    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #f0f0f0; }
-    th { background: #fafafa; font-weight: 500; }
-    .tag { padding: 2px 8px; border-radius: 4px; font-size: 12px; }
-    .tag-primary { background: #e6f7ff; color: var(--primary); } .tag-success { background: #f6ffed; color: var(--success); }
-    .tag-warning { background: #fffbe6; color: var(--warning); } .tag-danger { background: #fff2f0; color: var(--danger); }
-    .btn-sm { padding: 4px 12px; font-size: 12px; border-radius: 4px; }
-    .modal-mask { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.45); display: flex; justify-content: center; align-items: center; z-index: 2000; }
-    .modal-box { background: #fff; border-radius: 12px; padding: 24px; width: 700px; max-width: 90vw; max-height: 80vh; overflow-y: auto; box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
-    .toast { position: fixed; top: 20px; right: 20px; background: #fff; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 3000; animation: slideIn 0.3s; }
-    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-    .editor-toolbar { display: flex; flex-wrap: wrap; gap: 4px; border: 1px solid #d9d9d9; border-radius: 6px 6px 0 0; padding: 8px; background: #fafafa; }
-    .editor-toolbar button, .editor-toolbar select, .editor-toolbar input[type="color"] { height: 28px; border: 1px solid #ccc; border-radius: 4px; background: #fff; cursor: pointer; font-size: 13px; }
-    .editor-area { border: 1px solid #d9d9d9; border-top: none; border-radius: 0 0 6px 6px; min-height: 220px; padding: 12px; outline: none; }
-    .ad-placeholder { background: #fff7e6; border: 1px dashed #fa8c16; padding: 6px 10px; margin: 8px 0; border-radius: 4px; display: inline-block; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: 'Segoe UI','Microsoft YaHei',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; display:flex; }
+    /* 登录页 */
+    .auth-container {
+      width:100%; min-height:100vh; display:flex; align-items:center; justify-content:center;
+      background: linear-gradient(135deg, #0f172a, #1e3a5f 50%, #0d4f4f);
+    }
+    .auth-card {
+      width:440px; max-width:90vw; background: rgba(255,255,255,0.97);
+      border-radius: 16px; box-shadow: 0 25px 60px rgba(0,0,0,0.3); padding: 30px;
+    }
+    .auth-card h2 { text-align:center; color: var(--primary); margin-bottom:20px; }
+    .form-group { margin-bottom:16px; }
+    .form-label { display:block; font-weight:600; margin-bottom:5px; color:var(--text); }
+    .form-input { width:100%; padding:9px 12px; border:1.5px solid var(--border); border-radius:6px; font-size:0.92rem; background:#fff; }
+    .form-input:focus { border-color:var(--primary); outline:none; box-shadow:0 0 0 3px rgba(13,148,136,0.1); }
+    .btn { width:100%; padding:10px; border:none; border-radius:6px; font-size:0.95rem; font-weight:700; cursor:pointer; transition:0.2s; }
+    .btn-primary { background:var(--primary); color:#fff; }
+    .btn-primary:hover { background:var(--primary-dark); }
+    .btn-success { background:var(--success); color:#fff; } .btn-success:hover { opacity:0.9; }
+    .btn-danger { background:var(--danger); color:#fff; } .btn-danger:hover { opacity:0.9; }
+    .btn-block { margin-top:8px; }
+    .text-center { text-align:center; margin-top:16px; font-size:13px; }
+    .text-center a { color:var(--primary); text-decoration:none; cursor:pointer; }
+    .text-center a:hover { text-decoration:underline; }
+    .demo-hint { background:#f0fdf4; border:1px solid #bbf7d0; padding:8px 12px; border-radius:6px; margin-bottom:16px; color:#166534; }
+    .strength-bar { height:6px; background:#eee; border-radius:3px; margin-top:4px; overflow:hidden; }
+    .strength-fill { height:100%; width:0; transition:0.3s; }
+
+    /* 后台框架 */
+    .app-container { display:flex; width:100%; height:100vh; position:relative; }
+    .sidebar {
+      width:240px; background:#0f172a; color:#fff; flex-shrink:0;
+      display:flex; flex-direction:column; transition:width 0.3s; overflow:hidden; z-index:90;
+    }
+    .sidebar.closed { width:0; }
+    .sidebar-header { padding:16px; display:flex; align-items:center; gap:10px; border-bottom:1px solid rgba(255,255,255,0.1); }
+    .sidebar-logo { width:36px; height:36px; background:var(--primary); border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:900; }
+    .sidebar-user { padding:12px 16px; display:flex; align-items:center; gap:10px; border-bottom:1px solid rgba(255,255,255,0.1); }
+    .sidebar-avatar { width:36px; height:36px; border-radius:50%; background:var(--primary); display:flex; align-items:center; justify-content:center; font-weight:800; }
+    .sidebar-nav { flex:1; padding:8px 0; overflow-y:auto; }
+    .nav-item {
+      display:flex; align-items:center; gap:10px; padding:12px 18px; margin:2px 8px; border-radius:8px;
+      cursor:pointer; color:rgba(255,255,255,0.8); font-size:0.9rem; transition:0.15s;
+    }
+    .nav-item:hover, .nav-item.active { background:var(--primary); color:#fff; }
+    .nav-item i { width:20px; text-align:center; }
+    .sidebar-toggle-btn {
+      position:absolute; top:12px; left:12px; z-index:200;
+      width:36px; height:36px; background:var(--primary); color:#fff;
+      border:2px solid rgba(255,255,255,0.2); border-radius:6px;
+      display:flex; align-items:center; justify-content:center; cursor:pointer;
+      font-size:1.2rem; box-shadow:0 2px 8px rgba(0,0,0,0.3); transition:left 0.3s;
+    }
+    .sidebar-toggle-btn:hover { background:var(--primary-dark); }
+    .sidebar.closed + .sidebar-toggle-btn { left:12px; }
+
+    .main-content { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+    .topbar { background:var(--card-bg); padding:12px 24px; box-shadow:var(--shadow); display:flex; justify-content:space-between; align-items:center; }
+    .notif-badge { position:relative; cursor:pointer; }
+    .badge { position:absolute; top:-6px; right:-10px; background:var(--danger); color:#fff; font-size:10px; width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+    .page-content { flex:1; padding:24px; overflow-y:auto; }
+    .card { background:var(--card-bg); border-radius:var(--radius); padding:20px; box-shadow:var(--shadow); margin-bottom:20px; }
+    .card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+    table { width:100%; border-collapse:collapse; }
+    th,td { padding:10px; text-align:left; border-bottom:1px solid var(--border); }
+    th { background:#f8fafc; font-weight:600; }
+    .tag { padding:2px 8px; border-radius:4px; font-size:0.75rem; }
+    .tag-success { background:#dcfce7; color:#16a34a; }
+    .tag-warning { background:#fffbeb; color:#d97706; }
+    .tag-danger { background:#fee2e2; color:#dc2626; }
+    .tag-primary { background:#e0f2fe; color:#0d9488; }
+    .btn-sm { padding:4px 10px; font-size:0.8rem; border:none; border-radius:4px; cursor:pointer; }
+    .btn-sm-primary { background:var(--primary); color:#fff; }
+    .btn-sm-danger { background:#fee2e2; color:#dc2626; }
+    .btn-sm-success { background:#f0fdf4; color:#16a34a; }
+    .modal-mask { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.45); display:flex; align-items:center; justify-content:center; z-index:2000; }
+    .modal-box { background:#fff; border-radius:12px; padding:24px; width:700px; max-width:90vw; max-height:80vh; overflow-y:auto; box-shadow:0 8px 24px rgba(0,0,0,0.15); }
+    .toast { position:fixed; top:20px; right:20px; background:#fff; padding:12px 20px; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.15); z-index:3000; display:flex; align-items:center; gap:8px; animation:slideIn 0.3s; }
+    @keyframes slideIn { from{transform:translateX(100%);opacity:0;} to{transform:translateX(0);opacity:1;} }
+
+    .editor-toolbar { border:1px solid var(--border); border-radius:6px 6px 0 0; padding:8px; background:#f8fafc; display:flex; flex-wrap:wrap; gap:5px; align-items:center; }
+    .editor-toolbar button,.editor-toolbar select,.editor-toolbar input[type="color"] { height:28px; border:1px solid #cbd5e1; border-radius:4px; background:#fff; cursor:pointer; font-size:0.8rem; }
+    .editor-area { border:1px solid var(--border); border-top:none; border-radius:0 0 6px 6px; min-height:220px; padding:12px; outline:none; }
+    .ad-placeholder { background:#fffbeb; border:1px dashed var(--accent); padding:6px 10px; margin:8px 0; border-radius:4px; display:inline-block; cursor:pointer; }
   </style>
 </head>
 <body>
-<div id="authPage" class="auth-container">
-  <div class="auth-card">
-    <h2>聚媒通 · 自媒体广告投放平台</h2>
-    <div id="loginForm">
-      <div class="demo-hint"><i class="fas fa-info-circle"></i> 演示账号：admin / 123456</div>
-      <div class="form-group"><label>账号</label><input type="text" id="loginUsername" value="admin"></div>
-      <div class="form-group"><label>密码</label><input type="password" id="loginPassword" value="123456"></div>
-      <div class="text-center"><a id="showForgot">忘记密码？</a></div>
-      <button class="btn btn-primary btn-block" id="loginBtn">登 录</button>
-      <div class="text-center"><a id="showRegisterLink">还没有账号？立即注册</a></div>
-    </div>
-    <div id="registerForm" style="display:none;">
-      <div class="form-group"><label>用户名</label><input type="text" id="regUsername"></div>
-      <div class="form-group"><label>手机号</label><input type="text" id="regPhone"></div>
-      <div class="form-group"><label>密码</label><input type="password" id="regPassword" oninput="checkStrength(this.value)"></div>
-      <div class="strength-bar"><div id="regStrengthFill" class="strength-fill"></div></div>
-      <small id="strengthText"></small>
-      <div class="form-group"><label>确认密码</label><input type="password" id="regPassword2"></div>
-      <button class="btn btn-primary btn-block" id="registerBtn">注 册</button>
-      <div class="text-center"><a id="showLoginLink">已有账号？立即登录</a></div>
-    </div>
-    <div id="forgotForm" style="display:none;">
-      <div class="form-group"><label>注册手机号/邮箱</label><input type="text" id="forgotContact"></div>
-      <button class="btn btn-primary btn-block" id="resetBtn">重置密码</button>
-      <div class="text-center"><a id="backLoginLink">返回登录</a></div>
-    </div>
-  </div>
-</div>
-
-<div id="adminPage" class="admin-layout" style="display:none;">
-  <button class="sidebar-toggle" id="sidebarToggleBtn"><i class="fas fa-bars"></i></button>
-  <div class="sidebar" id="sidebar">
-    <div class="logo">📡 悦享·聚媒通</div>
-    <nav id="sidebarNav"></nav>
-  </div>
-  <div class="main-content">
-    <div class="topbar">
-      <div>👋 欢迎，<strong id="currentUser"></strong> <small id="userRoleBadge"></small></div>
-      <div class="notif-badge" id="notifBell">
-        <i class="fas fa-bell fa-lg"></i>
-        <span class="badge" id="notifCount" style="display:none;">0</span>
+  <!-- 登录/注册 -->
+  <div id="authPage" class="auth-container">
+    <div class="auth-card">
+      <h2>悦享网 · 聚媒通</h2>
+      <div id="loginForm">
+        <div class="demo-hint"><i class="fas fa-info-circle"></i> 演示账号：admin / 123456</div>
+        <div class="form-group"><label class="form-label">账号</label><input type="text" id="loginUsername" class="form-input" value="admin"></div>
+        <div class="form-group"><label class="form-label">密码</label><input type="password" id="loginPassword" class="form-input" value="123456"></div>
+        <div class="text-center"><a id="showForgot">忘记密码？</a></div>
+        <button class="btn btn-primary btn-block" id="loginBtn">登 录</button>
+        <div class="text-center"><a id="showRegisterLink">还没有账号？立即注册</a></div>
+      </div>
+      <div id="registerForm" style="display:none;">
+        <div class="form-group"><label class="form-label">用户名</label><input type="text" id="regUsername" class="form-input"></div>
+        <div class="form-group"><label class="form-label">手机号</label><input type="text" id="regPhone" class="form-input"></div>
+        <div class="form-group"><label class="form-label">密码</label><input type="password" id="regPassword" class="form-input" oninput="checkStrength(this.value)"></div>
+        <div class="strength-bar"><div id="regStrengthFill" class="strength-fill"></div></div>
+        <small id="strengthText"></small>
+        <div class="form-group"><label class="form-label">确认密码</label><input type="password" id="regPassword2" class="form-input"></div>
+        <button class="btn btn-success btn-block" id="registerBtn">注 册</button>
+        <div class="text-center"><a id="showLoginLink">已有账号？立即登录</a></div>
+      </div>
+      <div id="forgotForm" style="display:none;">
+        <div class="form-group"><label class="form-label">注册手机号/邮箱</label><input type="text" id="forgotContact" class="form-input"></div>
+        <button class="btn btn-primary btn-block" id="resetBtn">重置密码</button>
+        <div class="text-center"><a id="backLoginLink">返回登录</a></div>
       </div>
     </div>
-    <div class="page-content" id="pageContent"></div>
   </div>
-</div>
 
-<div id="modalContainer"></div>
-<div id="toastContainer" style="position:fixed; top:20px; right:20px; z-index:3000;"></div>
+  <!-- 后台主界面 -->
+  <div class="app-container" id="appContainer" style="display:none;">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo"><i class="fas fa-satellite"></i></div>
+        <div style="font-weight:800;">悦享·聚媒通</div>
+      </div>
+      <div class="sidebar-user">
+        <div class="sidebar-avatar" id="sidebarAvatar">管</div>
+        <div>
+          <strong id="sidebarUserName">管理员</strong>
+          <br><small id="sidebarUserRole">超级管理员</small>
+        </div>
+      </div>
+      <nav class="sidebar-nav" id="sidebarNav"></nav>
+    </aside>
+    <div class="sidebar-toggle-btn" id="sidebarToggleBtn"><i class="fas fa-times"></i></div>
 
+    <div class="main-content">
+      <div class="topbar">
+        <div>👋 欢迎，<strong id="currentUser"></strong> <small id="userRoleBadge"></small></div>
+        <div class="notif-badge" id="notifBell">
+          <i class="fas fa-bell fa-lg"></i>
+          <span class="badge" id="notifCount" style="display:none;">0</span>
+        </div>
+      </div>
+      <div class="page-content" id="pageContent"></div>
+    </div>
+  </div>
+
+  <div id="modalContainer"></div>
+  <div id="toastContainer" style="position:fixed;top:20px;right:20px;z-index:3000;"></div>
 <script>
 (function() {
-  const DB_KEY = 'jumeitong_full_db_v2';
+  // ==================== 数据库 ====================
+  const DB_KEY = 'jumeitong_ultimate_db';
   function defaultDB() {
     return {
       users: [
-        { username:'admin', password:'123456', phone:'13800000000', role:'admin', balance:100000 },
-        { username:'creator1', password:'123456', phone:'13900000001', role:'creator', balance:5000 },
-        { username:'advertiser1', password:'123456', phone:'13900000002', role:'advertiser', balance:20000 },
-        { username:'sharer1', password:'123456', phone:'13900000003', role:'sharer', balance:300 }
+        { username:'admin', password:'123456', phone:'13800000000', email:'admin@yuexiang.com', role:'admin', balance:100000 },
+        { username:'creator1', password:'123456', phone:'13900000001', email:'c1@yuexiang.com', role:'creator', balance:5000 },
+        { username:'advertiser1', password:'123456', phone:'13900000002', email:'ad1@yuexiang.com', role:'advertiser', balance:20000 },
+        { username:'sharer1', password:'123456', phone:'13900000003', email:'sh1@yuexiang.com', role:'sharer', balance:300 }
       ],
       currentUser: null,
       articles: [
-        { id:1, title:'自媒体运营技巧', content:'<p>核心内容质量...</p><div class="ad-placeholder" data-ad-id="1">广告位：某某教育</div>', author:'creator1', category:'运营', status:'published', date:'2026-04-20', platforms:['微信公众号','头条号'], views:6540, ads:1, locked:false },
-        { id:2, title:'短视频变现策略', content:'<p>短视频变现...</p>', author:'creator1', category:'营销', status:'draft', date:'2026-04-21', platforms:[], views:0, ads:0, locked:false }
+        { id:1, title:'自媒体运营技巧', content:'<p>做好自媒体，核心在于内容质量和用户互动……</p><div class="ad-placeholder" data-ad-id="1">📢 广告位：某某教育（原生广告）</div><p>继续提升内容价值的方法……</p>', author:'creator1', category:'运营', status:'published', date:'2026-04-20', platforms:['微信公众号','头条号'], views:6540, ads:1, locked:false },
+        { id:2, title:'短视频变现策略', content:'<p>短视频变现策略详解……</p>', author:'creator1', category:'营销', status:'draft', date:'2026-04-21', platforms:[], views:0, ads:0, locked:false }
       ],
       ads: [
         { id:1, name:'某某教育', type:'原生广告', position:'文章中部', budget:2000, price:100, duration:7, status:'active', link:'#', advertiser:'advertiser1', impressions:15600, clicks:2340, revenue:2340 },
@@ -137,8 +187,8 @@
       ],
       shares: [],
       notifications: [
-        { id:1, title:'欢迎使用聚媒通', desc:'系统已启动', time:'刚刚', type:'system', unread:true },
-        { id:2, title:'收益到账', desc:'广告收益 ¥580', time:'30分钟前', type:'revenue', unread:true }
+        { id:1, title:'系统通知', desc:'欢迎使用悦享网·聚媒通', time:'刚刚', type:'system', unread:true },
+        { id:2, title:'收益到账', desc:'广告收益 ¥580 已结算', time:'30分钟前', type:'revenue', unread:true }
       ],
       nextId: { article:3, ad:3, share:1, notif:3 },
       siteName:'悦享网', maxAdsPerArticle:3
@@ -151,21 +201,22 @@
   }
   function saveDB(db) { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
 
+  // ==================== 工具 ====================
   function toast(msg, type='info') {
     const container = document.getElementById('toastContainer');
     const div = document.createElement('div'); div.className='toast';
-    div.style.borderLeft = `4px solid ${type==='success'?'#52c41a':type==='error'?'#ff4d4f':'#1677ff'}`;
-    div.textContent = msg; container.appendChild(div);
-    setTimeout(()=>div.remove(), 3000);
+    div.style.borderLeft = `4px solid ${type==='success'?'#16a34a':type==='error'?'#dc2626':'#0d9488'}`;
+    div.innerHTML = `<span>${type==='success'?'✅':type==='error'?'❌':'ℹ️'}</span> ${msg}`;
+    container.appendChild(div); setTimeout(()=>div.remove(), 3000);
   }
   function openModal(title, content, onSave) {
     const container = document.getElementById('modalContainer');
     container.innerHTML = `
       <div class="modal-mask" id="modalMask">
-        <div class="modal-box"><h2 style="margin-bottom:20px;">${title}</h2><div id="modalBody">${content}</div>
-        <div style="text-align:right;margin-top:20px;">
-          <button class="btn" onclick="document.getElementById('modalContainer').innerHTML=''">取消</button>
-          <button class="btn btn-primary" id="modalSaveBtn">保存</button>
+        <div class="modal-box"><h2>${title}</h2><div id="modalBody">${content}</div>
+        <div style="text-align:right; margin-top:20px;">
+          <button class="btn-sm" onclick="document.getElementById('modalContainer').innerHTML=''">取消</button>
+          <button class="btn-sm btn-sm-primary" id="modalSaveBtn" style="margin-left:8px;">保存</button>
         </div></div>
       </div>`;
     document.getElementById('modalSaveBtn').addEventListener('click', ()=>{ if(onSave) onSave(); container.innerHTML=''; });
@@ -185,6 +236,7 @@
     badge.style.display = unread>0?'flex':'none';
   }
 
+  // ==================== 角色权限 ====================
   const menus = {
     admin: ['dashboard','articles','ads','revenue','shares','users','settings'],
     creator: ['dashboard','articles','revenue','shares'],
@@ -208,8 +260,7 @@
     allowed.forEach(key => {
       html += `<div class="nav-item" data-page="${key}"><i class="fas ${menuLabels[key][1]}"></i> ${menuLabels[key][0]}</div>`;
     });
-    // 添加退出登录
-    html += `<div class="nav-item" id="logoutBtn" style="color:#ff4d4f;"><i class="fas fa-sign-out-alt"></i> 退出登录</div>`;
+    html += `<div class="nav-item" id="logoutBtn" style="color:#dc2626;"><i class="fas fa-sign-out-alt"></i> 退出登录</div>`;
     document.getElementById('sidebarNav').innerHTML = html;
     document.querySelectorAll('.nav-item[data-page]').forEach(item => {
       item.addEventListener('click', ()=> switchPage(item.dataset.page));
@@ -221,17 +272,17 @@
   const sidebarToggle = document.getElementById('sidebarToggleBtn');
   const sidebar = document.getElementById('sidebar');
   sidebarToggle.addEventListener('click', ()=>{
-    sidebar.classList.toggle('collapsed');
+    sidebar.classList.toggle('closed');
     const icon = sidebarToggle.querySelector('i');
-    icon.className = sidebar.classList.contains('collapsed') ? 'fas fa-bars' : 'fas fa-times';
-    localStorage.setItem('sidebar_collapsed', sidebar.classList.contains('collapsed')?'1':'0');
+    icon.className = sidebar.classList.contains('closed') ? 'fas fa-bars' : 'fas fa-times';
+    localStorage.setItem('sidebar_collapsed', sidebar.classList.contains('closed')?'1':'0');
   });
   if(localStorage.getItem('sidebar_collapsed')==='1') {
-    sidebar.classList.add('collapsed');
+    sidebar.classList.add('closed');
     sidebarToggle.querySelector('i').className = 'fas fa-bars';
   }
 
-  // 登录/注册/忘记密码
+  // ==================== 登录/注册/忘记密码 ====================
   function doLogin() {
     const username = document.getElementById('loginUsername').value.trim();
     const password = document.getElementById('loginPassword').value.trim();
@@ -241,9 +292,12 @@
     if(!user) return toast('账号或密码错误','error');
     db.currentUser = user; saveDB(db);
     document.getElementById('authPage').style.display='none';
-    document.getElementById('adminPage').style.display='flex';
+    document.getElementById('appContainer').style.display='flex';
     document.getElementById('currentUser').textContent = user.username;
     document.getElementById('userRoleBadge').textContent = user.role==='admin'?'管理员':user.role==='creator'?'创作者':user.role==='advertiser'?'广告主':'分享者';
+    document.getElementById('sidebarUserName').textContent = user.username;
+    document.getElementById('sidebarAvatar').textContent = user.username.charAt(0);
+    document.getElementById('sidebarUserRole').textContent = user.role==='admin'?'超级管理员':user.role==='creator'?'创作者':user.role==='advertiser'?'广告主':'分享者';
     buildSidebar(); updateNotifBadge(); switchPage('dashboard');
     toast('登录成功','success');
     addNotification('登录提醒', `${user.username} 登录系统`);
@@ -257,7 +311,7 @@
     if(password!==password2) return toast('两次密码不一致','error');
     const db = getDB();
     if(db.users.find(u=>u.username===username)) return toast('用户名已存在','error');
-    db.users.push({ username, password, phone, role:'creator', balance:0 });
+    db.users.push({ username, password, phone, email:'', role:'creator', balance:0 });
     saveDB(db);
     toast('注册成功，请登录','success');
     showLoginForm();
@@ -280,20 +334,22 @@
   function logout() {
     const db = getDB(); db.currentUser = null; saveDB(db);
     document.getElementById('authPage').style.display='flex';
-    document.getElementById('adminPage').style.display='none';
-    toast('已退出','info');
+    document.getElementById('appContainer').style.display='none';
+    toast('已安全退出','info');
   }
   window.checkStrength = function(pw) {
     const bar = document.getElementById('regStrengthFill');
     const text = document.getElementById('strengthText');
+    if(!bar) return;
     let s=0;
     if(pw.length>=6)s++; if(pw.length>=10)s++; if(/[A-Z]/.test(pw))s++; if(/[0-9]/.test(pw))s++; if(/[^A-Za-z0-9]/.test(pw))s++;
     bar.style.width = (s*20)+'%';
-    if(s<=2){ bar.style.background='#ff4d4f'; text.textContent='弱'; }
-    else if(s<=4){ bar.style.background='#faad14'; text.textContent='中'; }
-    else { bar.style.background='#52c41a'; text.textContent='强'; }
+    if(s<=2){ bar.style.background='#dc2626'; text.textContent='弱'; }
+    else if(s<=4){ bar.style.background='#d97706'; text.textContent='中'; }
+    else { bar.style.background='#16a34a'; text.textContent='强'; }
   };
 
+  // ==================== 页面切换 ====================
   function switchPage(page) {
     document.querySelectorAll('.nav-item[data-page]').forEach(i=>i.classList.remove('active'));
     const target = document.querySelector(`.nav-item[data-page="${page}"]`);
@@ -307,7 +363,6 @@
       case 'shares': content.innerHTML = renderShares(); break;
       case 'users': content.innerHTML = renderUsers(); break;
       case 'settings': content.innerHTML = renderSettings(); break;
-      default: content.innerHTML = renderDashboard();
     }
   }
 
@@ -317,9 +372,9 @@
     const notifs = db.notifications.slice(0,30);
     let html = '';
     notifs.forEach(n=>{
-      html += `<div style="padding:10px 0;border-bottom:1px solid #f0f0f0;${n.unread?'background:#e6f7ff':''}">
+      html += `<div style="padding:10px 0;border-bottom:1px solid var(--border);${n.unread?'background:#f0fdf4':''}">
         <strong>[${n.type==='system'?'系统':n.type==='revenue'?'收益':'审核'}] ${n.title}</strong>
-        <div style="color:#666;">${n.desc} <small>${n.time}</small></div>
+        <div style="color:var(--text-light);">${n.desc} <small>${n.time}</small></div>
       </div>`;
     });
     openModal('消息通知', html, ()=>{
@@ -328,6 +383,7 @@
     });
   });
 
+  // ==================== 工作台 ====================
   function renderDashboard() {
     const db = getDB();
     const articles=db.articles.length, published=db.articles.filter(a=>a.status==='published').length;
@@ -335,26 +391,286 @@
     const revenue=db.ads.reduce((s,a)=>s+a.revenue,0);
     return `
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:20px;">
-        <div class="card"><h3>📄 文章</h3><p style="font-size:2rem;color:#1677ff;">${articles}</p></div>
-        <div class="card"><h3>✅ 已发布</h3><p style="font-size:2rem;color:#52c41a;">${published}</p></div>
-        <div class="card"><h3>💰 广告</h3><p style="font-size:2rem;color:#fa8c16;">${ads}</p></div>
-        <div class="card"><h3>📢 投放中</h3><p style="font-size:2rem;color:#1677ff;">${active}</p></div>
-        <div class="card"><h3>💵 总收益</h3><p style="font-size:1.5rem;color:#ff4d4f;">¥${revenue}</p></div>
+        <div class="card" style="text-align:center;"><h3>📄 文章</h3><p style="font-size:2rem;color:var(--primary);">${articles}</p></div>
+        <div class="card" style="text-align:center;"><h3>✅ 已发布</h3><p style="font-size:2rem;color:#16a34a;">${published}</p></div>
+        <div class="card" style="text-align:center;"><h3>💰 广告</h3><p style="font-size:2rem;color:#d97706;">${ads}</p></div>
+        <div class="card" style="text-align:center;"><h3>📢 投放中</h3><p style="font-size:2rem;color:var(--primary);">${active}</p></div>
+        <div class="card" style="text-align:center;"><h3>💵 总收益</h3><p style="font-size:1.5rem;color:#dc2626;">¥${revenue}</p></div>
       </div>
       <div class="card"><h3>📊 收益趋势</h3><canvas id="trendChart" height="200"></canvas></div>`;
   }
   function initDashboardChart() {
     setTimeout(()=>{
       const ctx = document.getElementById('trendChart');
-      if(ctx) new Chart(ctx, { type:'line', data:{ labels:['1月','2月','3月','4月','5月','6月'], datasets:[{ label:'收益', data:[3200,4500,5800,6200,7800,getDB().ads.reduce((s,a)=>s+a.revenue,0)], borderColor:'#1677ff' }] } });
+      if(ctx) new Chart(ctx, { type:'line', data:{ labels:['1月','2月','3月','4月','5月','6月'], datasets:[{ label:'收益', data:[3200,4500,5800,6200,7800,getDB().ads.reduce((s,a)=>s+a.revenue,0)], borderColor:'#0d9488' }] } });
     },100);
   }
 
-  // 文章管理（其他所有函数保持不变，为节省篇幅此处省略，但实际代码中包含上一版全部功能）
-  // ...（此处插入之前版本中的 renderArticles, openArticleEditor, execCmd, insertAdPlaceholder, renderAds, renderRevenue, renderShares, renderUsers, renderSettings 等完整函数）
-  // 因字符限制，完整代码已在最终回答中提供，请务必复制下面补充的函数。
+  // ==================== 文章管理 ====================
+  function renderArticles() {
+    const db = getDB();
+    const user = db.currentUser;
+    let articles = user.role==='admin' ? db.articles : db.articles.filter(a=>a.author===user.username);
+    let rows = '';
+    articles.forEach(a=>{
+      rows += `<tr>
+        <td>${a.title}</td><td>${a.category}</td>
+        <td><span class="tag ${a.status==='published'?'tag-success':a.status==='draft'?'tag-warning':a.status==='reviewing'?'tag-primary':'tag-danger'}">${a.status==='published'?'已发布':a.status==='draft'?'草稿':a.status==='reviewing'?'审核中':'锁定'}</span></td>
+        <td>${a.platforms?.join(', ')||'-'}</td>
+        <td>${a.views}</td>
+        <td>
+          <button class="btn-sm btn-sm-primary" onclick="editArticle(${a.id})" ${a.locked?'disabled':''}>编辑</button>
+          <button class="btn-sm" onclick="previewArticle(${a.id})">预览</button>
+          <button class="btn-sm btn-sm-danger" onclick="deleteArticle(${a.id})">删除</button>
+          ${a.status==='draft'?`<button class="btn-sm btn-sm-success" onclick="publishArticle(${a.id})">发布</button>`:''}
+          ${a.status==='reviewing'&&user.role==='admin'?`<button class="btn-sm btn-sm-primary" onclick="approveArticle(${a.id})">通过</button>`:''}
+          <button class="btn-sm" onclick="toggleLockArticle(${a.id})">${a.locked?'解锁':'锁定'}</button>
+        </td>
+      </tr>`;
+    });
+    return `<div class="card"><div class="card-header"><h3>文章管理</h3>
+      <div><button class="btn-sm btn-sm-primary" onclick="newArticle()">➕ 新建</button>
+      <button class="btn-sm" onclick="fetchArticle()">🌐 抓取文章</button></div></div>
+      <table><thead><tr><th>标题</th><th>分类</th><th>状态</th><th>平台</th><th>阅读</th><th>操作</th></tr></thead><tbody>${rows||'<tr><td colspan="6">暂无文章</td></tr>'}</tbody></table></div>`;
+  }
 
-  // 事件绑定
+  window.newArticle = function() { openArticleEditor(); };
+  window.editArticle = function(id) { openArticleEditor(id); };
+  window.previewArticle = function(id) {
+    const db = getDB(); const a = db.articles.find(a=>a.id===id);
+    if(a) openModal('预览：'+a.title, `<div style="padding:20px;">${a.content}</div>`, null);
+  };
+  window.deleteArticle = function(id) { if(!confirm('删除？'))return; const db=getDB(); db.articles=db.articles.filter(a=>a.id!==id); saveDB(db); switchPage('articles'); toast('已删除','success'); };
+  window.publishArticle = function(id) {
+    const db = getDB(); const a = db.articles.find(a=>a.id===id);
+    if(!a) return;
+    a.status = 'published'; saveDB(db);
+    addNotification('文章发布', `${a.title} 已发布到悦享网，同步至 ${a.platforms?.join(',')||'无'}`);
+    switchPage('articles'); toast('发布成功','success');
+  };
+  window.approveArticle = function(id) { const db=getDB(); const a=db.articles.find(a=>a.id===id); a.status='published'; saveDB(db); switchPage('articles'); toast('审核通过','success'); };
+  window.toggleLockArticle = function(id) { const db=getDB(); const a=db.articles.find(a=>a.id===id); a.locked=!a.locked; saveDB(db); switchPage('articles'); };
+  window.fetchArticle = function() {
+    openModal('抓取文章', `<input type="text" id="fetchUrl" class="form-input" placeholder="输入文章URL"><div id="fetchResult"></div><button class="btn-sm btn-sm-primary" onclick="doFetch()">抓取</button>`, null);
+  };
+  window.doFetch = async function() {
+    const url = document.getElementById('fetchUrl').value.trim();
+    if(!url) return toast('输入URL','error');
+    try {
+      const res = await fetch(url); const text = await res.text();
+      const doc = new DOMParser().parseFromString(text, 'text/html');
+      const content = doc.querySelector('article')?.innerHTML || doc.body.innerText;
+      document.getElementById('fetchResult').innerHTML = `<textarea style="width:100%;height:200px;">${content}</textarea><button class="btn-sm btn-sm-primary" onclick="useFetched()">使用并编辑</button>`;
+    } catch(e) { toast('抓取失败，可能跨域','error'); }
+  };
+  window.useFetched = function() {
+    const content = document.querySelector('#fetchResult textarea').value;
+    openArticleEditor(null, content);
+  };
+
+  function openArticleEditor(id, preContent) {
+    const db = getDB();
+    const article = id ? db.articles.find(a=>a.id===id) : null;
+    const title = article?.title || '';
+    const content = preContent || article?.content || '';
+    const category = article?.category || '运营';
+    const platforms = article?.platforms || [];
+    const platformOpts = ['微信公众号','头条号','知乎','抖音','快手','小红书','微博','百家号'].map(p=>
+      `<label style="margin-right:12px;display:inline-block;"><input type="checkbox" value="${p}" ${platforms.includes(p)?'checked':''}> ${p}</label>`).join('');
+    const html = `
+      <div class="form-group"><label>标题</label><input type="text" id="artTitle" class="form-input" value="${title}"></div>
+      <div class="form-group"><label>分类</label><select id="artCat" class="form-input"><option>运营</option><option>营销</option><option>科技</option><option>生活</option></select></div>
+      <div class="form-group"><label>发布平台</label><div>${platformOpts}</div></div>
+      <div class="form-group"><label>内容</label>
+        <div class="editor-toolbar">
+          <button onclick="execCmd('bold')"><b>B</b></button>
+          <button onclick="execCmd('italic')"><i>I</i></button>
+          <button onclick="execCmd('underline')"><u>U</u></button>
+          <button onclick="execCmd('strikeThrough')"><s>S</s></button>
+          <select onchange="execCmd('fontSize', this.value)"><option value="1">小</option><option value="3" selected>中</option><option value="5">大</option><option value="7">特大</option></select>
+          <input type="color" onchange="execCmd('foreColor', this.value)" title="字体颜色">
+          <input type="color" onchange="execCmd('hiliteColor', this.value)" title="背景色">
+          <button onclick="insertLink()"><i class="fas fa-link"></i></button>
+          <button onclick="insertImage()"><i class="fas fa-image"></i></button>
+          <button onclick="insertVideo()"><i class="fas fa-video"></i></button>
+          <button onclick="execCmd('insertOrderedList')">1.</button>
+          <button onclick="execCmd('insertUnorderedList')">•</button>
+          <button onclick="execCmd('formatBlock','<pre>')"><i class="fas fa-code"></i></button>
+          <button onclick="execCmd('formatBlock','<blockquote>')">❝</button>
+          <button onclick="execCmd('removeFormat')"><i class="fas fa-remove-format"></i></button>
+          <button onclick="insertAdPlaceholder()">📢 插入广告</button>
+        </div>
+        <div id="articleContent" class="editor-area" contenteditable="true">${content}</div>
+      </div>`;
+    openModal(article?'编辑文章':'新建文章', html, ()=>{
+      const newTitle = document.getElementById('artTitle').value.trim();
+      const newContent = document.getElementById('articleContent').innerHTML;
+      const newCat = document.getElementById('artCat').value;
+      const selectedPlatforms = [...document.querySelectorAll('#modalBody input[type=checkbox]:checked')].map(i=>i.value);
+      if(!newTitle) return toast('标题不能为空','error');
+      if(article) {
+        article.title = newTitle; article.content = newContent; article.category = newCat; article.platforms = selectedPlatforms;
+      } else {
+        db.articles.push({
+          id: db.nextId.article++, title: newTitle, content: newContent, category: newCat,
+          status: 'draft', date: new Date().toISOString().slice(0,10), author: db.currentUser.username,
+          platforms: selectedPlatforms, views:0, ads:0, locked:false
+        });
+      }
+      saveDB(db); switchPage('articles'); toast('保存成功','success');
+    });
+  }
+  window.execCmd = function(cmd, val) { document.execCommand(cmd, false, val); };
+  window.insertLink = function() { const url = prompt('链接URL:'); if(url) execCmd('createLink', url); };
+  window.insertImage = function() { const url = prompt('图片URL:'); if(url) execCmd('insertImage', url); };
+  window.insertVideo = function() { const url = prompt('视频iframe代码或URL:'); if(url) document.execCommand('insertHTML', false, `<iframe width="560" height="315" src="${url}" frameborder="0" allowfullscreen></iframe>`); };
+  window.insertAdPlaceholder = function() {
+    const db = getDB();
+    const ads = db.ads.filter(a=>a.status==='active');
+    if(!ads.length) return toast('无可用广告','error');
+    const opts = ads.map(a=>`<option value="${a.id}">${a.name} (${a.type})</option>`).join('');
+    openModal('插入广告', `<select id="adSelect" class="form-input">${opts}</select>`, ()=>{
+      const adId = document.getElementById('adSelect').value;
+      const ad = db.ads.find(a=>a.id==adId);
+      if(ad) {
+        const editor = document.getElementById('articleContent');
+        const ph = document.createElement('div'); ph.className='ad-placeholder';
+        ph.setAttribute('data-ad-id', ad.id); ph.textContent = `📢 ${ad.name} (${ad.type})`;
+        editor.focus();
+        const sel = window.getSelection();
+        if(sel.rangeCount) { const range=sel.getRangeAt(0); range.insertNode(ph); range.collapse(false); }
+        else editor.appendChild(ph);
+        toast('广告已插入','success');
+      }
+    });
+  };
+
+  // ==================== 广告管理 ====================
+  function renderAds() {
+    const db = getDB();
+    const user = db.currentUser;
+    let ads = user.role==='admin' ? db.ads : db.ads.filter(a=>a.advertiser===user.username);
+    let rows = '';
+    ads.forEach(a=>{
+      rows += `<tr>
+        <td>${a.name}</td><td>${a.type}</td><td>${a.position}</td><td>¥${a.budget}</td>
+        <td>${a.impressions}</td><td>¥${a.revenue}</td>
+        <td><span class="tag ${a.status==='active'?'tag-success':a.status==='pending'?'tag-warning':a.status==='paused'?'tag-danger':''}">${a.status==='active'?'投放中':a.status==='pending'?'待审核':a.status==='paused'?'已暂停':''}</span></td>
+        <td>
+          <button class="btn-sm btn-sm-primary" onclick="editAd(${a.id})">编辑</button>
+          <button class="btn-sm btn-sm-danger" onclick="deleteAd(${a.id})">删除</button>
+          ${a.status==='pending'&&user.role==='admin'?`<button class="btn-sm btn-sm-primary" onclick="approveAd(${a.id})">审核通过</button>`:''}
+          ${a.status==='active'?`<button class="btn-sm" onclick="pauseAd(${a.id})">暂停</button>`:''}
+          ${a.status==='paused'?`<button class="btn-sm" onclick="resumeAd(${a.id})">恢复</button>`:''}
+        </td>
+      </tr>`;
+    });
+    return `<div class="card"><div class="card-header"><h3>广告管理</h3><button class="btn-sm btn-sm-primary" onclick="newAd()">➕ 新建广告</button></div>
+      <table><thead><tr><th>名称</th><th>类型</th><th>位置</th><th>预算</th><th>曝光</th><th>收益</th><th>状态</th><th>操作</th></tr></thead><tbody>${rows||'<tr><td colspan="8">暂无广告</td></tr>'}</tbody></table></div>`;
+  }
+  window.newAd = function() { openAdEditor(); };
+  window.editAd = function(id) { openAdEditor(id); };
+  window.deleteAd = function(id) { if(!confirm('删除？'))return; const db=getDB(); db.ads=db.ads.filter(a=>a.id!==id); saveDB(db); switchPage('ads'); toast('已删除','success'); };
+  window.approveAd = function(id) { const db=getDB(); const a=db.ads.find(a=>a.id===id); a.status='active'; saveDB(db); addNotification('广告审核', `${a.name} 已通过`); switchPage('ads'); toast('审核通过','success'); };
+  window.pauseAd = function(id) { const db=getDB(); const a=db.ads.find(a=>a.id===id); a.status='paused'; saveDB(db); switchPage('ads'); };
+  window.resumeAd = function(id) { const db=getDB(); const a=db.ads.find(a=>a.id===id); a.status='active'; saveDB(db); switchPage('ads'); };
+  function openAdEditor(id) {
+    const db = getDB();
+    const ad = id ? db.ads.find(a=>a.id===id) : null;
+    const html = `
+      <div class="form-group"><label>名称</label><input type="text" id="adName" class="form-input" value="${ad?.name||''}"></div>
+      <div class="form-group"><label>类型</label><select id="adType" class="form-input"><option>横幅广告</option><option>原生广告</option><option>视频广告</option></select></div>
+      <div class="form-group"><label>位置</label><select id="adPos" class="form-input"><option>文章顶部</option><option>文章中部</option><option>文章底部</option></select></div>
+      <div class="form-group"><label>预算(¥)</label><input type="number" id="adBudget" class="form-input" value="${ad?.budget||1000}"></div>
+      <div class="form-group"><label>单价(¥/天)</label><input type="number" id="adPrice" class="form-input" value="${ad?.price||100}"></div>
+      <div class="form-group"><label>时长(天)</label><input type="number" id="adDuration" class="form-input" value="${ad?.duration||7}"></div>
+      <div class="form-group"><label>链接</label><input type="text" id="adLink" class="form-input" value="${ad?.link||''}"></div>`;
+    openModal(ad?'编辑广告':'新建广告', html, ()=>{
+      const name = document.getElementById('adName').value.trim();
+      if(!name) return toast('名称必填','error');
+      const newAd = {
+        name, type: document.getElementById('adType').value,
+        position: document.getElementById('adPos').value,
+        budget: +document.getElementById('adBudget').value,
+        price: +document.getElementById('adPrice').value,
+        duration: +document.getElementById('adDuration').value,
+        link: document.getElementById('adLink').value,
+        advertiser: db.currentUser.username,
+        status: 'pending', impressions:0, clicks:0, revenue:0
+      };
+      if(ad) Object.assign(ad, newAd);
+      else { newAd.id = db.nextId.ad++; db.ads.push(newAd); }
+      saveDB(db); switchPage('ads'); toast('广告已保存','success');
+    });
+  }
+
+  // ==================== 收益中心 ====================
+  function renderRevenue() {
+    const db = getDB();
+    const user = db.currentUser;
+    let totalRevenue = db.ads.filter(a=>a.status==='active').reduce((s,a)=>s+a.revenue,0);
+    let myRevenue = 0;
+    if(user.role==='creator') myRevenue = db.articles.filter(a=>a.author===user.username).reduce((s,a)=>s+(a.ads||0)*100*0.5, 0);
+    else if(user.role==='advertiser') myRevenue = db.ads.filter(a=>a.advertiser===user.username).reduce((s,a)=>s+a.revenue,0);
+    else if(user.role==='sharer') myRevenue = db.shares.filter(s=>s.sharer===user.username).reduce((s,s)=>s+s.earnings,0);
+    else myRevenue = totalRevenue;
+    return `<div class="card"><h3>收益概览</h3><p>平台总收益：<strong>¥${totalRevenue}</strong></p><p>我的收益：<strong style="color:#dc2626;">¥${myRevenue}</strong></p>
+    <p>可提现余额：¥${user.balance}</p><button class="btn-sm btn-sm-primary" onclick="withdraw()">申请提现</button></div>
+    <div class="card"><h3>收益趋势</h3><canvas id="revenueChart" height="200"></canvas></div>`;
+  }
+  window.withdraw = function() {
+    const db = getDB(); const user = db.currentUser;
+    const amount = prompt(`当前余额 ¥${user.balance}，输入提现金额：`);
+    if(amount && +amount<=user.balance && +amount>0) {
+      user.balance -= +amount; saveDB(db);
+      addNotification('提现申请', `提现 ¥${amount} 已提交`); toast('提现申请成功','success');
+      switchPage('revenue');
+    } else toast('金额无效','error');
+  };
+  function initRevenueChart() {
+    setTimeout(()=>{
+      const ctx = document.getElementById('revenueChart');
+      if(ctx) new Chart(ctx, { type:'bar', data:{ labels:['教育','品牌'], datasets:[{ label:'收益', data:[2340, 0] }] } });
+    },100);
+  }
+
+  // ==================== 分享管理 ====================
+  function renderShares() {
+    const db = getDB();
+    let rows = '';
+    db.shares.forEach(s=>{
+      rows += `<tr><td>${s.articleTitle}</td><td>${s.sharer}</td><td>${s.platform}</td><td>${s.clicks}</td><td>¥${s.earnings}</td></tr>`;
+    });
+    return `<div class="card"><h3>分享记录</h3><table><thead><tr><th>文章</th><th>分享者</th><th>平台</th><th>点击</th><th>收益</th></tr></thead><tbody>${rows||'<tr><td colspan="5">暂无分享</td></tr>'}</tbody></table></div>`;
+  }
+
+  // ==================== 用户管理 (仅admin) ====================
+  function renderUsers() {
+    const db = getDB();
+    if(db.currentUser.role!=='admin') return '<div class="card">权限不足</div>';
+    let rows = '';
+    db.users.forEach(u=>{
+      rows += `<tr><td>${u.username}</td><td>${u.role}</td><td>${u.phone}</td><td>¥${u.balance}</td></tr>`;
+    });
+    return `<div class="card"><h3>用户管理</h3><table><thead><tr><th>用户名</th><th>角色</th><th>手机</th><th>余额</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  }
+
+  // ==================== 系统设置 ====================
+  function renderSettings() {
+    const db = getDB();
+    return `<div class="card"><h3>基本设置</h3>
+      <div class="form-group"><label>站点名称</label><input type="text" id="siteName" class="form-input" value="${db.siteName}"></div>
+      <div class="form-group"><label>每篇文章最大广告数</label><input type="number" id="maxAds" class="form-input" value="${db.maxAdsPerArticle}"></div>
+      <button class="btn-sm btn-sm-primary" onclick="saveSettings()">保存</button></div>`;
+  }
+  window.saveSettings = function() {
+    const db = getDB();
+    db.siteName = document.getElementById('siteName').value.trim();
+    db.maxAdsPerArticle = +document.getElementById('maxAds').value;
+    saveDB(db); toast('设置已保存','success');
+  };
+
+  // ==================== 事件绑定 ====================
   document.addEventListener('DOMContentLoaded', ()=>{
     document.getElementById('loginBtn').addEventListener('click', doLogin);
     document.getElementById('registerBtn').addEventListener('click', doRegister);
@@ -371,16 +687,20 @@
       document.getElementById('registerForm').style.display='none';
     });
     document.getElementById('backLoginLink').addEventListener('click', showLoginForm);
+    // 自动登录
     const db = getDB();
     if(db.currentUser) {
       document.getElementById('authPage').style.display='none';
-      document.getElementById('adminPage').style.display='flex';
+      document.getElementById('appContainer').style.display='flex';
       document.getElementById('currentUser').textContent = db.currentUser.username;
       document.getElementById('userRoleBadge').textContent = db.currentUser.role==='admin'?'管理员':db.currentUser.role==='creator'?'创作者':db.currentUser.role==='advertiser'?'广告主':'分享者';
+      document.getElementById('sidebarUserName').textContent = db.currentUser.username;
+      document.getElementById('sidebarAvatar').textContent = db.currentUser.username.charAt(0);
+      document.getElementById('sidebarUserRole').textContent = db.currentUser.role==='admin'?'超级管理员':db.currentUser.role==='creator'?'创作者':db.currentUser.role==='advertiser'?'广告主':'分享者';
       buildSidebar(); updateNotifBadge(); switchPage('dashboard');
     }
   });
 })();
-</script>
+  </script>
 </body>
 </html>
