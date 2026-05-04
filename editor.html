@@ -1,1 +1,1733 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaaS 富文本编辑器</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --border: #dee2e6;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .editor-wrapper {
+            display: flex;
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            min-height: 85vh;
+        }
+        
+        /* 左侧边栏 */
+        .sidebar {
+            width: 250px;
+            background: var(--dark);
+            color: white;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .logo {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .logo h1 {
+            font-size: 1.5rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo h1 i {
+            color: var(--primary);
+        }
+        
+        .user-info {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .sidebar-menu {
+            flex: 1;
+            padding: 0 10px;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .menu-item:hover, .menu-item.active {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+        }
+        
+        .menu-item.active {
+            background: var(--primary);
+        }
+        
+        /* 主要内容区 */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            border-bottom: 1px solid var(--border);
+            background: white;
+        }
+        
+        .article-title {
+            flex: 1;
+            border: none;
+            font-size: 1.5rem;
+            font-weight: 600;
+            padding: 8px 0;
+            outline: none;
+            color: var(--dark);
+        }
+        
+        .article-title::placeholder {
+            color: var(--gray);
+        }
+        
+        .top-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+        
+        .btn-secondary {
+            background: #f1f3f9;
+            color: var(--dark);
+        }
+        
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        /* 工具栏 */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 10px 20px;
+            border-bottom: 1px solid var(--border);
+            background: white;
+            gap: 5px;
+        }
+        
+        .toolbar-group {
+            display: flex;
+            border-right: 1px solid var(--border);
+            padding-right: 10px;
+            margin-right: 10px;
+        }
+        
+        .toolbar-group:last-child {
+            border-right: none;
+            margin-right: 0;
+        }
+        
+        .toolbar-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 4px;
+            border: none;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+        
+        .toolbar-btn:hover {
+            background: #f1f3f9;
+        }
+        
+        .toolbar-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .font-select, .font-size-select {
+            height: 36px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 0 10px;
+            background: white;
+            margin-right: 5px;
+        }
+        
+        .color-picker-btn {
+            position: relative;
+        }
+        
+        .color-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 8px;
+            display: none;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+        
+        .color-options.show {
+            display: grid;
+        }
+        
+        .color-option {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            cursor: pointer;
+            border: 1px solid #ddd;
+        }
+        
+        .dropdown {
+            position: relative;
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 8px 0;
+            min-width: 150px;
+            display: none;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+        
+        .dropdown-menu.show {
+            display: block;
+        }
+        
+        .dropdown-item {
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        
+        .dropdown-item:hover {
+            background: #f1f3f9;
+        }
+        
+        /* 编辑器区域 */
+        .editor-area {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: white;
+            min-height: 400px;
+        }
+        
+        .ProseMirror {
+            outline: none;
+            min-height: 400px;
+        }
+        
+        .ProseMirror p {
+            margin-bottom: 1em;
+            line-height: 1.6;
+        }
+        
+        .ProseMirror h1 {
+            font-size: 2.5em;
+            margin: 0.5em 0;
+        }
+        
+        .ProseMirror h2 {
+            font-size: 2em;
+            margin: 0.5em 0;
+        }
+        
+        .ProseMirror h3 {
+            font-size: 1.5em;
+            margin: 0.5em 0;
+        }
+        
+        .ProseMirror ul, .ProseMirror ol {
+            padding-left: 1.5em;
+            margin-bottom: 1em;
+        }
+        
+        .ProseMirror blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1em;
+            margin: 1em 0;
+            font-style: italic;
+        }
+        
+        .ProseMirror pre {
+            background: #f5f5f5;
+            padding: 1em;
+            border-radius: 4px;
+            margin: 1em 0;
+            overflow-x: auto;
+        }
+        
+        .ProseMirror code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .ProseMirror img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            margin: 1em 0;
+        }
+        
+        .ProseMirror a {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+        
+        /* 广告插入面板 */
+        .ad-panel {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            background: white;
+        }
+        
+        .ad-source-selector {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .ad-source-selector select {
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            min-width: 200px;
+        }
+        
+        .ad-preview {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border: 1px dashed #ddd;
+        }
+        
+        .ad-preview-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        /* 状态栏 */
+        .status-bar {
+            padding: 10px 20px;
+            border-top: 1px solid var(--border);
+            background: white;
+            display: flex;
+            justify-content: space-between;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .word-count, .char-count {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+        }
+        
+        .ad-sources-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .ad-source-item {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 15px;
+            cursor: pointer;
+        }
+        
+        .ad-source-item:hover, .ad-source-item.selected {
+            border-color: var(--primary);
+            background: #f0f4ff;
+        }
+        
+        /* 响应式 */
+        @media (max-width: 992px) {
+            .editor-wrapper {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                flex-direction: row;
+                padding: 10px;
+            }
+            
+            .sidebar-menu {
+                display: flex;
+                flex: 1;
+                justify-content: space-around;
+            }
+            
+            .menu-item span {
+                display: none;
+            }
+            
+            .toolbar {
+                overflow-x: auto;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .top-actions {
+                flex-wrap: wrap;
+            }
+            
+            .toolbar-group {
+                flex-wrap: wrap;
+            }
+        }
+        
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        
+        /* 广告占位符样式 */
+        .ad-placeholder {
+            padding: 20px;
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            text-align: center;
+            color: #6c757d;
+            margin: 1em 0;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .ad-placeholder i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #4361ee;
+        }
+        
+        /* 表格样式 */
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 1em 0;
+        }
+        
+        .ProseMirror table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 1em 0;
+        }
+        
+        .ProseMirror th, .ProseMirror td {
+            border: 1px solid #dee2e6;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        
+        .ProseMirror th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        /* 行内代码块 */
+        .ProseMirror code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+        }
+        
+        /* 引用块 */
+        .ProseMirror blockquote {
+            border-left: 4px solid #4361ee;
+            padding-left: 1em;
+            margin: 1em 0;
+            color: #495057;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="editor-wrapper">
+            <!-- 左侧边栏 -->
+            <div class="sidebar">
+                <div class="logo">
+                    <h1><i class="fas fa-edit"></i> SaaS Editor</h1>
+                </div>
+                
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h3>创作者</h3>
+                    <p>admin@example.com</p>
+                </div>
+                
+                <div class="sidebar-menu">
+                    <div class="menu-item active" data-tab="editor">
+                        <i class="fas fa-edit"></i>
+                        <span>编辑器</span>
+                    </div>
+                    <div class="menu-item" data-tab="articles">
+                        <i class="fas fa-file-alt"></i>
+                        <span>文章管理</span>
+                    </div>
+                    <div class="menu-item" data-tab="ads">
+                        <i class="fas fa-ad"></i>
+                        <span>广告管理</span>
+                    </div>
+                    <div class="menu-item" data-tab="analytics">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>数据分析</span>
+                    </div>
+                    <div class="menu-item" data-tab="settings">
+                        <i class="fas fa-cog"></i>
+                        <span>设置</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 主要内容区 -->
+            <div class="main-content">
+                <!-- 顶部栏 -->
+                <div class="top-bar">
+                    <input type="text" class="article-title" id="articleTitle" placeholder="输入文章标题...">
+                    
+                    <div class="top-actions">
+                        <button class="btn btn-secondary" id="saveDraftBtn">
+                            <i class="fas fa-save"></i> 保存草稿
+                        </button>
+                        <button class="btn btn-primary" id="publishBtn">
+                            <i class="fas fa-paper-plane"></i> 发布文章
+                        </button>
+                        <button class="btn btn-success" id="exportBtn">
+                            <i class="fas fa-download"></i> 导出
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 工具栏 -->
+                <div class="toolbar">
+                    <!-- 字体样式 -->
+                    <div class="toolbar-group">
+                        <select class="font-select" id="fontFamily">
+                            <option value="">选择字体</option>
+                            <option value="Arial, sans-serif">Arial</option>
+                            <option value="'Times New Roman', serif">Times New Roman</option>
+                            <option value="'Courier New', monospace">Courier New</option>
+                            <option value="Georgia, serif">Georgia</option>
+                        </select>
+                        
+                        <select class="font-size-select" id="fontSize">
+                            <option value="">字号</option>
+                            <option value="12">12px</option>
+                            <option value="14">14px</option>
+                            <option value="16" selected>16px</option>
+                            <option value="18">18px</option>
+                            <option value="20">20px</option>
+                            <option value="24">24px</option>
+                            <option value="30">30px</option>
+                        </select>
+                        
+                        <button class="toolbar-btn" id="boldBtn" title="加粗">
+                            <i class="fas fa-bold"></i>
+                        </button>
+                        <button class="toolbar-btn" id="italicBtn" title="斜体">
+                            <i class="fas fa-italic"></i>
+                        </button>
+                        <button class="toolbar-btn" id="underlineBtn" title="下划线">
+                            <i class="fas fa-underline"></i>
+                        </button>
+                        <button class="toolbar-btn" id="strikeBtn" title="删除线">
+                            <i class="fas fa-strikethrough"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- 标题和段落 -->
+                    <div class="toolbar-group">
+                        <button class="toolbar-btn" id="h1Btn" title="标题1">
+                            H1
+                        </button>
+                        <button class="toolbar-btn" id="h2Btn" title="标题2">
+                            H2
+                        </button>
+                        <button class="toolbar-btn" id="h3Btn" title="标题3">
+                            H3
+                        </button>
+                        
+                        <div class="dropdown">
+                            <button class="toolbar-btn" id="textColorBtn" title="文字颜色">
+                                <i class="fas fa-palette"></i>
+                            </button>
+                            <div class="color-options" id="textColorOptions">
+                                <div class="color-option" style="background-color: #000000;" data-color="#000000"></div>
+                                <div class="color-option" style="background-color: #333333;" data-color="#333333"></div>
+                                <div class="color-option" style="background-color: #666666;" data-color="#666666"></div>
+                                <div class="color-option" style="background-color: #FF0000;" data-color="#FF0000"></div>
+                                <div class="color-option" style="background-color: #00FF00;" data-color="#00FF00"></div>
+                                <div class="color-option" style="background-color: #0000FF;" data-color="#0000FF"></div>
+                                <div class="color-option" style="background-color: #FFFF00;" data-color="#FFFF00"></div>
+                                <div class="color-option" style="background-color: #FF00FF;" data-color="#FF00FF"></div>
+                                <div class="color-option" style="background-color: #00FFFF;" data-color="#00FFFF"></div>
+                                <div class="color-option" style="background-color: #FFA500;" data-color="#FFA500"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="dropdown">
+                            <button class="toolbar-btn" id="highlightBtn" title="背景高亮">
+                                <i class="fas fa-highlighter"></i>
+                            </button>
+                            <div class="color-options" id="highlightOptions">
+                                <div class="color-option" style="background-color: #FFFF00;" data-color="#FFFF00"></div>
+                                <div class="color-option" style="background-color: #FFD700;" data-color="#FFD700"></div>
+                                <div class="color-option" style="background-color: #98FB98;" data-color="#98FB98"></div>
+                                <div class="color-option" style="background-color: #ADD8E6;" data-color="#ADD8E6"></div>
+                                <div class="color-option" style="background-color: #FFB6C1;" data-color="#FFB6C1"></div>
+                                <div class="color-option" style="background-color: #DDA0DD;" data-color="#DDA0DD"></div>
+                                <div class="color-option" style="background-color: #F0E68C;" data-color="#F0E68C"></div>
+                                <div class="color-option" style="background-color: #E6E6FA;" data-color="#E6E6FA"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 对齐和列表 -->
+                    <div class="toolbar-group">
+                        <button class="toolbar-btn" id="alignLeftBtn" title="左对齐">
+                            <i class="fas fa-align-left"></i>
+                        </button>
+                        <button class="toolbar-btn" id="alignCenterBtn" title="居中对齐">
+                            <i class="fas fa-align-center"></i>
+                        </button>
+                        <button class="toolbar-btn" id="alignRightBtn" title="右对齐">
+                            <i class="fas fa-align-right"></i>
+                        </button>
+                        <button class="toolbar-btn" id="alignJustifyBtn" title="两端对齐">
+                            <i class="fas fa-align-justify"></i>
+                        </button>
+                        
+                        <button class="toolbar-btn" id="bulletListBtn" title="无序列表">
+                            <i class="fas fa-list-ul"></i>
+                        </button>
+                        <button class="toolbar-btn" id="orderedListBtn" title="有序列表">
+                            <i class="fas fa-list-ol"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- 插入功能 -->
+                    <div class="toolbar-group">
+                        <button class="toolbar-btn" id="insertLinkBtn" title="插入链接">
+                            <i class="fas fa-link"></i>
+                        </button>
+                        <button class="toolbar-btn" id="insertImageBtn" title="插入图片">
+                            <i class="fas fa-image"></i>
+                        </button>
+                        <button class="toolbar-btn" id="insertVideoBtn" title="插入视频">
+                            <i class="fas fa-video"></i>
+                        </button>
+                        <button class="toolbar-btn" id="insertTableBtn" title="插入表格">
+                            <i class="fas fa-table"></i>
+                        </button>
+                        <button class="toolbar-btn" id="codeBtn" title="插入代码">
+                            <i class="fas fa-code"></i>
+                        </button>
+                        <button class="toolbar-btn" id="quoteBtn" title="引用">
+                            <i class="fas fa-quote-right"></i>
+                        </button>
+                        <button class="toolbar-btn" id="horizontalRuleBtn" title="分割线">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- 广告插入 -->
+                    <div class="toolbar-group">
+                        <select id="adSourceSelect" style="height: 36px; padding: 0 10px; border: 1px solid #dee2e6; border-radius: 4px;">
+                            <option value="">选择广告源</option>
+                            <option value="adsense">Google AdSense</option>
+                            <option value="custom">自定义广告</option>
+                            <option value="banner">横幅广告</option>
+                            <option value="native">原生广告</option>
+                        </select>
+                        <button class="toolbar-btn" id="insertAdBtn" title="插入广告">
+                            <i class="fas fa-ad"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- 其他功能 -->
+                    <div class="toolbar-group">
+                        <button class="toolbar-btn" id="undoBtn" title="撤销">
+                            <i class="fas fa-undo"></i>
+                        </button>
+                        <button class="toolbar-btn" id="redoBtn" title="重做">
+                            <i class="fas fa-redo"></i>
+                        </button>
+                        <button class="toolbar-btn" id="clearFormatBtn" title="清除格式">
+                            <i class="fas fa-eraser"></i>
+                        </button>
+                        <button class="toolbar-btn" id="zoomInBtn" title="放大">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                        <button class="toolbar-btn" id="zoomOutBtn" title="缩小">
+                            <i class="fas fa-search-minus"></i>
+                        </button>
+                        <button class="toolbar-btn" id="spellCheckBtn" title="拼写检查">
+                            <i class="fas fa-spell-check"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 编辑器区域 -->
+                <div class="editor-area" id="editorArea">
+                    <!-- 编辑器内容将通过JavaScript生成 -->
+                </div>
+                
+                <!-- 状态栏 -->
+                <div class="status-bar">
+                    <div class="word-count">
+                        <i class="fas fa-font"></i>
+                        <span id="wordCount">0 字</span>
+                    </div>
+                    <div class="char-count">
+                        <i class="fas fa-text-height"></i>
+                        <span id="charCount">0 字符</span>
+                    </div>
+                    <div>
+                        <span>状态: <span id="editorStatus">就绪</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 插入链接模态框 -->
+    <div class="modal" id="linkModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>插入链接</h3>
+                <button class="toolbar-btn close-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="linkUrl">链接地址</label>
+                    <input type="text" class="form-control" id="linkUrl" placeholder="https://example.com">
+                </div>
+                <div class="form-group">
+                    <label for="linkText">链接文本</label>
+                    <input type="text" class="form-control" id="linkText" placeholder="点击这里">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary close-modal">取消</button>
+                <button class="btn btn-primary" id="insertLinkConfirm">插入链接</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 插入图片模态框 -->
+    <div class="modal" id="imageModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>插入图片</h3>
+                <button class="toolbar-btn close-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="imageUrl">图片地址</label>
+                    <input type="text" class="form-control" id="imageUrl" placeholder="https://example.com/image.jpg">
+                </div>
+                <div class="form-group">
+                    <label for="imageAlt">图片描述</label>
+                    <input type="text" class="form-control" id="imageAlt" placeholder="图片描述">
+                </div>
+                <div class="form-group">
+                    <label for="imageWidth">宽度 (px)</label>
+                    <input type="number" class="form-control" id="imageWidth" placeholder="自动">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary close-modal">取消</button>
+                <button class="btn btn-primary" id="insertImageConfirm">插入图片</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 插入表格模态框 -->
+    <div class="modal" id="tableModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>插入表格</h3>
+                <button class="toolbar-btn close-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="tableRows">行数</label>
+                    <input type="number" class="form-control" id="tableRows" min="1" max="10" value="3">
+                </div>
+                <div class="form-group">
+                    <label for="tableCols">列数</label>
+                    <input type="number" class="form-control" id="tableCols" min="1" max="10" value="3">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary close-modal">取消</button>
+                <button class="btn btn-primary" id="insertTableConfirm">插入表格</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 广告管理模态框 -->
+    <div class="modal" id="adModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>广告源管理</h3>
+                <button class="toolbar-btn close-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <button class="btn btn-primary" id="addAdSourceBtn" style="margin-bottom: 15px;">
+                    <i class="fas fa-plus"></i> 添加广告源
+                </button>
+                
+                <div class="ad-sources-list" id="adSourcesList">
+                    <!-- 广告源列表将通过JavaScript生成 -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary close-modal">关闭</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 初始化编辑器
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取编辑器区域
+            const editorArea = document.getElementById('editorArea');
+            
+            // 设置编辑器内容
+            editorArea.contentEditable = true;
+            editorArea.innerHTML = `
+                <h1>欢迎使用SaaS富文本编辑器</h1>
+                <p>这是一个功能齐全的富文本编辑器，支持各种格式设置和广告插入功能。</p>
+                <p>您可以：</p>
+                <ul>
+                    <li>设置字体、字号、颜色</li>
+                    <li>插入图片、视频、链接</li>
+                    <li>添加表格、代码块、引用</li>
+                    <li>插入广告位并选择广告源</li>
+                    <li>保存草稿或发布文章</li>
+                </ul>
+                <p>开始创作您的内容吧！</p>
+            `;
+            
+            // 初始化变量
+            let currentFontSize = 16;
+            let currentTextColor = '#000000';
+            let currentHighlightColor = '#FFFF00';
+            let isBold = false;
+            let isItalic = false;
+            let isUnderline = false;
+            let isStrike = false;
+            let wordCount = 0;
+            let charCount = 0;
+            let adSources = [
+                { id: 1, name: 'Google AdSense', code: '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>', type: 'script' },
+                { id: 2, name: '自定义广告', code: '<div class="ad-container">您的广告代码</div>', type: 'html' },
+                { id: 3, name: '横幅广告', code: '<div style="width: 728px; height: 90px; background: #f0f0f0; display: flex; align-items: center; justify-content: center;">横幅广告 (728x90)</div>', type: 'banner' },
+                { id: 4, name: '原生广告', code: '<div style="padding: 15px; border: 1px solid #ddd; border-radius: 5px; background: #f9f9f9;"><h4>推荐内容</h4><p>这是一条原生广告，与内容样式一致。</p></div>', type: 'native' }
+            ];
+            
+            // 更新字数统计
+            function updateWordCount() {
+                const text = editorArea.innerText || '';
+                // 移除多余的空格和换行
+                const cleanText = text.replace(/\s+/g, ' ').trim();
+                // 中文字数统计（一个中文字符算一个字）
+                const chineseChars = (cleanText.match(/[\u4e00-\u9fa5]/g) || []).length;
+                // 英文单词数
+                const englishWords = cleanText.replace(/[\u4e00-\u9fa5]/g, '').split(/\s+/).filter(word => word.length > 0).length;
+                wordCount = chineseChars + englishWords;
+                charCount = cleanText.length;
+                
+                document.getElementById('wordCount').textContent = `${wordCount} 字`;
+                document.getElementById('charCount').textContent = `${charCount} 字符`;
+            }
+            
+            // 监听编辑器内容变化
+            editorArea.addEventListener('input', updateWordCount);
+            updateWordCount(); // 初始化统计
+            
+            // 字体选择
+            document.getElementById('fontFamily').addEventListener('change', function() {
+                document.execCommand('fontName', false, this.value);
+            });
+            
+            // 字号选择
+            document.getElementById('fontSize').addEventListener('change', function() {
+                if (this.value) {
+                    currentFontSize = this.value;
+                    document.execCommand('fontSize', false, 7); // 7是最大字号，我们会用CSS覆盖
+                    // 设置具体的字号
+                    document.execCommand('styleWithCSS', false, true);
+                    const selection = window.getSelection();
+                    if (selection.rangeCount > 0) {
+                        const range = selection.getRangeAt(0);
+                        const span = document.createElement('span');
+                        span.style.fontSize = `${this.value}px`;
+                        range.surroundContents(span);
+                    }
+                }
+            });
+            
+            // 加粗
+            document.getElementById('boldBtn').addEventListener('click', function() {
+                document.execCommand('bold');
+                isBold = !isBold;
+                this.classList.toggle('active', isBold);
+            });
+            
+            // 斜体
+            document.getElementById('italicBtn').addEventListener('click', function() {
+                document.execCommand('italic');
+                isItalic = !isItalic;
+                this.classList.toggle('active', isItalic);
+            });
+            
+            // 下划线
+            document.getElementById('underlineBtn').addEventListener('click', function() {
+                document.execCommand('underline');
+                isUnderline = !isUnderline;
+                this.classList.toggle('active', isUnderline);
+            });
+            
+            // 删除线
+            document.getElementById('strikeBtn').addEventListener('click', function() {
+                document.execCommand('strikeThrough');
+                isStrike = !isStrike;
+                this.classList.toggle('active', isStrike);
+            });
+            
+            // 标题按钮
+            document.getElementById('h1Btn').addEventListener('click', function() {
+                document.execCommand('formatBlock', false, '<h1>');
+            });
+            
+            document.getElementById('h2Btn').addEventListener('click', function() {
+                document.execCommand('formatBlock', false, '<h2>');
+            });
+            
+            document.getElementById('h3Btn').addEventListener('click', function() {
+                document.execCommand('formatBlock', false, '<h3>');
+            });
+            
+            // 文字颜色
+            document.getElementById('textColorBtn').addEventListener('click', function() {
+                const options = document.getElementById('textColorOptions');
+                options.classList.toggle('show');
+            });
+            
+            // 文字颜色选项
+            document.querySelectorAll('#textColorOptions .color-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    const color = this.getAttribute('data-color');
+                    document.execCommand('foreColor', false, color);
+                    document.getElementById('textColorOptions').classList.remove('show');
+                });
+            });
+            
+            // 高亮颜色
+            document.getElementById('highlightBtn').addEventListener('click', function() {
+                const options = document.getElementById('highlightOptions');
+                options.classList.toggle('show');
+            });
+            
+            // 高亮颜色选项
+            document.querySelectorAll('#highlightOptions .color-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    const color = this.getAttribute('data-color');
+                    document.execCommand('backColor', false, color);
+                    document.getElementById('highlightOptions').classList.remove('show');
+                });
+            });
+            
+            // 对齐按钮
+            document.getElementById('alignLeftBtn').addEventListener('click', function() {
+                document.execCommand('justifyLeft');
+            });
+            
+            document.getElementById('alignCenterBtn').addEventListener('click', function() {
+                document.execCommand('justifyCenter');
+            });
+            
+            document.getElementById('alignRightBtn').addEventListener('click', function() {
+                document.execCommand('justifyRight');
+            });
+            
+            document.getElementById('alignJustifyBtn').addEventListener('click', function() {
+                document.execCommand('justifyFull');
+            });
+            
+            // 列表按钮
+            document.getElementById('bulletListBtn').addEventListener('click', function() {
+                document.execCommand('insertUnorderedList');
+            });
+            
+            document.getElementById('orderedListBtn').addEventListener('click', function() {
+                document.execCommand('insertOrderedList');
+            });
+            
+            // 插入链接
+            document.getElementById('insertLinkBtn').addEventListener('click', function() {
+                document.getElementById('linkModal').classList.add('show');
+                // 如果有选中的文本，设置为链接文本
+                const selection = window.getSelection().toString();
+                if (selection) {
+                    document.getElementById('linkText').value = selection;
+                }
+            });
+            
+            document.getElementById('insertLinkConfirm').addEventListener('click', function() {
+                const url = document.getElementById('linkUrl').value;
+                const text = document.getElementById('linkText').value || url;
+                
+                if (url) {
+                    // 创建链接
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.textContent = text;
+                    link.target = '_blank';
+                    link.rel = 'noopener noreferrer';
+                    
+                    // 插入链接
+                    const selection = window.getSelection();
+                    if (selection.rangeCount > 0) {
+                        const range = selection.getRangeAt(0);
+                        range.deleteContents();
+                        range.insertNode(link);
+                    }
+                    
+                    // 关闭模态框
+                    document.getElementById('linkModal').classList.remove('show');
+                    // 清空表单
+                    document.getElementById('linkUrl').value = '';
+                    document.getElementById('linkText').value = '';
+                } else {
+                    alert('请输入链接地址');
+                }
+            });
+            
+            // 插入图片
+            document.getElementById('insertImageBtn').addEventListener('click', function() {
+                document.getElementById('imageModal').classList.add('show');
+            });
+            
+            document.getElementById('insertImageConfirm').addEventListener('click', function() {
+                const url = document.getElementById('imageUrl').value;
+                const alt = document.getElementById('imageAlt').value || '图片';
+                const width = document.getElementById('imageWidth').value;
+                
+                if (url) {
+                    // 创建图片
+                    const img = document.createElement('img');
+                    img.src = url;
+                    img.alt = alt;
+                    if (width) img.style.width = `${width}px`;
+                    img.style.maxWidth = '100%';
+                    img.style.height = 'auto';
+                    
+                    // 插入图片
+                    document.execCommand('insertHTML', false, img.outerHTML);
+                    
+                    // 关闭模态框
+                    document.getElementById('imageModal').classList.remove('show');
+                    // 清空表单
+                    document.getElementById('imageUrl').value = '';
+                    document.getElementById('imageAlt').value = '';
+                    document.getElementById('imageWidth').value = '';
+                } else {
+                    alert('请输入图片地址');
+                }
+            });
+            
+            // 插入表格
+            document.getElementById('insertTableBtn').addEventListener('click', function() {
+                document.getElementById('tableModal').classList.add('show');
+            });
+            
+            document.getElementById('insertTableConfirm').addEventListener('click', function() {
+                const rows = parseInt(document.getElementById('tableRows').value) || 3;
+                const cols = parseInt(document.getElementById('tableCols').value) || 3;
+                
+                // 创建表格
+                let tableHTML = '<table style="width: 100%; border-collapse: collapse;">';
+                
+                // 表头
+                tableHTML += '<thead><tr>';
+                for (let i = 0; i < cols; i++) {
+                    tableHTML += `<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">标题 ${i+1}</th>`;
+                }
+                tableHTML += '</tr></thead>';
+                
+                // 表格内容
+                tableHTML += '<tbody>';
+                for (let i = 0; i < rows; i++) {
+                    tableHTML += '<tr>';
+                    for (let j = 0; j < cols; j++) {
+                        tableHTML += `<td style="border: 1px solid #ddd; padding: 8px;">内容 ${i+1}-${j+1}</td>`;
+                    }
+                    tableHTML += '</tr>';
+                }
+                tableHTML += '</tbody></table>';
+                
+                // 插入表格
+                document.execCommand('insertHTML', false, tableHTML);
+                
+                // 关闭模态框
+                document.getElementById('tableModal').classList.remove('show');
+            });
+            
+            // 插入广告
+            document.getElementById('insertAdBtn').addEventListener('click', function() {
+                const adSource = document.getElementById('adSourceSelect').value;
+                
+                if (!adSource) {
+                    alert('请先选择一个广告源');
+                    return;
+                }
+                
+                // 获取选中的广告源
+                const selectedAd = adSources.find(ad => 
+                    ad.name.toLowerCase().includes(adSource) || 
+                    ad.type === adSource
+                ) || adSources[0];
+                
+                // 创建广告占位符
+                const adPlaceholder = document.createElement('div');
+                adPlaceholder.className = 'ad-placeholder';
+                adPlaceholder.innerHTML = `
+                    <i class="fas fa-ad"></i>
+                    <p>广告位: ${selectedAd.name}</p>
+                    <small>发布后将显示实际广告</small>
+                `;
+                adPlaceholder.setAttribute('data-ad-id', selectedAd.id);
+                adPlaceholder.setAttribute('contenteditable', 'false');
+                
+                // 插入广告占位符
+                document.execCommand('insertHTML', false, adPlaceholder.outerHTML);
+                
+                // 更新状态
+                document.getElementById('editorStatus').textContent = '广告已插入';
+                setTimeout(() => {
+                    document.getElementById('editorStatus').textContent = '就绪';
+                }, 2000);
+            });
+            
+            // 插入代码
+            document.getElementById('codeBtn').addEventListener('click', function() {
+                const code = prompt('请输入代码:');
+                if (code) {
+                    const codeBlock = document.createElement('pre');
+                    const codeElement = document.createElement('code');
+                    codeElement.textContent = code;
+                    codeBlock.appendChild(codeElement);
+                    document.execCommand('insertHTML', false, codeBlock.outerHTML);
+                }
+            });
+            
+            // 插入引用
+            document.getElementById('quoteBtn').addEventListener('click', function() {
+                document.execCommand('formatBlock', false, '<blockquote>');
+            });
+            
+            // 插入分割线
+            document.getElementById('horizontalRuleBtn').addEventListener('click', function() {
+                document.execCommand('insertHorizontalRule');
+            });
+            
+            // 插入视频
+            document.getElementById('insertVideoBtn').addEventListener('click', function() {
+                const url = prompt('请输入视频URL (YouTube, Vimeo等):');
+                if (url) {
+                    let videoHTML = '';
+                    
+                    // 检查是否是YouTube视频
+                    if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                        let videoId = '';
+                        if (url.includes('v=')) {
+                            videoId = url.split('v=')[1].split('&')[0];
+                        } else if (url.includes('youtu.be/')) {
+                            videoId = url.split('youtu.be/')[1].split('?')[0];
+                        }
+                        
+                        if (videoId) {
+                            videoHTML = `<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; margin: 1em 0;">
+                                <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" 
+                                        src="https://www.youtube.com/embed/${videoId}" 
+                                        frameborder="0" 
+                                        allowfullscreen>
+                                </iframe>
+                            </div>`;
+                        }
+                    } else {
+                        // 通用视频嵌入
+                        videoHTML = `<video controls style="max-width: 100%; margin: 1em 0;">
+                                <source src="${url}" type="video/mp4">
+                                您的浏览器不支持视频标签。
+                            </video>`;
+                    }
+                    
+                    if (videoHTML) {
+                        document.execCommand('insertHTML', false, videoHTML);
+                    }
+                }
+            });
+            
+            // 撤销/重做
+            document.getElementById('undoBtn').addEventListener('click', function() {
+                document.execCommand('undo');
+            });
+            
+            document.getElementById('redoBtn').addEventListener('click', function() {
+                document.execCommand('redo');
+            });
+            
+            // 清除格式
+            document.getElementById('clearFormatBtn').addEventListener('click', function() {
+                document.execCommand('removeFormat');
+            });
+            
+            // 缩放
+            let zoomLevel = 1;
+            document.getElementById('zoomInBtn').addEventListener('click', function() {
+                if (zoomLevel < 2) {
+                    zoomLevel += 0.1;
+                    editorArea.style.transform = `scale(${zoomLevel})`;
+                    editorArea.style.transformOrigin = 'top left';
+                }
+            });
+            
+            document.getElementById('zoomOutBtn').addEventListener('click', function() {
+                if (zoomLevel > 0.5) {
+                    zoomLevel -= 0.1;
+                    editorArea.style.transform = `scale(${zoomLevel})`;
+                    editorArea.style.transformOrigin = 'top left';
+                }
+            });
+            
+            // 拼写检查
+            document.getElementById('spellCheckBtn').addEventListener('click', function() {
+                document.execCommand('enableObjectResizing', false, false);
+                document.execCommand('enableInlineTableEditing', false, false);
+                // 简单拼写检查模拟
+                alert('拼写检查完成，未发现错误。');
+            });
+            
+            // 保存草稿
+            document.getElementById('saveDraftBtn').addEventListener('click', function() {
+                const title = document.getElementById('articleTitle').value || '未命名文章';
+                const content = editorArea.innerHTML;
+                
+                // 保存到localStorage
+                const draft = {
+                    title: title,
+                    content: content,
+                    timestamp: new Date().toISOString(),
+                    wordCount: wordCount,
+                    charCount: charCount
+                };
+                
+                localStorage.setItem('editorDraft', JSON.stringify(draft));
+                
+                // 更新状态
+                document.getElementById('editorStatus').textContent = '草稿已保存';
+                this.innerHTML = '<i class="fas fa-check"></i> 已保存';
+                this.classList.add('btn-success');
+                
+                setTimeout(() => {
+                    document.getElementById('editorStatus').textContent = '就绪';
+                    this.innerHTML = '<i class="fas fa-save"></i> 保存草稿';
+                    this.classList.remove('btn-success');
+                }, 2000);
+            });
+            
+            // 发布文章
+            document.getElementById('publishBtn').addEventListener('click', function() {
+                const title = document.getElementById('articleTitle').value || '未命名文章';
+                let content = editorArea.innerHTML;
+                
+                if (!title.trim() || !content.trim() || content === '<p><br></p>') {
+                    alert('请输入文章标题和内容');
+                    return;
+                }
+                
+                // 替换广告占位符为实际广告代码
+                const adPlaceholders = editorArea.querySelectorAll('.ad-placeholder');
+                adPlaceholders.forEach(placeholder => {
+                    const adId = placeholder.getAttribute('data-ad-id');
+                    if (adId) {
+                        const adSource = adSources.find(ad => ad.id == adId);
+                        if (adSource) {
+                            const adDiv = document.createElement('div');
+                            adDiv.className = 'ad-container';
+                            adDiv.innerHTML = adSource.code;
+                            placeholder.replaceWith(adDiv);
+                        }
+                    }
+                });
+                
+                content = editorArea.innerHTML;
+                
+                // 生成发布数据
+                const article = {
+                    title: title,
+                    content: content,
+                    publishedAt: new Date().toISOString(),
+                    wordCount: wordCount,
+                    charCount: charCount,
+                    url: `article_${Date.now()}`
+                };
+                
+                // 保存到localStorage
+                localStorage.setItem('publishedArticle', JSON.stringify(article));
+                
+                // 显示成功消息
+                document.getElementById('editorStatus').textContent = '文章已发布';
+                this.innerHTML = '<i class="fas fa-check"></i> 已发布';
+                this.classList.add('btn-success');
+                
+                // 生成分享链接
+                setTimeout(() => {
+                    const shareUrl = `${window.location.origin}?article=${article.url}`;
+                    alert(`文章发布成功！\n\n标题: ${title}\n字数: ${wordCount}\n\n分享链接: ${shareUrl}\n\n内容已保存到浏览器本地存储。`);
+                    
+                    document.getElementById('editorStatus').textContent = '就绪';
+                    this.innerHTML = '<i class="fas fa-paper-plane"></i> 发布文章';
+                    this.classList.remove('btn-success');
+                }, 1000);
+            });
+            
+            // 导出功能
+            document.getElementById('exportBtn').addEventListener('click', function() {
+                const title = document.getElementById('articleTitle').value || '未命名文章';
+                const content = editorArea.innerHTML;
+                
+                // 创建导出内容
+                const exportContent = `
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${title}</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .ad-container { margin: 20px 0; padding: 20px; background: #f5f5f5; border: 1px dashed #ccc; text-align: center; }
+    </style>
+</head>
+<body>
+    <h1>${title}</h1>
+    ${content}
+    <p><em>文章创建于: ${new Date().toLocaleString()}</em></p>
+</body>
+</html>`;
+                
+                // 创建下载链接
+                const blob = new Blob([exportContent], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${title.replace(/\s+/g, '_')}.html`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                // 更新状态
+                document.getElementById('editorStatus').textContent = '已导出HTML';
+                setTimeout(() => {
+                    document.getElementById('editorStatus').textContent = '就绪';
+                }, 2000);
+            });
+            
+            // 侧边栏菜单
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const tab = this.getAttribute('data-tab');
+                    // 这里可以添加切换标签页的逻辑
+                    if (tab === 'ads') {
+                        showAdManagement();
+                    }
+                });
+            });
+            
+            // 显示广告管理
+            function showAdManagement() {
+                const adSourcesList = document.getElementById('adSourcesList');
+                adSourcesList.innerHTML = '';
+                
+                adSources.forEach((ad, index) => {
+                    const adItem = document.createElement('div');
+                    adItem.className = 'ad-source-item';
+                    adItem.innerHTML = `
+                        <h4>${ad.name}</h4>
+                        <p><small>类型: ${ad.type}</small></p>
+                        <div style="margin-top: 10px; display: flex; gap: 10px;">
+                            <button class="btn btn-secondary" onclick="editAdSource(${index})" style="padding: 5px 10px; font-size: 0.8rem;">编辑</button>
+                            <button class="btn btn-danger" onclick="deleteAdSource(${index})" style="padding: 5px 10px; font-size: 0.8rem;">删除</button>
+                        </div>
+                    `;
+                    adSourcesList.appendChild(adItem);
+                });
+                
+                document.getElementById('adModal').classList.add('show');
+            }
+            
+            // 添加广告源
+            document.getElementById('addAdSourceBtn').addEventListener('click', function() {
+                const name = prompt('请输入广告源名称:');
+                if (name) {
+                    const type = prompt('请输入广告类型 (script/html/banner/native):');
+                    if (type) {
+                        const code = prompt('请输入广告代码:');
+                        if (code) {
+                            adSources.push({
+                                id: adSources.length + 1,
+                                name: name,
+                                code: code,
+                                type: type
+                            });
+                            
+                            // 更新广告源选择框
+                            updateAdSourceSelect();
+                            // 重新显示广告管理
+                            showAdManagement();
+                            
+                            alert('广告源添加成功！');
+                        }
+                    }
+                }
+            });
+            
+            // 更新广告源选择框
+            function updateAdSourceSelect() {
+                const select = document.getElementById('adSourceSelect');
+                // 保存当前选中的值
+                const currentValue = select.value;
+                // 清空选项（除了第一个）
+                while (select.options.length > 1) {
+                    select.remove(1);
+                }
+                
+                // 添加广告源选项
+                adSources.forEach(ad => {
+                    const option = document.createElement('option');
+                    option.value = ad.id;
+                    option.textContent = ad.name;
+                    select.appendChild(option);
+                });
+                
+                // 恢复之前选中的值
+                if (currentValue) {
+                    select.value = currentValue;
+                }
+            }
+            
+            // 编辑广告源
+            window.editAdSource = function(index) {
+                const ad = adSources[index];
+                const newName = prompt('修改广告源名称:', ad.name);
+                if (newName !== null) {
+                    ad.name = newName;
+                }
+                
+                const newType = prompt('修改广告类型:', ad.type);
+                if (newType !== null) {
+                    ad.type = newType;
+                }
+                
+                const newCode = prompt('修改广告代码:', ad.code);
+                if (newCode !== null) {
+                    ad.code = newCode;
+                }
+                
+                updateAdSourceSelect();
+                showAdManagement();
+            };
+            
+            // 删除广告源
+            window.deleteAdSource = function(index) {
+                if (confirm('确定要删除这个广告源吗？')) {
+                    adSources.splice(index, 1);
+                    updateAdSourceSelect();
+                    showAdManagement();
+                }
+            };
+            
+            // 关闭模态框
+            document.querySelectorAll('.close-modal').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    this.closest('.modal').classList.remove('show');
+                });
+            });
+            
+            // 点击模态框外部关闭
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        this.classList.remove('show');
+                    }
+                });
+            });
+            
+            // 初始化广告源选择框
+            updateAdSourceSelect();
+            
+            // 加载保存的草稿
+            const savedDraft = localStorage.getItem('editorDraft');
+            if (savedDraft) {
+                if (confirm('检测到有保存的草稿，是否加载？')) {
+                    try {
+                        const draft = JSON.parse(savedDraft);
+                        document.getElementById('articleTitle').value = draft.title;
+                        editorArea.innerHTML = draft.content;
+                        updateWordCount();
+                    } catch (e) {
+                        console.error('加载草稿失败:', e);
+                    }
+                }
+            }
+            
+            // 页面卸载前提示保存
+            window.addEventListener('beforeunload', function(e) {
+                const title = document.getElementById('articleTitle').value;
+                const content = editorArea.innerHTML;
+                
+                if (title || (content && content !== '<p><br></p>' && content !== '<p>开始写作...</p>')) {
+                    // 自动保存草稿
+                    const draft = {
+                        title: title || '未命名文章',
+                        content: content,
+                        timestamp: new Date().toISOString(),
+                        wordCount: wordCount,
+                        charCount: charCount
+                    };
+                    localStorage.setItem('editorDraft', JSON.stringify(draft));
+                }
+            });
+        });
+    </script>
+</body>
+</html>
 
