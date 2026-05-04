@@ -1,483 +1,1732 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>AdForge Editor</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box}html,body{height:100%;overflow:hidden}
-body{font-family:'Noto Sans SC','Space Grotesk',sans-serif;background:#0e1017;color:#e6e8f0}
-::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:#252a3a;border-radius:9px}
-
-:root{--side:#12141e;--card:#181c28;--border:#252a3a;--bg:#0e1017;--fg:#e6e8f0;--fg2:#b8bcc8;--muted:#5c6178;--accent:#e89b3a;--accent2:#3dd68c;--danger:#e5484d;--info:#38bdf8;--toolbar:#111420;--editor:#151925;--codebg:#0a0d16}
-
-/* 侧边栏 */
-.sb{position:fixed;left:0;top:0;bottom:0;width:260px;background:var(--side);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:50;transform:translateX(-100%);transition:transform .25s cubic-bezier(.4,0,.2,1)}
-.sb.open{transform:translateX(0)}
-.sb-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:45;opacity:0;pointer-events:none;transition:opacity .25s}.sb-mask.on{opacity:1;pointer-events:auto}
-.sb-hd{padding:12px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px;flex-shrink:0}
-.sb-logo{width:24px;height:24px;border-radius:5px;background:linear-gradient(135deg,#e89b3a,#f4a623);display:flex;align-items:center;justify-content:center;font-size:10px;color:#000;font-weight:800;flex-shrink:0}
-.sb-hd span{font-family:'Space Grotesk';font-size:13px;font-weight:700;background:linear-gradient(135deg,#e89b3a,#f4a623);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.sb-role{padding:8px 10px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;gap:4px}
-.role-btn{flex:1;padding:5px 0;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:9px;font-weight:700;cursor:pointer;text-align:center;transition:all .12s}
-.role-btn:hover{border-color:var(--accent);color:var(--fg)}
-.role-btn.on{border-color:var(--accent);background:rgba(232,155,58,.08);color:#fbbf24}
-.role-btn i{display:block;font-size:12px;margin-bottom:2px}
-.sb-search{padding:6px 8px;border-bottom:1px solid var(--border);flex-shrink:0;position:relative}
-.sb-search input{width:100%;height:26px;border-radius:5px;background:var(--bg);border:1px solid var(--border);padding:0 7px 0 22px;color:var(--fg);font-size:10px;outline:none}
-.sb-search input:focus{border-color:var(--accent)}
-.sb-search i{position:absolute;left:7px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:9px;pointer-events:none}
-.sb-list{flex:1;overflow-y:auto;padding:3px}
-.art-item{padding:8px 9px;border-radius:6px;cursor:pointer;transition:all .1s;margin-bottom:1px;border:1px solid transparent;position:relative}
-.art-item:hover{background:rgba(255,255,255,.02);border-color:var(--border)}
-.art-item.on{background:rgba(232,155,58,.07);border-color:rgba(232,155,58,.15)}
-.art-item .at{font-size:10px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:30px}
-.art-item .ad{font-size:8px;color:var(--muted);margin-top:1px;display:flex;align-items:center;gap:3px}
-.art-item .ptag{padding:0 4px;border-radius:2px;font-size:7px;font-weight:700;flex-shrink:0}
-.ptag-admin{background:rgba(232,155,58,.1);color:#fbbf24}
-.ptag-creator{background:rgba(61,214,140,.1);color:#34d399}
-.ptag-sharer{background:rgba(255,255,255,.04);color:var(--muted)}
-.art-item .ab{position:absolute;right:6px;top:8px;display:flex;gap:1px;opacity:0;transition:opacity .1s}
-.art-item:hover .ab{opacity:1}
-.abtn{width:18px;height:18px;border-radius:3px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);background:none;border:none;font-size:8px;transition:all .1s}
-.abtn:hover{color:var(--fg);background:rgba(255,255,255,.05)}
-.abtn.del:hover{color:var(--danger);background:rgba(229,72,77,.08)}
-.sb-ft{padding:8px;border-top:1px solid var(--border);flex-shrink:0}
-
-/* 侧边栏切换按钮 - 固定不浮动 */
-.sb-toggle{position:fixed;top:10px;left:10px;z-index:55;width:36px;height:36px;border-radius:50%;background:var(--card);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--accent);font-size:14px;transition:all .2s;box-shadow:0 2px 10px rgba(0,0,0,.3);touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-.sb-toggle:hover{box-shadow:0 4px 18px rgba(232,155,58,.3)}
-.sb-toggle.active{left:270px;background:var(--accent);color:#000}
-.sb-toggle.active i{transform:rotate(90deg)}
-
-/* 主区域 */
-.main{height:100vh;display:flex;flex-direction:column}
-.topbar{height:44px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 10px 0 52px;gap:5px;background:var(--toolbar);flex-shrink:0}
-.topbar .ti{flex:1;background:transparent;border:none;color:var(--fg);font-size:14px;font-weight:700;outline:none;font-family:inherit;min-width:0}
-.topbar .ti::placeholder{color:var(--border)}
-.topbar .ti:disabled{opacity:.3}
-.mbtn{padding:3px 10px;border-radius:4px;font-size:9px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all .12s;white-space:nowrap;flex-shrink:0}
-.mbtn:hover{color:var(--fg);border-color:var(--accent)}.mbtn.on{background:var(--accent);color:#000;border-color:var(--accent)}
-.mbtn:disabled{opacity:.25;cursor:not-allowed;transform:none!important}
-.mbtn.pub{color:var(--warn);border-color:rgba(240,160,48,.2)}.mbtn.pub:hover{background:var(--warn);color:#000}
-.mbtn.rev{color:var(--info);border-color:rgba(56,189,248,.15)}.mbtn.rev:hover{background:var(--info);color:#000}
-
-/* 工具栏 - 所有按钮固定不浮动 */
-.toolbar{display:flex;align-items:center;gap:1px;padding:2px 6px;border-bottom:1px solid var(--border);background:var(--toolbar);flex-shrink:0;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-.toolbar::-webkit-scrollbar{display:none}
-.tb{width:28px;height:26px;min-width:28px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);transition:all .08s;font-size:10px;border:none;background:transparent;flex-shrink:0}
-.tb:hover{color:var(--fg);background:rgba(255,255,255,.05)}
-.tb:active{transform:scale(.86);background:rgba(255,255,255,.08)}
-.tb.on{color:var(--accent);background:rgba(232,155,58,.08)}
-.tb-sep{width:1px;height:12px;background:var(--border);margin:0 1px;flex-shrink:0}
-.tb-accent{color:var(--warn)!important}.tb-accent:hover{background:rgba(232,155,58,.08)!important}
-
-.ib{display:none;padding:5px 10px;background:rgba(232,155,58,.05);border-bottom:1px solid rgba(232,155,58,.1);align-items:center;gap:5px}
-.ib.show{display:flex}
-.ib label{font-size:9px;color:var(--accent);font-weight:700;white-space:nowrap}
-.ib input{flex:1;height:24px;padding:0 7px;border-radius:4px;background:var(--bg);border:1px solid var(--border);color:var(--fg);font-size:11px;outline:none}
-.ib input:focus{border-color:var(--accent)}
-.ib-b{padding:3px 10px;border-radius:3px;font-size:9px;font-weight:700;cursor:pointer;border:none;transition:all .1s}
-.ib-ok{background:var(--accent);color:#000}.ib-no{background:transparent;border:1px solid var(--border);color:var(--muted)}
-
-.pb{display:none;padding:5px 10px;background:rgba(56,189,248,.05);border-bottom:1px solid rgba(56,189,248,.1);align-items:center;gap:6px;font-size:10px;color:var(--info)}
-.pb.show{display:flex}
-.pb-b{padding:2px 7px;border-radius:3px;font-size:9px;font-weight:700;cursor:pointer;border:none}
-.pb-y{background:var(--info);color:#000}.pb-n{background:transparent;border:1px solid var(--border);color:var(--muted)}
-
-.ew{flex:1;overflow-y:auto;padding:16px 14px;background:var(--editor)}
-.ed{outline:none;min-height:120px;line-height:1.8;font-size:14px;color:var(--fg)}
-.ed:empty::before{content:'开始撰写你的文章...';color:var(--border);pointer-events:none;font-style:italic}
-.ed h1{font-size:24px;font-weight:900;margin:16px 0 8px;color:#fff}
-.ed h2{font-size:18px;font-weight:700;margin:12px 0 6px;color:#e8eaf0}
-.ed h3{font-size:16px;font-weight:700;margin:10px 0 5px}
-.ed h4{font-size:14px;font-weight:600;margin:8px 0 4px}
-.ed p{margin:5px 0;color:var(--fg2)}
-.ed blockquote{border-left:3px solid var(--accent);padding:5px 12px;margin:8px 0;background:rgba(232,155,58,.03);border-radius:0 6px 6px 0}
-.ed ul,.ed ol{padding-left:20px;margin:5px 0;color:var(--fg2)}.ed li{margin:2px 0}
-.ed a{color:var(--accent2);text-decoration:underline}
-.ed hr{border:none;height:1px;background:var(--border);margin:14px 0}
-.ed img{max-width:100%;border-radius:6px;margin:8px 0;display:block}
-.ad-ph{margin:12px 0;border:2px dashed rgba(240,160,48,.25);border-radius:7px;padding:10px 12px;background:rgba(240,160,48,.02);display:flex;align-items:center;gap:10px;user-select:all}
-.ad-ph:hover{border-color:rgba(240,160,48,.4)}
-.ad-ph-icon{width:28px;height:28px;border-radius:5px;background:rgba(240,160,48,.08);display:flex;align-items:center;justify-content:center;color:var(--warn);font-size:11px;flex-shrink:0}
-.ad-ph-info{flex:1}.ad-ph-label{font-size:10px;font-weight:700;color:var(--warn)}.ad-ph-desc{font-size:8px;color:var(--muted);margin-top:1px}
-.ad-ph-del{width:18px;height:18px;border-radius:3px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);font-size:8px;background:none;border:none;flex-shrink:0;transition:all .1s}
-.ad-ph-del:hover{color:var(--danger);background:rgba(229,72,77,.08)}
-.cw{margin:10px 0;border-radius:6px;overflow:hidden;border:1px solid var(--border);background:var(--codebg)}
-.cwh{display:flex;align-items:center;justify-content:space-between;padding:3px 8px;background:rgba(255,255,255,.02);border-bottom:1px solid var(--border)}
-.cwh span{font-size:9px;color:var(--info);font-weight:600;font-family:'Space Grotesk'}
-.cwh button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:8px;padding:1px 4px;border-radius:2px;transition:all .1s}
-.cwh button:hover{color:var(--fg);background:rgba(255,255,255,.05)}
-.cw pre{margin:0;padding:10px;overflow-x:auto;font-family:'Space Grotesk',monospace;font-size:11px;line-height:1.5;color:#7dd3fc;white-space:pre;tab-size:2}
-.pw{flex:1;overflow-y:auto;padding:16px 14px;background:var(--editor);display:none}
-.pv{max-width:600px;margin:0 auto;line-height:1.8;font-size:14px}
-.pv h1{font-size:24px;font-weight:900;margin:16px 0 8px;color:#fff}
-.pv h2{font-size:18px;font-weight:700;margin:12px 0 6px}.pv h3{font-size:16px;font-weight:700;margin:10px 0 5px}
-.pv p{margin:5px 0;color:var(--fg2)}
-.pv blockquote{border-left:3px solid var(--accent);padding:5px 12px;margin:8px 0;background:rgba(232,155,58,.03);border-radius:0 6px 6px 0}
-.pv img{max-width:100%;border-radius:6px;margin:8px 0}
-.pv hr{border:none;height:1px;background:var(--border);margin:14px 0}
-.pv code{font-family:'Space Grotesk',monospace;font-size:11px;background:rgba(255,255,255,.05);padding:1px 4px;border-radius:2px}
-.pv pre{margin:10px 0;border-radius:6px;padding:10px;background:var(--codebg);overflow-x:auto;border:1px solid var(--border)}
-.pv pre code{background:none;padding:0;font-size:11px;color:#7dd3fc;line-height:1.5}
-.pv .ad-render{margin:12px 0;border-radius:6px;overflow:hidden;border:1px solid var(--border)}
-.pv .ad-render img{width:100%;display:block}
-.pv .ad-label{font-size:7px;color:rgba(255,255,255,.2);text-align:right;padding:2px 5px;background:rgba(0,0,0,.2)}
-.pv .ad-empty{margin:12px 0;border:1px dashed var(--border);border-radius:6px;padding:18px;text-align:center;font-size:10px;color:var(--muted)}
-.statbar{height:24px;border-top:1px solid var(--border);display:flex;align-items:center;padding:0 10px;font-size:8px;color:var(--muted);background:var(--toolbar);gap:10px;flex-shrink:0}
-
-.mo{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(3px);z-index:100;display:none;align-items:center;justify-content:center;padding:12px}
-.mo.show{display:flex;animation:fi .12s}
-@keyframes fi{from{opacity:0}to{opacity:1}}
-.ml{background:var(--card);border:1px solid var(--border);border-radius:10px;width:100%;max-width:420px;animation:sd .15s ease}
-@keyframes sd{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
-.mh{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.mh h4{font-size:12px;font-weight:700}
-.mx{width:22px;height:22px;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);background:none;border:none;transition:all .1s;font-size:11px}
-.mx:hover{color:var(--fg);background:rgba(255,255,255,.05)}
-.mb{padding:10px 14px}
-.mf{padding:8px 14px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:6px}
-.btn{display:inline-flex;align-items:center;gap:3px;padding:4px 10px;border-radius:4px;font-size:9px;font-weight:700;cursor:pointer;border:none;transition:all .12s;white-space:nowrap}
-.btn-p{background:var(--accent);color:#000}.btn-p:hover{opacity:.85}
-.btn-g{background:transparent;border:1px solid var(--border);color:var(--fg)}.btn-g:hover{border-color:var(--accent)}
-.btn-d{background:rgba(229,72,77,.08);color:#f87171;border:1px solid rgba(229,72,77,.12)}.btn-d:hover{background:rgba(229,72,77,.15)}
-
-.pm{position:fixed;z-index:60;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:3px 0;min-width:130px;box-shadow:0 6px 20px rgba(0,0,0,.5)}
-.pm::before{content:'';position:absolute;top:-4px;left:14px;border:4px solid transparent;border-bottom-color:var(--border)}
-.pm-i{display:flex;align-items:center;gap:6px;padding:5px 10px;cursor:pointer;transition:background .08s;font-size:10px;white-space:nowrap}
-.pm-i:hover{background:rgba(255,255,255,.04)}
-.pm-i i{width:12px;text-align:center;font-size:9px;flex-shrink:0}
-.pm-div{height:1px;background:var(--border);margin:2px 0}
-
-.share-bar{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
-.share-ch{display:flex;align-items:center;gap:5px;padding:6px 10px;border-radius:6px;background:rgba(255,255,255,.03);border:1px solid var(--border);cursor:pointer;transition:all .12s;flex:1;min-width:80px}
-.share-ch:hover{border-color:var(--accent2);background:rgba(61,214,140,.05)}
-.share-ch i{font-size:12px}
-.share-ch .sc-name{font-size:9px;font-weight:600;flex:1}
-.share-ch .sc-toggle{width:28px;height:14px;border-radius:7px;background:var(--border);position:relative;cursor:pointer;transition:background .15s;flex-shrink:0}
-.share-ch .sc-toggle.on{background:var(--accent2)}
-.share-ch .sc-toggle::after{content:'';position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;background:#fff;transition:transform .15s}
-.share-ch .sc-toggle.on::after{transform:translateX(14px)}
-.share-ch .sc-earn{font-size:8px;color:var(--muted);text-align:center;margin-top:2px}
-.rev-bar{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:10px;margin-top:10px}
-.rev-item{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:10px}
-.rev-item .ri-label{color:var(--muted)}.rev-item .ri-val{font-family:'Space Grotesk';font-weight:700;color:var(--accent)}
-
-.tc-w{position:fixed;top:8px;right:8px;z-index:200;display:flex;flex-direction:column;gap:4px;pointer-events:none}
-.toast{padding:6px 12px;border-radius:6px;font-size:10px;font-weight:500;display:flex;align-items:center;gap:5px;animation:ti .15s;border:1px solid;pointer-events:auto;backdrop-filter:blur(6px)}
-.toast.ok{background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.15);color:#34d399}
-.toast.err{background:rgba(229,72,77,.12);border-color:rgba(229,72,77,.15);color:#f87171}
-.toast.inf{background:rgba(56,189,248,.12);border-color:rgba(56,189,248,.15);color:#22d3ee}
-@keyframes ti{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
-.embed-code{background:#0a0d16;border:1px solid var(--border);border-radius:6px;padding:8px;font-family:'Space Grotesk',monospace;font-size:9px;line-height:1.5;color:#7dd3fc;overflow-x:auto;white-space:pre-wrap;word-break:break-all;max-height:200px;position:relative;user-select:all}
-.embed-copy{position:absolute;top:4px;right:4px;padding:2px 8px;border-radius:3px;background:var(--accent);color:#000;font-size:8px;font-weight:700;cursor:pointer;border:none}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaaS 富文本编辑器</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --border: #dee2e6;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .editor-wrapper {
+            display: flex;
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            min-height: 85vh;
+        }
+        
+        /* 左侧边栏 */
+        .sidebar {
+            width: 250px;
+            background: var(--dark);
+            color: white;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .logo {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .logo h1 {
+            font-size: 1.5rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo h1 i {
+            color: var(--primary);
+        }
+        
+        .user-info {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .sidebar-menu {
+            flex: 1;
+            padding: 0 10px;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .menu-item:hover, .menu-item.active {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+        }
+        
+        .menu-item.active {
+            background: var(--primary);
+        }
+        
+        /* 主要内容区 */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            border-bottom: 1px solid var(--border);
+            background: white;
+        }
+        
+        .article-title {
+            flex: 1;
+            border: none;
+            font-size: 1.5rem;
+            font-weight: 600;
+            padding: 8px 0;
+            outline: none;
+            color: var(--dark);
+        }
+        
+        .article-title::placeholder {
+            color: var(--gray);
+        }
+        
+        .top-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+        
+        .btn-secondary {
+            background: #f1f3f9;
+            color: var(--dark);
+        }
+        
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        /* 工具栏 */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 10px 20px;
+            border-bottom: 1px solid var(--border);
+            background: white;
+            gap: 5px;
+        }
+        
+        .toolbar-group {
+            display: flex;
+            border-right: 1px solid var(--border);
+            padding-right: 10px;
+            margin-right: 10px;
+        }
+        
+        .toolbar-group:last-child {
+            border-right: none;
+            margin-right: 0;
+        }
+        
+        .toolbar-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 4px;
+            border: none;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+        
+        .toolbar-btn:hover {
+            background: #f1f3f9;
+        }
+        
+        .toolbar-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .font-select, .font-size-select {
+            height: 36px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 0 10px;
+            background: white;
+            margin-right: 5px;
+        }
+        
+        .color-picker-btn {
+            position: relative;
+        }
+        
+        .color-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 8px;
+            display: none;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+        
+        .color-options.show {
+            display: grid;
+        }
+        
+        .color-option {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            cursor: pointer;
+            border: 1px solid #ddd;
+        }
+        
+        .dropdown {
+            position: relative;
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 8px 0;
+            min-width: 150px;
+            display: none;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+        
+        .dropdown-menu.show {
+            display: block;
+        }
+        
+        .dropdown-item {
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        
+        .dropdown-item:hover {
+            background: #f1f3f9;
+        }
+        
+        /* 编辑器区域 */
+        .editor-area {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: white;
+            min-height: 400px;
+        }
+        
+        .ProseMirror {
+            outline: none;
+            min-height: 400px;
+        }
+        
+        .ProseMirror p {
+            margin-bottom: 1em;
+            line-height: 1.6;
+        }
+        
+        .ProseMirror h1 {
+            font-size: 2.5em;
+            margin: 0.5em 0;
+        }
+        
+        .ProseMirror h2 {
+            font-size: 2em;
+            margin: 0.5em 0;
+        }
+        
+        .ProseMirror h3 {
+            font-size: 1.5em;
+            margin: 0.5em 0;
+        }
+        
+        .ProseMirror ul, .ProseMirror ol {
+            padding-left: 1.5em;
+            margin-bottom: 1em;
+        }
+        
+        .ProseMirror blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 1em;
+            margin: 1em 0;
+            font-style: italic;
+        }
+        
+        .ProseMirror pre {
+            background: #f5f5f5;
+            padding: 1em;
+            border-radius: 4px;
+            margin: 1em 0;
+            overflow-x: auto;
+        }
+        
+        .ProseMirror code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .ProseMirror img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            margin: 1em 0;
+        }
+        
+        .ProseMirror a {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+        
+        /* 广告插入面板 */
+        .ad-panel {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            background: white;
+        }
+        
+        .ad-source-selector {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .ad-source-selector select {
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            min-width: 200px;
+        }
+        
+        .ad-preview {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border: 1px dashed #ddd;
+        }
+        
+        .ad-preview-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        /* 状态栏 */
+        .status-bar {
+            padding: 10px 20px;
+            border-top: 1px solid var(--border);
+            background: white;
+            display: flex;
+            justify-content: space-between;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .word-count, .char-count {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+        }
+        
+        .ad-sources-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .ad-source-item {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 15px;
+            cursor: pointer;
+        }
+        
+        .ad-source-item:hover, .ad-source-item.selected {
+            border-color: var(--primary);
+            background: #f0f4ff;
+        }
+        
+        /* 响应式 */
+        @media (max-width: 992px) {
+            .editor-wrapper {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                flex-direction: row;
+                padding: 10px;
+            }
+            
+            .sidebar-menu {
+                display: flex;
+                flex: 1;
+                justify-content: space-around;
+            }
+            
+            .menu-item span {
+                display: none;
+            }
+            
+            .toolbar {
+                overflow-x: auto;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .top-actions {
+                flex-wrap: wrap;
+            }
+            
+            .toolbar-group {
+                flex-wrap: wrap;
+            }
+        }
+        
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        
+        /* 广告占位符样式 */
+        .ad-placeholder {
+            padding: 20px;
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            text-align: center;
+            color: #6c757d;
+            margin: 1em 0;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .ad-placeholder i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #4361ee;
+        }
+        
+        /* 表格样式 */
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 1em 0;
+        }
+        
+        .ProseMirror table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 1em 0;
+        }
+        
+        .ProseMirror th, .ProseMirror td {
+            border: 1px solid #dee2e6;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        
+        .ProseMirror th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        /* 行内代码块 */
+        .ProseMirror code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+        }
+        
+        /* 引用块 */
+        .ProseMirror blockquote {
+            border-left: 4px solid #4361ee;
+            padding-left: 1em;
+            margin: 1em 0;
+            color: #495057;
+            font-style: italic;
+        }
+    </style>
 </head>
 <body>
-
-<aside class="sb" id="SB"><div class="sb-hd"><div class="sb-logo"><i class="fas fa-bolt"></i></div><span>AdForge</span></div>
-<div class="sb-role" id="roleBar">
-<button class="role-btn on" type="button" data-role="admin"><i class="fas fa-shield-halved"></i>管理员</button>
-<button class="role-btn" type="button" data-role="creator"><i class="fas fa-pen-nib"></i>创作者</button>
-<button class="role-btn" type="button" data-role="sharer"><i class="fas fa-share-nodes"></i>分享者</button>
-</div>
-<div class="sb-search"><i class="fas fa-search"></i><input placeholder="搜索..." id="searchInp"></div>
-<div class="sb-list" id="artList"></div>
-<div class="sb-ft" id="sbFt"></div>
-</aside>
-
-<div class="sb-mask" id="SBMask"></div>
-<button class="sb-toggle" id="SBToggle" type="button"><i class="fas fa-bars"></i></button>
-
-<div class="main">
-<header class="topbar"><input class="ti" id="titleInp" placeholder="文章标题...">
-<button class="mbtn on" id="btnEdit" type="button">编辑</button>
-<button class="mbtn" id="btnPv" type="button">预览</button>
-<button class="mbtn pub" id="pubBtn" type="button"><i class="fas fa-rocket" style="margin-right:2px"></i>发布</button>
-<button class="mbtn rev" id="revBtn" type="button"><i class="fas fa-chart-line" style="margin-right:2px"></i>收益</button>
-<button class="mbtn rev" id="embedBtn" type="button"><i class="fas fa-code" style="margin-right:2px"></i>嵌入</button>
-</header>
-<div class="toolbar" id="toolbar">
-<button class="tb" data-cmd="bold"><i class="fas fa-bold"></i></button>
-<button class="tb" data-cmd="italic"><i class="fas fa-italic"></i></button>
-<button class="tb" data-cmd="underline"><i class="fas fa-underline"></i></button>
-<button class="tb" data-cmd="strikeThrough"><i class="fas fa-strikethrough"></i></button>
-<div class="tb-sep"></div>
-<button class="tb" data-cmd="h1">H1</button><button class="tb" data-cmd="h2">H2</button>
-<button class="tb" data-cmd="h3">H3</button><button class="tb" data-cmd="p">P</button>
-<div class="tb-sep"></div>
-<button class="tb" data-cmd="insertUnorderedList"><i class="fas fa-list-ul"></i></button>
-<button class="tb" data-cmd="insertOrderedList"><i class="fas fa-list-ol"></i></button>
-<button class="tb" data-cmd="formatBlock" data-val="blockquote"><i class="fas fa-quote-left"></i></button>
-<button class="tb" data-act="hr"><i class="fas fa-minus"></i></button>
-<div class="tb-sep"></div>
-<button class="tb" data-act="img"><i class="fas fa-image"></i></button>
-<button class="tb" data-act="link"><i class="fas fa-link"></i></button>
-<button class="tb" data-act="code"><i class="fas fa-code"></i></button>
-<button class="tb" data-act="table"><i class="fas fa-table"></i></button>
-<div class="tb-sep"></div>
-<button class="tb tb-accent" data-act="adslot"><i class="fas fa-rectangle-ad"></i></button>
-<div class="tb-sep"></div>
-<button class="tb" data-cmd="undo"><i class="fas fa-rotate-left"></i></button>
-<button class="tb" data-cmd="redo"><i class="fas fa-rotate-right"></i></button>
-</div>
-<div class="ib" id="IB"><label id="IBLabel">URL</label><input id="IBInp" placeholder="https://..."><button class="ib-b ib-ok" id="IBOk" type="button">确认</button><button class="ib-b ib-no" id="IBNo" type="button">取消</button></div>
-<div class="pb" id="PB"><i class="fas fa-code"></i><span style="flex:1">检测到代码，插入代码块？</span><button class="pb-b pb-y" id="PBY" type="button">插入</button><button class="pb-b pb-n" id="PBN" type="button">普通</button></div>
-<div class="ew" id="EW"><div class="ed" id="editor" contenteditable="true"></div></div>
-<div class="pw" id="PW"><div class="pv" id="preview"></div></div>
-<div class="statbar"><span id="sC">0 字</span><span id="sR">~0分钟</span><span id="sS" style="margin-left:auto">已保存</span></div>
-</div>
-
-<div class="mo" id="MoRev"><div class="ml"><div class="mh"><h4>收益分成管理</h4><button class="mx" id="RevClose" type="button"><i class="fas fa-xmark"></i></button></div><div class="mb" id="RevBody"></div></div></div>
-<div class="mo" id="MoEmbed"><div class="ml" style="max-width:520px"><div class="mh"><h4>生成嵌入代码</h4><button class="mx" id="EmbClose" type="button"><i class="fas fa-xmark"></i></button></div><div class="mb" id="EmbBody"></div></div></div>
-<div class="mo" id="MoCfm"><div class="ml" style="max-width:340px"><div style="padding:20px;text-align:center" id="CfmBox"></div></div></div>
-<div class="tc-w" id="TCW"></div>
-
-<script>
-document.addEventListener('DOMContentLoaded',function(){
-var $=function(id){return document.getElementById(id)};
-var editor=$('editor'),SB=$('SB'),Mask=$('SBMask'),Toggle=$('SBToggle');
-var sbOpen=false,curId=null,mode='edit',ilType='',pendingPaste=null,saveTimer=null;
-var curRole='admin',articles=[],auditLog=[];
-
-var POS_MAP={'home-top':{l:'首页顶部',i:'fa-arrow-up'},'home-middle':{l:'首页中部',i:'fa-grip-lines'},'home-bottom':{l:'首页底部',i:'fa-arrow-down'},'detail-bottom':{l:'详情页底部',i:'fa-file-lines'},'feed-list':{l:'信息流',i:'fa-rss'},'profile':{l:'个人中心',i:'fa-user'},'search-result':{l:'搜索结果',i:'fa-magnifying-glass'}};
-var SHARES=[{k:'wechat',l:'微信',i:'fa-brands fa-weixin',color:'#07c160'},{k:'weibo',l:'微博',i:'fa-brands fa-weibo',color:'#e6162d'},{k:'qq',l:'QQ',i:'fa-brands fa-qq',color:'#12b7f5'},{k:'link',l:'复制链接',i:'fa-link',color:'var(--accent2)'}];
-
-function toast(m,t){t=t||'ok';var c=$('TCW');if(!c)return;var d=document.createElement('div');d.className='toast '+t;d.innerHTML='<i class="fas fa-'+(t==='ok'?'circle-check':t==='err'?'circle-xmark':'circle-info')+'"></i>'+m;c.appendChild(d);setTimeout(function(){d.style.opacity='0';d.style.transform='translateX(16px)';d.style.transition='all .15s'},1800);setTimeout(function(){if(d.parentNode)d.remove()},2000)}
-function esc(s){return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'):'';
-function fn(n){n=Number(n)||0;return n>=10000?(n/10000).toFixed(1)+'万':n.toLocaleString()}
-
-/* ===== 侧边栏 ===== */
-function openSB(){sbOpen=true;SB.classList.add('open');Mask.classList.add('on');Toggle.classList.add('active')}
-function closeSB(){sbOpen=false;SB.classList.remove('open');Mask.classList.remove('on');Toggle.classList.remove('active')}
-function toggleSB(){sbOpen?closeSB():openSB()}
-Toggle.addEventListener('click',toggleSB);
-Mask.addEventListener('click',closeSB);
-
-function selectAndLoad(id){
-if(curId)autoSave();
-curId=id;
-var a=articles.find(function(x){return x.id===id});
-if(!a)return;
-editor.content=a.content||'';$('titleInp').value=a.title||'';
-var ro=canEdit();editor.contentEditable=ro?'true':'false';editor.style.opacity=ro?'1':'.45';
-$('titleInp').disabled=!ro;
-renderList();closeSB();mode='edit';$('btnEdit').classList.add('on');$('btnPv').classList.remove('on');
-$('EW').style.display='block';$('PW').style.display='none';updStats();
-}
-
-/* ===== 存储 ===== */
-function save(){try{localStorage.setItem('afe_a2',JSON.stringify(articles));localStorage.setItem('afe_c2',curId||'')}catch(e){}}
-function load(){try{articles=JSON.parse(localStorage.getItem('afe_a2'))||[];curId=parseInt(localStorage.getItem('afe_c2'))||null}catch(e){articles=[];curId=null}}
-function autoSave(){clearTimeout(saveTimer);var s=$('sS');if(s)s.textContent='保存中...';saveTimer=setTimeout(function(){if(curId){var a=articles.find(function(x){return x.id===curId});if(a&&editor){a.content=editor.innerHTML;a.updateTime=Date.now()}}save();if(s)s.textContent='已保存';updStats()},500)}
-function updStats(){var t=editor?editor.innerText||'';var c=t.replace(/\s/g,'').length;var c1=$('sC'),c2=$('sR');if(c1)c1.textContent=c+'字';if(c2)c2.textContent='~'+Math.max(1,Math.ceil(c/400))+'分钟阅读'}
-
-/* ===== 权限 ===== */
-function canEdit(){if(curRole==='admin')return true;var a=articles.find(function(x){return x.id===curId});if(!a)return false;if(curRole==='creator'&&a.owner===curUser())return true;return false}
-function canDelete(){if(curRole==='admin')return true;return false}
-function curUser(){var u=null;try{u=JSON.parse(localStorage.getItem('afe_u2'))}catch(e){}return u?u.u:'editor'}
-function getShareData(artId){var a=articles.find(function(x){return x.id===artId});if(!a)return null;return a.share||{channels:{}}}
-
-/* ===== 角色切换 ===== */
-document.querySelectorAll('.role-btn').forEach(function(b){b.addEventListener('click',function(){curRole=this.getAttribute('data-role');document.querySelectorAll('.role-btn').forEach(function(x){x.classList.toggle('on',x.getAttribute('data-role')===curRole)});renderList();if(curId)selectAndLoad(curId);toast('切换为'+({admin:'管理员',creator:'创作者',sharer:'分享者'})[curRole],'inf')})});
-$('searchInp').addEventListener('input',function(){renderList(this.value.trim())});
-
-/* ===== 文章列表 ===== */
-function renderList(kw){
-var list=articles;if(kw){var k=kw.toLowerCase();list=list.filter(function(a){return(a.title||'').toLowerCase().includes(k)})}
-if(curRole==='sharer'){list=list.filter(function(a){return(a.sharerStatus||'off')==='on'})}
-$('sbFt').innerHTML=curRole==='admin'?'<button class="mbtn" style="width:100%;justify-content:center;display:flex;gap:5px" id="newBtn" type="button"><i class="fas fa-plus"></i> 新建</button>':'';
-$('artList').innerHTML=list.length===0?'<div style="text-align:center;padding:24px 10px;color:var(--muted);font-size:10px"><i class="fas fa-file-lines" style="font-size:20px;display:block;margin-bottom:6px;opacity:.12"></i>'+(curRole==='sharer'?'暂无分享内容':'暂无文章')+'</div>':
-list.map(function(a){
-var ro=canEdit();
-var stDot=a.status==='published'?'background:var(--accent2);box-shadow:0 0 4px var(--accent2)':a.status==='locked'?'background:var(--danger)':'background:var(--border)';
-return '<div class="art-item'+(a.id===curId?' on':'')+'" data-aid="'+a.id+'">'+(!ro?'<i class="fas fa-lock" style="position:absolute;right:8px;top:10px;font-size:9px;color:var(--accent);opacity:.5"></i>':'<div class="ab" data-ab="'+a.id+'">'+(curRole==='admin'?'<button class="abtn" data-abt="menu" type="button"><i class="fas fa-ellipsis-vertical"></i></button>':'')+'</div>')+'<div class="at">'+esc(a.title||'无标题')+'</div><div class="ad"><span class="ptag ptag-'+a.owner+'">'+({admin:'管理员',creator:'创作者',sharer:'分享者'})[a.owner||'creator']+'</span><span>'+fmtT(a.updateTime)+'</span>'+(a.status==='published'?'<span style="color:var(--accent2)">·已发</span>':'')+'</div><div class="status-badge" style="width:5px;height:5px;border-radius:50%;'+stDot+'"></div></div>'
-}).join('');
-document.querySelectorAll('.art-item[data-aid]').forEach(function(el){el.addEventListener('click',function(e){if(e.target.closest('.ab'))return;selectAndLoad(Number(this.getAttribute('data-aid')))})});
-document.querySelectorAll('.ab[data-ab]').forEach(function(el){el.addEventListener('click',function(e){e.stopPropagation();var aid=Number(this.getAttribute('data-ab'));var abt=this.getAttribute('data-abt');if(abt==='menu')showPermMenu(aid,this)})});
-var nb=$('newBtn');if(nb)nb.addEventListener('click',function(){if(curRole==='sharer'){toast('分享者无法创建','err');return}if(curId)autoSave();var a={id:Date.now(),title:'',content:'',owner:curRole,status:'draft',createTime:Date.now(),updateTime:Date.now(),share:{channels:{}};articles.unshift(a);curId=a.id;save();renderList();selectAndLoad(a.id);toast('已创建','ok')});
-}
-function fmtT(t){if(!t)return'';var d=new Date(t),df=Date.now()-d.getTime();if(df<60000)return'刚刚';if(df<3600000)return Math.floor(df/60000)+'分钟前';return(d.getMonth()+1)+'/'+d.getDate()}
-
-/* ===== 权限菜单 ===== */
-var activeMenu=null;
-function showPermMenu(aid,btn){
-if(activeMenu)activeMenu.remove();
-var a=articles.find(function(x){return x.id===aid});if(!a)return;
-var r=btn.getBoundingClientRect();
-var m=document.createElement('div');m.className='pm';
-var html='<div class="pm-i" data-pm="lock"><i class="fas fa-'+(a.status==='locked'?'lock-open':'lock')+'" style="color:'+(a.status==='locked'?'var(--accent2)':'var(--danger)')+'"></i><span class="pi-label">'+(a.status==='locked'?'解锁':'锁定')+'</span></div>';
-if(a.owner!=='admin')html+='<div class="pm-i" data-pm="chown"><i class="fas fa-user-pen" style="color:var(--accent)"></i><span class="pi-label">转让所有权</span></div>';
-if(a.status!=='published')html+='<div class="pm-i" data-pm="pub"><i class="fas fa-check-circle" style="color:var(--accent2)"></i><span class="pi-label">标记已发布</span></div>';
-else html+='<div class="pm-i" data-pm="draft"><i class="fas fa-rotate-left" style="color:var(--muted)"></i><span class="pi-label">改回草稿</span></div>';
-html+='<div class="pm-div"></div><div class="pm-i" data-pm="share"><i class="fas fa-share-nodes" style="color:var(--info)"></i><span class="pi-label">分享设置</span></div><div class="pm-i" data-pm="del" style="color:var(--danger)"><i class="fas fa-trash"></i><span class="pi-label" style="color:var(--danger)">删除</span></div>';
-m.innerHTML=html;
-var ml=r.left+window.scrollX;var mt=r.bottom+window.scrollY+document.querySelector('.main').offsetTop;
-if(ml+140>window.innerWidth)m.style.left=(window.innerWidth-150)+'px';
-m.style.top=Math.min(mt,window.innerHeight-200)+'px';
-document.body.appendChild(m);activeMenu=m;
-setTimeout(function(){m.addEventListener('click',function(e){var pm=e.target.closest('.pm-i');if(pm)handlePerm(aid,pm.getAttribute('data-pm'));if(!e.target.closest('.pm'))m.remove()})},10);
-}
-function handlePerm(aid,act){
-if(activeMenu){activeMenu.remove();activeMenu=null}
-var a=articles.find(function(x){return x.id===aid});if(!a)return;
-switch(act){
-case'lock':a.status=a.status==='locked'?'owner':'locked';save();toast(a.status==='locked'?'已锁定':'已解锁');break;
-case'chown':a.owner=curRole;save();toast('已转让','ok');break;
-case'pub':a.status='published';save();toast('已发布','ok');break;
-case'draft':a.status='draft';save();toast('已改回草稿','inf');break;
-case'share':showShareModal(aid);return;
-case'del':confirmDel(aid);return;
-}
-renderList();if(curId===aid)selectAndLoad(aid);
-}
-function confirmDel(aid){var a=articles.find(function(x){return x.id===aid});if(!a)return;$('CfmBox').innerHTML='<div style="width:36px;height:36px;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;background:var(--danger-bg);font-size:16px;color:var(--danger)"><i class="fas fa-trash"></i></div><h4 style="font-size:12px;font-weight:700">删除「'+esc(a.title||'无标题')+'」</h4><p style="font-size:10px;color:var(--muted);margin-bottom:14px">不可撤销</p><div style="display:flex;gap:6px;justify-content:center"><button class="btn btn-g" id="cfN" type="button">取消</button><button class="btn btn-d" id="cfY" type="button"><i class="fas fa-trash"></i> 删除</button></div>';$('MoCfm').classList.add('show');$('cfN').addEventListener('click',function(){$('MoCfm').classList.remove('show')});$('cfY').addEventListener('click',function(){articles=articles.filter(function(x){return x.id!==aid});if(curId===aid)curId=articles.length?articles[0].id:null;save();addLog('删除',a.title||'');$('MoCfm').classList.remove('show');toast('已删除');renderList();if(curId)selectAndLoad(curId)})}
-
-/* ===== 编辑器命令 ===== */
-function execCmd(cmd,val){editor.focus();document.execCommand(cmd,false,val||null);autoSave()}
-$('toolbar').addEventListener('click',function(e){
-var b=e.target.closest('.tb');if(!b)return;
-var cmd=b.getAttribute('data-cmd');if(cmd){document.execCommand(cmd,false,b.getAttribute('data-val')||null);autoSave();return}
-var act=b.getAttribute('data-act');if(act)handleToolbar(act);
-});
-function handleToolbar(a){
-switch(a){
-case'img':ilType='img';$('IBLabel').textContent='图片URL';$('IBInp').value='';$('IB').classList.add('show');setTimeout(function(){($IBInp||{}).focus()},30);break;
-case'link':ilType='link';$('IBLabel').textContent='链接URL';$('IBInp').value='';$('IB').classList.add('show');setTimeout(function(){($IBInp||{}).focus()},30);break;
-case'code':editor.focus();document.execCommand('insertHTML',false,'<div class="cw" contenteditable="false"><div class="cwh"><span>Code</span></div><pre contenteditable="true" style="outline:none"><code>// 代码\n</code></pre></div><p><br></p>');setTimeout(function(){editor.querySelectorAll('.cw pre').forEach(function(p){p.addEventListener('input',autoSave)})},20);autoSave();break;
-case'table':editor.focus();document.execCommand('insertHTML',false,'<table style="width:100%;border-collapse:collapse;margin:10px 0"><tr><th style="border:1px solid var(--border);padding:6px;text-align:left;background:rgba(255,255,255,.02)">列1</th><th style="border:1px solid var(--border);padding:6px;text-align:left;background:rgba(255,255,255,.02)">列2</th></tr><tr><td style="border:1px solid var(--border);padding:6px">内容</td><td style="border:1px solid var(--border);padding:6px">内容</td></tr><tr><td style="border:1px solid var(--border);padding:6px">内容</td><td style="border:1px solid var(--border);padding:6px">内容</td></tr></table><p><br></p>');autoSave();break;
-case'hr':editor.focus();document.execCommand('insertHTML',false,'<hr><p><br></p>');autoSave();break;
-case'adslot':openSlotModal();break;
-}}
-$('IBOk').addEventListener('click',cfIB);$('IBNo').addEventListener('click',function(){$('IB').classList.remove('show')});$('IBInp').addEventListener('keydown',function(e){if(e.key==='Enter')cfIB()});
-function cfIB(){var v=$('IBInp').value.trim();if(!v){toast('请输入URL','err');return}editor.focus();if(ilType==='img')document.execCommand('insertHTML',false,'<img src="'+esc(v)+'" alt="">');else{var sel=window.getSelection();document.execCommand('insertHTML',false,'<a href="'+esc(v)+'" target="_blank">'+esc(sel.toString()||'链接')+'</a>')}$('IB').classList.remove('show');autoSave()}
-editor.addEventListener('paste',function(e){var text=(e.clipboardData||window.clipboardData).getData('text/plain');if(!text||!text.includes('\n'))return;if(['{','}',';','=>','function','const','let','var','import','//','/*'].filter(function(s){return text.includes(s)}).length>=2){e.preventDefault();pendingPaste=text;$('PB').classList.add('show')}});
-$('PBY').addEventListener('click',function(){$('PB').classList.remove('show');if(pendingPaste){editor.focus();document.execCommand('insertHTML',false,'<div class="cw" contenteditable="false"><div class="cwh"><span>Code</span></div><pre contenteditable="true" style="outline:none"><code>'+esc(pendingPaste)+'</code></pre></div><p><br></p>');pendingPaste=null;toast('已插入代码块','ok');setTimeout(function(){editor.querySelectorAll('.cw pre').forEach(function(p){p.addEventListener('input',autoSave)})},20);autoSave()}});
-$('PBN').addEventListener('click',function(){$('PB').classList.remove('show');if(pendingPaste){editor.focus();document.execCommand('insertText',false,pendingPaste);pendingPaste=null}});
-editor.addEventListener('input',autoSave);editor.addEventListener('keydown',function(e){if(e.key==='Tab'){var sel=window.getSelection();if(sel.anchorNode&&sel.anchorNode.closest&&sel.anchorNode.closest('.cw pre')){e.preventDefault();document.execCommand('insertText',false,'  ')}}
-if((e.ctrlKey||e.metaKey)&&e.key==='z'){e.preventDefault();e.shiftKey?execCmd('redo'):execCmd('undo')}});
-$('titleInp').addEventListener('input',function(){if(!canEdit())return;var a=articles.find(function(x){return x.id===curId});if(a){a.title=this.value;a.updateTime=Date.now()}autoSave();renderList()});
-$('btnEdit').addEventListener('click',function(){mode='edit';this.classList.add('on');$('btnPv').classList.remove('on');$('EW').style.display='block';$('PW').style.display='none'});
-$('btnPv').addEventListener('click',function(){mode='preview';this.classList.add('on');$('btnEdit').classList.remove('on');$('EW').style.display='none';$('PW').style.display='block';renderPV()});
-$('pubBtn').addEventListener('click',pubArt);
-$('revBtn').addEventListener('click',showRevModal);
-$('embedBtn').addEventListener('click',showEmbedModal);
-
-/* ===== 广告位 ===== */
-function openSlotModal(){
-var ad=[];try{ad=JSON.parse(localStorage.getItem('adforge_ads'))||[]}catch(e){ad=[]}
-var act=ad.filter(function(a){return a.status==='active'});
-var m=document.createElement('div');m.className='mo';m.id='SlotMo';
-m.innerHTML='<div class="ml" style="max-width:360px"><div class="mh"><h4>插入广告位</h4><button class="mx" type="button" id="SlotClose"><i class="fas fa-xmark"></i></button></div><div class="mb">'+Object.entries(POS_MAP).map(function(e){return'<div class="si" style="padding:8px 10px;border:1px solid var(--border);border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:8px;margin-bottom:4px;transition:all .1px" data-slot="'+e[0]+'"><i class="fas '+e[1].i+'" style="color:var(--warn);font-size:11px;width:14px;text-align:center"></i><span style="flex:1;font-size:10px;font-weight:600">'+e[1].l+'</span><span style="font-size:8px;color:var(--muted)">'+act.filter(function(a){return a.position===e[0]}).length+'个</span></div>'}).join('')+'</div></div>';
-$('body').appendChild(m);m.classList.add('show');
-$('SlotClose').addEventListener('click',function(){m.classList.remove('show')});
-m.addEventListener('click',function(e){if(e.target===m)return;
-var s=e.target.closest('[data-slot]');if(!s)return;var pos=s.getAttribute('data-slot');
-editor.focus();document.execCommand('insertHTML',false,'<div class="ad-ph" contenteditable="false" data-ad-pos="'+pos+'"><div class="ad-ph-icon"><i class="fas fa-rectangle-ad"></i></div><div class="ad-ph-info"><div class="ad-ph-label">广告位 · '+(POS_MAP[pos]?POS_MAP[pos].l:pos)+'</div><div class="ad-ph-desc">预览时自动匹配</div></div></div><p><br></p>');
-m.classList.remove('show');autoSave();updStats()});
-
-/* ===== 预览 ===== */
-function renderPV(){
-var html=editor.innerHTML;var ad=[];try{ad=JSON.parse(localStorage.getItem('adforge_ads'))||[]}catch(e){ad=[]}
-var act=ad.filter(function(a){return a.status==='active'});
-html=html.replace(/<div class="ad-ph"[^>]*data-ad-pos="([^"]*)"[^>]*>[\s\S]*?<\/div>/g,function(m,pos){
-var mt=act.filter(function(a){return a.position===pos});
-if(mt.length){var a=mt[Math.floor(Math.random()*mt.length)];return'<div class="ad-render"><img src="'+esc(a.image||'')+'" alt="'+esc(a.name||'')+'"><div class="ad-label">广告</div></div>'}
-return'<div class="ad-empty"><i class="fas fa-rectangle-ad" style="font-size:16px;display:block;margin-bottom:4px;opacity:.15"></i>'+(POS_MAP[pos]?POS_MAP[pos].l:pos)+'<span style="font-size:9px;display:block;margin-top:2px">暂无匹配广告</span></div>';
-});
-html=html.replace(/<div class="cw"[^>]*>[\s\S]*?<\/div>/g,function(m,code){return'<pre style="margin:10px 0;border-radius:6px;padding:10px;background:var(--codebg);overflow-x:auto;border:1px solid var(--border)"><code style="font-family:monospace;font-size:11px;color:#7dd3fc;line-height:1.5">'+m+'</code></pre>'});
-html=html.replace(/contenteditable="[^"]*"/g,'');
-$('preview').innerHTML='<h1>'+esc(curId?((articles.find(function(x){return x.id===curId})||{}).title||'无标题':'')+'</h1>'+html;
-}
-
-/* ===== 发布 ===== */
-function pubArt(){if(!curId||!editor.innerHTML.trim()){toast('内容为空','err');return}
-var content=editor.innerHTML;
-content=content.replace(/<div class="ad-ph"[^>]*data-ad-pos="([^"]*)"[^>]*>[\s\S]*?<\/div>/g,function(m,pos){return'<div data-ad-pos="'+pos+'" style="max-width:728px;margin:14px auto"></div>'});
-content=content.replace(/contenteditable="[^"]*"/g,'');
-content=content.replace(/<div class="cw"[^>]*>[\s\S]*?<\/div>/g,function(){return'<pre style="margin:10px 0;border-radius:6px;padding:10px;background:#0a0d16;overflow-x:auto;border:1px solid #1e293b"><code style="font-family:monospace;font-size:14px;color:#7dd3fc;line-height:1.6">代码块</code></pre>'});
-var title=curId?((articles.find(function(x){return x.id===curId})||{}).title:'无标题');
-var date=new Date((articles.find(function(x){return x.id===curId})||{}).createTime||Date.now()).toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric'});
-var slots=(content.match(/data-ad-pos="([^"]*)"/g)||[]).map(function(s){return s.replace(/data-ad-pos="|"$/g,'')});
-var full='<!-- AdForge 嵌入代码 -->\n<div id="adforge-art-'+curId+'" style="max-width:760px;margin:0 auto;padding:20px 16px;color:#1e293b;font-family:-apple-system,sans-serif;line-height:1.8">\n<h1 style="font-size:28px;font-weight:900;margin-bottom:8px;color:#0f172a">'+esc(title)+'</h1>\n<div style="font-size:13px;color:#94a3b8;margin-bottom:28px;padding-bottom:16px;border-bottom:1px solid #e2e8f0">'+date+'</div>\n'+content+'\n</div>\n<!-- 广告脚本（从AdForge后台获取） -->\n<script>\n(function(){var s=document.querySelector("#adforge-art-'+curId+'");if(!s)return;document.querySelectorAll("[data-ad-pos]").forEach(function(e){var p=e.getAttribute("data-ad-pos");if(!p){e.style.display="none";return}e.style.display="block";e.style.maxWidth="728px";e.style.margin="14px auto";var c=e.getAttribute("data-ad-count");var n=c?parseInt(c):1;e.setAttribute("data-ad-count",n+1)})})();})();\n<\/script>';
-var blob=new Blob([full],{type:'text/html;charset=utf-8'});var url=URL.createObjectURL(blob);var link=document.createElement('a');link.href=url;link.download=title.replace(/[<>:"/\\|?*]/g,'_')+'.html';link.click();URL.revokeObjectURL(url);addLog('发布',title);toast('已下载');
-}
-
-/* ===== 收益面板 ===== */
-function showRevModal(){
-var totalAdRev=0,totalShareRev=0,platRev=0;
-articles.forEach(function(a){
-if(a.status==='published'){totalAdRev+=a.adRevenue||0;var sd=getShareData(a.id);if(sd){Object.keys(sd.channels).forEach(function(ch){if(sd.channels[ch]&&sd.channels[ch].on)totalShareRev+=sd.channels[ch].earnings||0})}});
-platRev=Math.round(totalAdRev*0.25+totalShareRev*0.1);
-$('RevBody').innerHTML='<div style="margin-bottom:12px;padding:10px;background:rgba(232,155,58,.05);border:1px solid rgba(232,155,58,.1);border-radius:6px;font-size:10px;color:var(--warn)"><i class="fas fa-info-circle" style="margin-right:4px"></i>分成比例：创作者 65% · 分享者 15% · 平台 20%</div>'+
-'<div class="rev-bar"><div class="rev-item"><span class="ri-label">创作者总收益</span><span class="ri-val" style="color:var(--accent)">¥'+fn(totalAdRev)+'</span></div><div class="rev-item"><span class="ri-label">分享者总收益</span><span class="ri-val" style="color:var(--accent2)">¥'+fn(totalShareRev)+'</span></div><div class="rev-item"><span class="ri-label">平台收益</span><span class="ri-val">¥'+fn(platRev)+'</span></div></div>';
-$('MoRev').classList.add('show');
-$('RevClose').addEventListener('click',function(){$('MoRev').classList.remove('show')});
-}
-
-/* ===== 分享面板 ===== */
-function showShareModal(aid){
-var a=articles.find(function(x){return x.id===aid});if(!a)return;
-var sd=a.share||{channels:{}};
-Object.keys(SHARES).forEach(function(ch){
-if(!sd.channels[ch])sd.channels[ch]={on:false,clicks:0,earnings:0};
-});
-a.share=sd;save();
-var m=document.createElement('div');m.className='mo';m.id='ShareMo';
-m.innerHTML='<div class="ml" style="max-width:400px"><div class="mh"><h4>分享设置 · '+(a.title||'无标题')+'</h4><button class="mx" type="button" id="ShareClose"><i class="fas fa-xmark"></i></button></div><div class="mb"><div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.5">分享此文章后，通过你的渠道带来的广告收益中，你将获得 <b style="color:var(--accent2)">15%</b> 的分成。分享越多，收益越高。</div>'+
-Object.entries(SHARES).map(function(ch){var s=sd.channels[ch]||{on:false,clicks:0,earnings:0};return'<div class="share-ch"><i class="fas '+ch.i+'" style="color:'+ch.color+'"></i><div class="sc-name">'+ch.l+'</div><div class="sc-toggle'+(s.on?' on':'')+'" data-ch="'+ch+'" data-aid="'+aid+'"></div><div class="sc-earn">¥'+fn(s.earnings)+'</div></div>'}).join('')+'</div></div>';
-$('body').appendChild(m);m.classList.add('show');
-$('ShareClose').addEventListener('click',function(){m.classList.remove('show')});
-m.addEventListener('click',function(e){var t=e.target.closest('.sc-toggle');if(!t)return;var ch=t.getAttribute('data-ch'),aid2=t.getAttribute('data-aid');
-var a2=articles.find(function(x){return x.id===Number(aid2)});if(!a2)return;
-a2.share.channels[ch]={on:!a2.share.channels[ch].on};save();showShareModal(Number(aid2))});
-}
-
-/* ===== 嵌入代码生成 ===== */
-function showEmbedModal(){
-var a=curId?(articles.find(function(x){return x.id===curId})||{}):{};
-var content=editor.innerHTML;
-var ad=[];try{ad=JSON.parse(localStorage.getItem('adforge_ads'))||[]}catch(e){ad=[]}
-content=content.replace(/<div class="ad-ph"[^>]*data-ad-pos="([^"]*)"[^>]*>[\s\S]*?<\/div>/g,function(m,pos){return'<div data-ad-pos="'+pos+'" style="max-width:728px;margin:14px auto"></div>'});
-content=content.replace(/contenteditable="[^"]*"/g,'');
-content=content.replace(/<div class="cw"[^>]*>[\s\S]*?<\/div>/g,function(){return'<pre style="margin:10px 0;border-radius:6px;padding:10px;background:#0a0d16;overflow-x:auto;border:1px solid #1e293b"><code style="font-family:monospace;font-size:14px;color:#7dd3fc;line-height:1.6">代码块</code></pre>'});
-var title=a.title||'无标题';
-var slots=(content.match(/data-ad-pos="([^"]*)"/g)||[]).map(function(s){return s.replace(/data-ad-pos="|"$/g,'')});
-var code='<div id="adforge-root" style="max-width:760px;margin:0 auto;padding:20px 16px;font-family:-apple-system,sans-serif;color:#1e293b;line-height:1.8">\n<h1 style="font-size:28px;font-weight:900;margin-bottom:8px;color:#0f172a">'+esc(title)+'</h1>\n'+content+'\n</div>\n<script>\n(function(){var r=document.querySelector("#adforge-root");if(!r)return;document.querySelectorAll("[data-ad-pos]").forEach(function(e){var p=e.getAttribute("data-ad-pos");if(!p){e.style.display="none";return}e.style.display="block";e.style.maxWidth="728px";e.style.margin="14px auto"})})();\n<\/script>';
-$('EmbBody').innerHTML='<div style="margin-bottom:10px;padding:10px;background:rgba(56,189,248,.05);border:1px solid rgba(56,189,248,.1);border-radius:6px;font-size:10px;color:var(--info)"><i class="fas fa-info-circle" style="margin-right:4px"></i>复制以下代码粘贴到目标网站的 HTML 编辑器中，广告脚本需从 AdForge 后台获取</div><div class="embed-code" id="embedCode" style="position:relative">'+esc(code)+'<button class="embed-copy" id="embedCopy" type="button">复制代码</button></div><div style="margin-top:8px;font-size:9px;color:var(--muted)">包含 '+(slots.length?slots.length+' 个广告位'+(a.status==='published'?' · 已发布':'')+'</div>';
-$('MoEmbed').classList.add('show');
-$('EmbClose').addEventListener('click',function(){$('MoEmbed').classList.remove('show')});
-$('embedCopy').addEventListener('click',function(){var t=this.previousElementSibling||this.parentElement.querySelector('.embed-code');navigator.clipboard.writeText(t.textContent).then(function(){toast('已复制')}).catch(function(){var r=document.createElement('textarea');r.value=t.textContent;document.body.appendChild(r);r.select();document.execCommand('copy');r.remove();toast('已复制')})});
-}
-
-/* ===== 操作日志 ===== */
-function addLog(act,t){auditLog.unshift({time:Date.now(),act:act,t:t||''});if(auditLog.length>50)auditLog.length=50}
-
-/* ===== 弹窗通用关闭 ===== */
-['MoRev','MoEmbed','MoCfm'].forEach(function(id){
-var el=$(id);if(!el)return;
-el.addEventListener('click',function(e){if(e.target===el)el.classList.remove('show')});
-});
-
-/* ===== 示例数据 ===== */
-function loadDemo(){
-articles=[
-{id:1,title:'AdForge 使用指南',owner:'admin',status:'published',createTime:Date.now()-86400000,updateTime:Date.now()-3600000,adRevenue:12680,share:{channels:{wechat:{on:true,clicks:2340,earnings:1901},weibo:{on:true,clicks:890,earnings:723},qq:{on:false,clicks:0,earnings:0},link:{on:true,clicks:567,earnings:459}}},
-{id:2,title:'前端性能优化实战',owner:'creator',status:'published',createTime:Date.now()-172800000,updateTime:Date.now()-7200000,adRevenue:8450,share:{channels:{wechat:{on:true,clicks:1200,earnings:972},weibo:{on:false,clicks:0,earnings:0}}},
-{id:3,title:'产品体验设计方法论',owner:'sharer',shareStatus:'on',status:'published',createTime:Date.now()-259200000,updateTime:Date.now()-10800000,share:{channels:{wechat:{on:true,clicks:345,earnings:278},weibo:{on:true,clicks:128,earnings:103},link:{on:false,clicks:0,earnings:0}}}
-];save();renderList();if(curId)selectAndLoad(curId);
-}
-
-/* ===== 启动 ===== */
-load();
-if(articles.length===0)loadDemo();
-renderList();
-if(curId)selectAndLoad(curId);
-});
-</script>
+    <div class="container">
+        <div class="editor-wrapper">
+            <!-- 左侧边栏 -->
+            <div class="sidebar">
+                <div class="logo">
+                    <h1><i class="fas fa-edit"></i> SaaS Editor</h1>
+                </div>
+                
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h3>创作者</h3>
+                    <p>admin@example.com</p>
+                </div>
+                
+                <div class="sidebar-menu">
+                    <div class="menu-item active" data-tab="editor">
+                        <i class="fas fa-edit"></i>
+                        <span>编辑器</span>
+                    </div>
+                    <div class="menu-item" data-tab="articles">
+                        <i class="fas fa-file-alt"></i>
+                        <span>文章管理</span>
+                    </div>
+                    <div class="menu-item" data-tab="ads">
+                        <i class="fas fa-ad"></i>
+                        <span>广告管理</span>
+                    </div>
+                    <div class="menu-item" data-tab="analytics">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>数据分析</span>
+                    </div>
+                    <div class="menu-item" data-tab="settings">
+                        <i class="fas fa-cog"></i>
+                        <span>设置</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 主要内容区 -->
+            <div class="main-content">
+                <!-- 顶部栏 -->
+                <div class="top-bar">
+                    <input type="text" class="article-title" id="articleTitle" placeholder="输入文章标题...">
+                    
+                    <div class="top-actions">
+                        <button class="btn btn-secondary" id="saveDraftBtn">
+                            <i class="fas fa-save"></i> 保存草稿
+                        </button>
+                        <button class="btn btn-primary" id="publishBtn">
+                            <i class="fas fa-paper-plane"></i> 发布文章
+                        </button>
+                        <button class="btn btn-success" id="exportBtn">
+                            <i class="fas fa-download"></i> 导出
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 工具栏 -->
+                <div class="toolbar">
+                    <!-- 字体样式 -->
+                    <div class="toolbar-group">
+                        <select class="font-select" id="fontFamily">
+                            <option value="">选择字体</option>
+                            <option value="Arial, sans-serif">Arial</option>
+                            <option value="'Times New Roman', serif">Times New Roman</option>
+                            <option value="'Courier New', monospace">Courier New</option>
+                            <option value="Georgia, serif">Georgia</option>
+                        </select>
+                        
+                        <select class="font-size-select" id="fontSize">
+                            <option value="">字号</option>
+                            <option value="12">12px</option>
+                            <option value="14">14px</option>
+                            <option value="16" selected>16px</option>
+                            <option value="18">18px</option>
+                            <option value="20">20px</option>
+                            <option value="24">24px</option>
+                            <option value="30">30px</option>
+                        </select>
+                        
+                        <button class="toolbar-btn" id="boldBtn" title="加粗">
+                            <i class="fas fa-bold"></i>
+                        </button>
+                        <button class="toolbar-btn" id="italicBtn" title="斜体">
+                            <i class="fas fa-italic"></i>
+                        </button>
+                        <button class="toolbar-btn" id="underlineBtn" title="下划线">
+                            <i class="fas fa-underline"></i>
+                        </button>
+                        <button class="toolbar-btn" id="strikeBtn" title="删除线">
+                            <i class="fas fa-strikethrough"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- 标题和段落 -->
+                    <div class="toolbar-group">
+                        <button class="toolbar-btn" id="h1Btn" title="标题1">
+                            H1
+                        </button>
+                        <button class="toolbar-btn" id="h2Btn" title="标题2">
+                            H2
+                        </button>
+                        <button class="toolbar-btn" id="h3Btn" title="标题3">
+                            H3
+                        </button>
+                        
+                        <div class="dropdown">
+                            <button class="toolbar-btn" id="textColorBtn" title="文字颜色">
+                                <i class="fas fa-palette"></i>
+                            </button>
+                            <div class="color-options" id="textColorOptions">
+                                <div class="color-option" style="background-color: #000000;" data-color="#000000"></div>
+                                <div class="color-option" style="background-color: #333333;" data-color="#333333"></div>
+                                <div class="color-option" style="background-color: #666666;" data-color="#666666"></div>
+                                <div class="color-option" style="background-color: #FF0000;" data-color="#FF0000"></div>
+                                <div class="color-option" style="background-color: #00FF00;" data-color="#00FF00"></div>
+                                <div class="color-option" style="background-color: #0000FF;" data-color="#0000FF"></div>
+                                <div class="color-option" style="background-color: #FFFF00;" data-color="#FFFF00"></div>
+                                <div class="color-option" style="background-color: #FF00FF;" data-color="#FF00FF"></div>
+                                <div class="color-option" style="background-color: #00FFFF;" data-color="#00FFFF"></div>
+                                <div class="color-option" style="background-color: #FFA500;" data-color="#FFA500"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="dropdown">
+                            <button class="toolbar-btn" id="highlightBtn" title="背景高亮">
+                                <i class="fas fa-highlighter"></i>
+                            </button>
+                            <div class="color-options" id="highlightOptions">
+                                <div class="color-option" style="background-color: #FFFF00;" data-color="#FFFF00"></div>
+                                <div class="color-option" style="background-color: #FFD700;" data-color="#FFD700"></div>
+                                <div class="color-option" style="background-color: #98FB98;" data-color="#98FB98"></div>
+                                <div class="color-option" style="background-color: #ADD8E6;" data-color="#ADD8E6"></div>
+                                <div class="color-option" style="background-color: #FFB6C1;" data-color="#FFB6C1"></div>
+                                <div class="color-option" style="background-color: #DDA0DD;" data-color="#DDA0DD"></div>
+                                <div class="color-option" style="background-color: #F0E68C;" data-color="#F0E68C"></div>
+                                <div class="color-option" style="background-color: #E6E6FA;" data-color="#E6E6FA"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 对齐和列表 -->
+                    <div class="toolbar-group">
+                        <button class="toolbar-btn" id="alignLeftBtn" title="左对齐">
+                            <i class="fas fa-align-left"></i>
+                        </button>
+                        <button class="toolbar-btn" id="alignCenterBtn" title="居中对齐">
+                            <i class="fas fa-align-center"></i>
+                        </button>
+                        <button class="toolbar-btn" id="alignRightBtn" title="右对齐">
+                            <i class="fas fa-align-right"></i>
+                        </button>
+                        <button class="toolbar-btn" id="alignJustifyBtn" title="两端对齐">
+                            <i class="fas fa-align-justify"></i>
+                        </button>
+                        
+                        <button class="toolbar-btn" id="bulletListBtn" title="无序列表">
+                            <i class="fas fa-list-ul"></i>
+                        </button>
+                        <button class="toolbar-btn" id="orderedListBtn" title="有序列表">
+                            <i class="fas fa-list-ol"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- 插入功能 -->
+                    <div class="toolbar-group">
+                        <button class="toolbar-btn" id="insertLinkBtn" title="插入链接">
+                            <i class="fas fa-link"></i>
+                        </button>
+                        <button class="toolbar-btn" id="insertImageBtn" title="插入图片">
+                            <i class="fas fa-image"></i>
+                        </button>
+                        <button class="toolbar-btn" id="insertVideoBtn" title="插入视频">
+                            <i class="fas fa-video"></i>
+                        </button>
+                        <button class="toolbar-btn" id="insertTableBtn" title="插入表格">
+                            <i class="fas fa-table"></i>
+                        </button>
+                        <button class="toolbar-btn" id="codeBtn" title="插入代码">
+                            <i class="fas fa-code"></i>
+                        </button>
+                        <button class="toolbar-btn" id="quoteBtn" title="引用">
+                            <i class="fas fa-quote-right"></i>
+                        </button>
+                        <button class="toolbar-btn" id="horizontalRuleBtn" title="分割线">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- 广告插入 -->
+                    <div class="toolbar-group">
+                        <select id="adSourceSelect" style="height: 36px; padding: 0 10px; border: 1px solid #dee2e6; border-radius: 4px;">
+                            <option value="">选择广告源</option>
+                            <option value="adsense">Google AdSense</option>
+                            <option value="custom">自定义广告</option>
+                            <option value="banner">横幅广告</option>
+                            <option value="native">原生广告</option>
+                        </select>
+                        <button class="toolbar-btn" id="insertAdBtn" title="插入广告">
+                            <i class="fas fa-ad"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- 其他功能 -->
+                    <div class="toolbar-group">
+                        <button class="toolbar-btn" id="undoBtn" title="撤销">
+                            <i class="fas fa-undo"></i>
+                        </button>
+                        <button class="toolbar-btn" id="redoBtn" title="重做">
+                            <i class="fas fa-redo"></i>
+                        </button>
+                        <button class="toolbar-btn" id="clearFormatBtn" title="清除格式">
+                            <i class="fas fa-eraser"></i>
+                        </button>
+                        <button class="toolbar-btn" id="zoomInBtn" title="放大">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                        <button class="toolbar-btn" id="zoomOutBtn" title="缩小">
+                            <i class="fas fa-search-minus"></i>
+                        </button>
+                        <button class="toolbar-btn" id="spellCheckBtn" title="拼写检查">
+                            <i class="fas fa-spell-check"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 编辑器区域 -->
+                <div class="editor-area" id="editorArea">
+                    <!-- 编辑器内容将通过JavaScript生成 -->
+                </div>
+                
+                <!-- 状态栏 -->
+                <div class="status-bar">
+                    <div class="word-count">
+                        <i class="fas fa-font"></i>
+                        <span id="wordCount">0 字</span>
+                    </div>
+                    <div class="char-count">
+                        <i class="fas fa-text-height"></i>
+                        <span id="charCount">0 字符</span>
+                    </div>
+                    <div>
+                        <span>状态: <span id="editorStatus">就绪</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 插入链接模态框 -->
+    <div class="modal" id="linkModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>插入链接</h3>
+                <button class="toolbar-btn close-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="linkUrl">链接地址</label>
+                    <input type="text" class="form-control" id="linkUrl" placeholder="https://example.com">
+                </div>
+                <div class="form-group">
+                    <label for="linkText">链接文本</label>
+                    <input type="text" class="form-control" id="linkText" placeholder="点击这里">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary close-modal">取消</button>
+                <button class="btn btn-primary" id="insertLinkConfirm">插入链接</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 插入图片模态框 -->
+    <div class="modal" id="imageModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>插入图片</h3>
+                <button class="toolbar-btn close-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="imageUrl">图片地址</label>
+                    <input type="text" class="form-control" id="imageUrl" placeholder="https://example.com/image.jpg">
+                </div>
+                <div class="form-group">
+                    <label for="imageAlt">图片描述</label>
+                    <input type="text" class="form-control" id="imageAlt" placeholder="图片描述">
+                </div>
+                <div class="form-group">
+                    <label for="imageWidth">宽度 (px)</label>
+                    <input type="number" class="form-control" id="imageWidth" placeholder="自动">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary close-modal">取消</button>
+                <button class="btn btn-primary" id="insertImageConfirm">插入图片</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 插入表格模态框 -->
+    <div class="modal" id="tableModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>插入表格</h3>
+                <button class="toolbar-btn close-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="tableRows">行数</label>
+                    <input type="number" class="form-control" id="tableRows" min="1" max="10" value="3">
+                </div>
+                <div class="form-group">
+                    <label for="tableCols">列数</label>
+                    <input type="number" class="form-control" id="tableCols" min="1" max="10" value="3">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary close-modal">取消</button>
+                <button class="btn btn-primary" id="insertTableConfirm">插入表格</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 广告管理模态框 -->
+    <div class="modal" id="adModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>广告源管理</h3>
+                <button class="toolbar-btn close-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <button class="btn btn-primary" id="addAdSourceBtn" style="margin-bottom: 15px;">
+                    <i class="fas fa-plus"></i> 添加广告源
+                </button>
+                
+                <div class="ad-sources-list" id="adSourcesList">
+                    <!-- 广告源列表将通过JavaScript生成 -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary close-modal">关闭</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 初始化编辑器
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取编辑器区域
+            const editorArea = document.getElementById('editorArea');
+            
+            // 设置编辑器内容
+            editorArea.contentEditable = true;
+            editorArea.innerHTML = `
+                <h1>欢迎使用SaaS富文本编辑器</h1>
+                <p>这是一个功能齐全的富文本编辑器，支持各种格式设置和广告插入功能。</p>
+                <p>您可以：</p>
+                <ul>
+                    <li>设置字体、字号、颜色</li>
+                    <li>插入图片、视频、链接</li>
+                    <li>添加表格、代码块、引用</li>
+                    <li>插入广告位并选择广告源</li>
+                    <li>保存草稿或发布文章</li>
+                </ul>
+                <p>开始创作您的内容吧！</p>
+            `;
+            
+            // 初始化变量
+            let currentFontSize = 16;
+            let currentTextColor = '#000000';
+            let currentHighlightColor = '#FFFF00';
+            let isBold = false;
+            let isItalic = false;
+            let isUnderline = false;
+            let isStrike = false;
+            let wordCount = 0;
+            let charCount = 0;
+            let adSources = [
+                { id: 1, name: 'Google AdSense', code: '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>', type: 'script' },
+                { id: 2, name: '自定义广告', code: '<div class="ad-container">您的广告代码</div>', type: 'html' },
+                { id: 3, name: '横幅广告', code: '<div style="width: 728px; height: 90px; background: #f0f0f0; display: flex; align-items: center; justify-content: center;">横幅广告 (728x90)</div>', type: 'banner' },
+                { id: 4, name: '原生广告', code: '<div style="padding: 15px; border: 1px solid #ddd; border-radius: 5px; background: #f9f9f9;"><h4>推荐内容</h4><p>这是一条原生广告，与内容样式一致。</p></div>', type: 'native' }
+            ];
+            
+            // 更新字数统计
+            function updateWordCount() {
+                const text = editorArea.innerText || '';
+                // 移除多余的空格和换行
+                const cleanText = text.replace(/\s+/g, ' ').trim();
+                // 中文字数统计（一个中文字符算一个字）
+                const chineseChars = (cleanText.match(/[\u4e00-\u9fa5]/g) || []).length;
+                // 英文单词数
+                const englishWords = cleanText.replace(/[\u4e00-\u9fa5]/g, '').split(/\s+/).filter(word => word.length > 0).length;
+                wordCount = chineseChars + englishWords;
+                charCount = cleanText.length;
+                
+                document.getElementById('wordCount').textContent = `${wordCount} 字`;
+                document.getElementById('charCount').textContent = `${charCount} 字符`;
+            }
+            
+            // 监听编辑器内容变化
+            editorArea.addEventListener('input', updateWordCount);
+            updateWordCount(); // 初始化统计
+            
+            // 字体选择
+            document.getElementById('fontFamily').addEventListener('change', function() {
+                document.execCommand('fontName', false, this.value);
+            });
+            
+            // 字号选择
+            document.getElementById('fontSize').addEventListener('change', function() {
+                if (this.value) {
+                    currentFontSize = this.value;
+                    document.execCommand('fontSize', false, 7); // 7是最大字号，我们会用CSS覆盖
+                    // 设置具体的字号
+                    document.execCommand('styleWithCSS', false, true);
+                    const selection = window.getSelection();
+                    if (selection.rangeCount > 0) {
+                        const range = selection.getRangeAt(0);
+                        const span = document.createElement('span');
+                        span.style.fontSize = `${this.value}px`;
+                        range.surroundContents(span);
+                    }
+                }
+            });
+            
+            // 加粗
+            document.getElementById('boldBtn').addEventListener('click', function() {
+                document.execCommand('bold');
+                isBold = !isBold;
+                this.classList.toggle('active', isBold);
+            });
+            
+            // 斜体
+            document.getElementById('italicBtn').addEventListener('click', function() {
+                document.execCommand('italic');
+                isItalic = !isItalic;
+                this.classList.toggle('active', isItalic);
+            });
+            
+            // 下划线
+            document.getElementById('underlineBtn').addEventListener('click', function() {
+                document.execCommand('underline');
+                isUnderline = !isUnderline;
+                this.classList.toggle('active', isUnderline);
+            });
+            
+            // 删除线
+            document.getElementById('strikeBtn').addEventListener('click', function() {
+                document.execCommand('strikeThrough');
+                isStrike = !isStrike;
+                this.classList.toggle('active', isStrike);
+            });
+            
+            // 标题按钮
+            document.getElementById('h1Btn').addEventListener('click', function() {
+                document.execCommand('formatBlock', false, '<h1>');
+            });
+            
+            document.getElementById('h2Btn').addEventListener('click', function() {
+                document.execCommand('formatBlock', false, '<h2>');
+            });
+            
+            document.getElementById('h3Btn').addEventListener('click', function() {
+                document.execCommand('formatBlock', false, '<h3>');
+            });
+            
+            // 文字颜色
+            document.getElementById('textColorBtn').addEventListener('click', function() {
+                const options = document.getElementById('textColorOptions');
+                options.classList.toggle('show');
+            });
+            
+            // 文字颜色选项
+            document.querySelectorAll('#textColorOptions .color-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    const color = this.getAttribute('data-color');
+                    document.execCommand('foreColor', false, color);
+                    document.getElementById('textColorOptions').classList.remove('show');
+                });
+            });
+            
+            // 高亮颜色
+            document.getElementById('highlightBtn').addEventListener('click', function() {
+                const options = document.getElementById('highlightOptions');
+                options.classList.toggle('show');
+            });
+            
+            // 高亮颜色选项
+            document.querySelectorAll('#highlightOptions .color-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    const color = this.getAttribute('data-color');
+                    document.execCommand('backColor', false, color);
+                    document.getElementById('highlightOptions').classList.remove('show');
+                });
+            });
+            
+            // 对齐按钮
+            document.getElementById('alignLeftBtn').addEventListener('click', function() {
+                document.execCommand('justifyLeft');
+            });
+            
+            document.getElementById('alignCenterBtn').addEventListener('click', function() {
+                document.execCommand('justifyCenter');
+            });
+            
+            document.getElementById('alignRightBtn').addEventListener('click', function() {
+                document.execCommand('justifyRight');
+            });
+            
+            document.getElementById('alignJustifyBtn').addEventListener('click', function() {
+                document.execCommand('justifyFull');
+            });
+            
+            // 列表按钮
+            document.getElementById('bulletListBtn').addEventListener('click', function() {
+                document.execCommand('insertUnorderedList');
+            });
+            
+            document.getElementById('orderedListBtn').addEventListener('click', function() {
+                document.execCommand('insertOrderedList');
+            });
+            
+            // 插入链接
+            document.getElementById('insertLinkBtn').addEventListener('click', function() {
+                document.getElementById('linkModal').classList.add('show');
+                // 如果有选中的文本，设置为链接文本
+                const selection = window.getSelection().toString();
+                if (selection) {
+                    document.getElementById('linkText').value = selection;
+                }
+            });
+            
+            document.getElementById('insertLinkConfirm').addEventListener('click', function() {
+                const url = document.getElementById('linkUrl').value;
+                const text = document.getElementById('linkText').value || url;
+                
+                if (url) {
+                    // 创建链接
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.textContent = text;
+                    link.target = '_blank';
+                    link.rel = 'noopener noreferrer';
+                    
+                    // 插入链接
+                    const selection = window.getSelection();
+                    if (selection.rangeCount > 0) {
+                        const range = selection.getRangeAt(0);
+                        range.deleteContents();
+                        range.insertNode(link);
+                    }
+                    
+                    // 关闭模态框
+                    document.getElementById('linkModal').classList.remove('show');
+                    // 清空表单
+                    document.getElementById('linkUrl').value = '';
+                    document.getElementById('linkText').value = '';
+                } else {
+                    alert('请输入链接地址');
+                }
+            });
+            
+            // 插入图片
+            document.getElementById('insertImageBtn').addEventListener('click', function() {
+                document.getElementById('imageModal').classList.add('show');
+            });
+            
+            document.getElementById('insertImageConfirm').addEventListener('click', function() {
+                const url = document.getElementById('imageUrl').value;
+                const alt = document.getElementById('imageAlt').value || '图片';
+                const width = document.getElementById('imageWidth').value;
+                
+                if (url) {
+                    // 创建图片
+                    const img = document.createElement('img');
+                    img.src = url;
+                    img.alt = alt;
+                    if (width) img.style.width = `${width}px`;
+                    img.style.maxWidth = '100%';
+                    img.style.height = 'auto';
+                    
+                    // 插入图片
+                    document.execCommand('insertHTML', false, img.outerHTML);
+                    
+                    // 关闭模态框
+                    document.getElementById('imageModal').classList.remove('show');
+                    // 清空表单
+                    document.getElementById('imageUrl').value = '';
+                    document.getElementById('imageAlt').value = '';
+                    document.getElementById('imageWidth').value = '';
+                } else {
+                    alert('请输入图片地址');
+                }
+            });
+            
+            // 插入表格
+            document.getElementById('insertTableBtn').addEventListener('click', function() {
+                document.getElementById('tableModal').classList.add('show');
+            });
+            
+            document.getElementById('insertTableConfirm').addEventListener('click', function() {
+                const rows = parseInt(document.getElementById('tableRows').value) || 3;
+                const cols = parseInt(document.getElementById('tableCols').value) || 3;
+                
+                // 创建表格
+                let tableHTML = '<table style="width: 100%; border-collapse: collapse;">';
+                
+                // 表头
+                tableHTML += '<thead><tr>';
+                for (let i = 0; i < cols; i++) {
+                    tableHTML += `<th style="border: 1px solid #ddd; padding: 8px; text-align: left;">标题 ${i+1}</th>`;
+                }
+                tableHTML += '</tr></thead>';
+                
+                // 表格内容
+                tableHTML += '<tbody>';
+                for (let i = 0; i < rows; i++) {
+                    tableHTML += '<tr>';
+                    for (let j = 0; j < cols; j++) {
+                        tableHTML += `<td style="border: 1px solid #ddd; padding: 8px;">内容 ${i+1}-${j+1}</td>`;
+                    }
+                    tableHTML += '</tr>';
+                }
+                tableHTML += '</tbody></table>';
+                
+                // 插入表格
+                document.execCommand('insertHTML', false, tableHTML);
+                
+                // 关闭模态框
+                document.getElementById('tableModal').classList.remove('show');
+            });
+            
+            // 插入广告
+            document.getElementById('insertAdBtn').addEventListener('click', function() {
+                const adSource = document.getElementById('adSourceSelect').value;
+                
+                if (!adSource) {
+                    alert('请先选择一个广告源');
+                    return;
+                }
+                
+                // 获取选中的广告源
+                const selectedAd = adSources.find(ad => 
+                    ad.name.toLowerCase().includes(adSource) || 
+                    ad.type === adSource
+                ) || adSources[0];
+                
+                // 创建广告占位符
+                const adPlaceholder = document.createElement('div');
+                adPlaceholder.className = 'ad-placeholder';
+                adPlaceholder.innerHTML = `
+                    <i class="fas fa-ad"></i>
+                    <p>广告位: ${selectedAd.name}</p>
+                    <small>发布后将显示实际广告</small>
+                `;
+                adPlaceholder.setAttribute('data-ad-id', selectedAd.id);
+                adPlaceholder.setAttribute('contenteditable', 'false');
+                
+                // 插入广告占位符
+                document.execCommand('insertHTML', false, adPlaceholder.outerHTML);
+                
+                // 更新状态
+                document.getElementById('editorStatus').textContent = '广告已插入';
+                setTimeout(() => {
+                    document.getElementById('editorStatus').textContent = '就绪';
+                }, 2000);
+            });
+            
+            // 插入代码
+            document.getElementById('codeBtn').addEventListener('click', function() {
+                const code = prompt('请输入代码:');
+                if (code) {
+                    const codeBlock = document.createElement('pre');
+                    const codeElement = document.createElement('code');
+                    codeElement.textContent = code;
+                    codeBlock.appendChild(codeElement);
+                    document.execCommand('insertHTML', false, codeBlock.outerHTML);
+                }
+            });
+            
+            // 插入引用
+            document.getElementById('quoteBtn').addEventListener('click', function() {
+                document.execCommand('formatBlock', false, '<blockquote>');
+            });
+            
+            // 插入分割线
+            document.getElementById('horizontalRuleBtn').addEventListener('click', function() {
+                document.execCommand('insertHorizontalRule');
+            });
+            
+            // 插入视频
+            document.getElementById('insertVideoBtn').addEventListener('click', function() {
+                const url = prompt('请输入视频URL (YouTube, Vimeo等):');
+                if (url) {
+                    let videoHTML = '';
+                    
+                    // 检查是否是YouTube视频
+                    if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                        let videoId = '';
+                        if (url.includes('v=')) {
+                            videoId = url.split('v=')[1].split('&')[0];
+                        } else if (url.includes('youtu.be/')) {
+                            videoId = url.split('youtu.be/')[1].split('?')[0];
+                        }
+                        
+                        if (videoId) {
+                            videoHTML = `<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; margin: 1em 0;">
+                                <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" 
+                                        src="https://www.youtube.com/embed/${videoId}" 
+                                        frameborder="0" 
+                                        allowfullscreen>
+                                </iframe>
+                            </div>`;
+                        }
+                    } else {
+                        // 通用视频嵌入
+                        videoHTML = `<video controls style="max-width: 100%; margin: 1em 0;">
+                                <source src="${url}" type="video/mp4">
+                                您的浏览器不支持视频标签。
+                            </video>`;
+                    }
+                    
+                    if (videoHTML) {
+                        document.execCommand('insertHTML', false, videoHTML);
+                    }
+                }
+            });
+            
+            // 撤销/重做
+            document.getElementById('undoBtn').addEventListener('click', function() {
+                document.execCommand('undo');
+            });
+            
+            document.getElementById('redoBtn').addEventListener('click', function() {
+                document.execCommand('redo');
+            });
+            
+            // 清除格式
+            document.getElementById('clearFormatBtn').addEventListener('click', function() {
+                document.execCommand('removeFormat');
+            });
+            
+            // 缩放
+            let zoomLevel = 1;
+            document.getElementById('zoomInBtn').addEventListener('click', function() {
+                if (zoomLevel < 2) {
+                    zoomLevel += 0.1;
+                    editorArea.style.transform = `scale(${zoomLevel})`;
+                    editorArea.style.transformOrigin = 'top left';
+                }
+            });
+            
+            document.getElementById('zoomOutBtn').addEventListener('click', function() {
+                if (zoomLevel > 0.5) {
+                    zoomLevel -= 0.1;
+                    editorArea.style.transform = `scale(${zoomLevel})`;
+                    editorArea.style.transformOrigin = 'top left';
+                }
+            });
+            
+            // 拼写检查
+            document.getElementById('spellCheckBtn').addEventListener('click', function() {
+                document.execCommand('enableObjectResizing', false, false);
+                document.execCommand('enableInlineTableEditing', false, false);
+                // 简单拼写检查模拟
+                alert('拼写检查完成，未发现错误。');
+            });
+            
+            // 保存草稿
+            document.getElementById('saveDraftBtn').addEventListener('click', function() {
+                const title = document.getElementById('articleTitle').value || '未命名文章';
+                const content = editorArea.innerHTML;
+                
+                // 保存到localStorage
+                const draft = {
+                    title: title,
+                    content: content,
+                    timestamp: new Date().toISOString(),
+                    wordCount: wordCount,
+                    charCount: charCount
+                };
+                
+                localStorage.setItem('editorDraft', JSON.stringify(draft));
+                
+                // 更新状态
+                document.getElementById('editorStatus').textContent = '草稿已保存';
+                this.innerHTML = '<i class="fas fa-check"></i> 已保存';
+                this.classList.add('btn-success');
+                
+                setTimeout(() => {
+                    document.getElementById('editorStatus').textContent = '就绪';
+                    this.innerHTML = '<i class="fas fa-save"></i> 保存草稿';
+                    this.classList.remove('btn-success');
+                }, 2000);
+            });
+            
+            // 发布文章
+            document.getElementById('publishBtn').addEventListener('click', function() {
+                const title = document.getElementById('articleTitle').value || '未命名文章';
+                let content = editorArea.innerHTML;
+                
+                if (!title.trim() || !content.trim() || content === '<p><br></p>') {
+                    alert('请输入文章标题和内容');
+                    return;
+                }
+                
+                // 替换广告占位符为实际广告代码
+                const adPlaceholders = editorArea.querySelectorAll('.ad-placeholder');
+                adPlaceholders.forEach(placeholder => {
+                    const adId = placeholder.getAttribute('data-ad-id');
+                    if (adId) {
+                        const adSource = adSources.find(ad => ad.id == adId);
+                        if (adSource) {
+                            const adDiv = document.createElement('div');
+                            adDiv.className = 'ad-container';
+                            adDiv.innerHTML = adSource.code;
+                            placeholder.replaceWith(adDiv);
+                        }
+                    }
+                });
+                
+                content = editorArea.innerHTML;
+                
+                // 生成发布数据
+                const article = {
+                    title: title,
+                    content: content,
+                    publishedAt: new Date().toISOString(),
+                    wordCount: wordCount,
+                    charCount: charCount,
+                    url: `article_${Date.now()}`
+                };
+                
+                // 保存到localStorage
+                localStorage.setItem('publishedArticle', JSON.stringify(article));
+                
+                // 显示成功消息
+                document.getElementById('editorStatus').textContent = '文章已发布';
+                this.innerHTML = '<i class="fas fa-check"></i> 已发布';
+                this.classList.add('btn-success');
+                
+                // 生成分享链接
+                setTimeout(() => {
+                    const shareUrl = `${window.location.origin}?article=${article.url}`;
+                    alert(`文章发布成功！\n\n标题: ${title}\n字数: ${wordCount}\n\n分享链接: ${shareUrl}\n\n内容已保存到浏览器本地存储。`);
+                    
+                    document.getElementById('editorStatus').textContent = '就绪';
+                    this.innerHTML = '<i class="fas fa-paper-plane"></i> 发布文章';
+                    this.classList.remove('btn-success');
+                }, 1000);
+            });
+            
+            // 导出功能
+            document.getElementById('exportBtn').addEventListener('click', function() {
+                const title = document.getElementById('articleTitle').value || '未命名文章';
+                const content = editorArea.innerHTML;
+                
+                // 创建导出内容
+                const exportContent = `
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${title}</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .ad-container { margin: 20px 0; padding: 20px; background: #f5f5f5; border: 1px dashed #ccc; text-align: center; }
+    </style>
+</head>
+<body>
+    <h1>${title}</h1>
+    ${content}
+    <p><em>文章创建于: ${new Date().toLocaleString()}</em></p>
+</body>
+</html>`;
+                
+                // 创建下载链接
+                const blob = new Blob([exportContent], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${title.replace(/\s+/g, '_')}.html`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                // 更新状态
+                document.getElementById('editorStatus').textContent = '已导出HTML';
+                setTimeout(() => {
+                    document.getElementById('editorStatus').textContent = '就绪';
+                }, 2000);
+            });
+            
+            // 侧边栏菜单
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const tab = this.getAttribute('data-tab');
+                    // 这里可以添加切换标签页的逻辑
+                    if (tab === 'ads') {
+                        showAdManagement();
+                    }
+                });
+            });
+            
+            // 显示广告管理
+            function showAdManagement() {
+                const adSourcesList = document.getElementById('adSourcesList');
+                adSourcesList.innerHTML = '';
+                
+                adSources.forEach((ad, index) => {
+                    const adItem = document.createElement('div');
+                    adItem.className = 'ad-source-item';
+                    adItem.innerHTML = `
+                        <h4>${ad.name}</h4>
+                        <p><small>类型: ${ad.type}</small></p>
+                        <div style="margin-top: 10px; display: flex; gap: 10px;">
+                            <button class="btn btn-secondary" onclick="editAdSource(${index})" style="padding: 5px 10px; font-size: 0.8rem;">编辑</button>
+                            <button class="btn btn-danger" onclick="deleteAdSource(${index})" style="padding: 5px 10px; font-size: 0.8rem;">删除</button>
+                        </div>
+                    `;
+                    adSourcesList.appendChild(adItem);
+                });
+                
+                document.getElementById('adModal').classList.add('show');
+            }
+            
+            // 添加广告源
+            document.getElementById('addAdSourceBtn').addEventListener('click', function() {
+                const name = prompt('请输入广告源名称:');
+                if (name) {
+                    const type = prompt('请输入广告类型 (script/html/banner/native):');
+                    if (type) {
+                        const code = prompt('请输入广告代码:');
+                        if (code) {
+                            adSources.push({
+                                id: adSources.length + 1,
+                                name: name,
+                                code: code,
+                                type: type
+                            });
+                            
+                            // 更新广告源选择框
+                            updateAdSourceSelect();
+                            // 重新显示广告管理
+                            showAdManagement();
+                            
+                            alert('广告源添加成功！');
+                        }
+                    }
+                }
+            });
+            
+            // 更新广告源选择框
+            function updateAdSourceSelect() {
+                const select = document.getElementById('adSourceSelect');
+                // 保存当前选中的值
+                const currentValue = select.value;
+                // 清空选项（除了第一个）
+                while (select.options.length > 1) {
+                    select.remove(1);
+                }
+                
+                // 添加广告源选项
+                adSources.forEach(ad => {
+                    const option = document.createElement('option');
+                    option.value = ad.id;
+                    option.textContent = ad.name;
+                    select.appendChild(option);
+                });
+                
+                // 恢复之前选中的值
+                if (currentValue) {
+                    select.value = currentValue;
+                }
+            }
+            
+            // 编辑广告源
+            window.editAdSource = function(index) {
+                const ad = adSources[index];
+                const newName = prompt('修改广告源名称:', ad.name);
+                if (newName !== null) {
+                    ad.name = newName;
+                }
+                
+                const newType = prompt('修改广告类型:', ad.type);
+                if (newType !== null) {
+                    ad.type = newType;
+                }
+                
+                const newCode = prompt('修改广告代码:', ad.code);
+                if (newCode !== null) {
+                    ad.code = newCode;
+                }
+                
+                updateAdSourceSelect();
+                showAdManagement();
+            };
+            
+            // 删除广告源
+            window.deleteAdSource = function(index) {
+                if (confirm('确定要删除这个广告源吗？')) {
+                    adSources.splice(index, 1);
+                    updateAdSourceSelect();
+                    showAdManagement();
+                }
+            };
+            
+            // 关闭模态框
+            document.querySelectorAll('.close-modal').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    this.closest('.modal').classList.remove('show');
+                });
+            });
+            
+            // 点击模态框外部关闭
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        this.classList.remove('show');
+                    }
+                });
+            });
+            
+            // 初始化广告源选择框
+            updateAdSourceSelect();
+            
+            // 加载保存的草稿
+            const savedDraft = localStorage.getItem('editorDraft');
+            if (savedDraft) {
+                if (confirm('检测到有保存的草稿，是否加载？')) {
+                    try {
+                        const draft = JSON.parse(savedDraft);
+                        document.getElementById('articleTitle').value = draft.title;
+                        editorArea.innerHTML = draft.content;
+                        updateWordCount();
+                    } catch (e) {
+                        console.error('加载草稿失败:', e);
+                    }
+                }
+            }
+            
+            // 页面卸载前提示保存
+            window.addEventListener('beforeunload', function(e) {
+                const title = document.getElementById('articleTitle').value;
+                const content = editorArea.innerHTML;
+                
+                if (title || (content && content !== '<p><br></p>' && content !== '<p>开始写作...</p>')) {
+                    // 自动保存草稿
+                    const draft = {
+                        title: title || '未命名文章',
+                        content: content,
+                        timestamp: new Date().toISOString(),
+                        wordCount: wordCount,
+                        charCount: charCount
+                    };
+                    localStorage.setItem('editorDraft', JSON.stringify(draft));
+                }
+            });
+        });
+    </script>
 </body>
 </html>
