@@ -3,1609 +3,433 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>广告创建器 - 全功能广告设计工具</title>
+    <title>广告创建工具</title>
     <style>
-        :root {
-            --bg: #f0f2f5;
-            --panel-bg: #ffffff;
-            --text: #1a1a2e;
-            --text-secondary: #555;
-            --border: #e0e3e8;
-            --accent: #4f6ef7;
-            --accent-hover: #3b54d4;
-            --danger: #e74c3c;
-            --success: #27ae60;
-            --shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-            --radius: 10px;
-            --transition: 0.2s ease;
-            --font: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
-        }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
-
+        
         body {
-            font-family: var(--font);
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            -webkit-font-smoothing: antialiased;
+            background-color: #f5f5f5;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
         }
-
-        /* ========== 顶部导航栏 ========== */
-        .topbar {
-            background: var(--panel-bg);
-            border-bottom: 1px solid var(--border);
-            padding: 12px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
-            z-index: 100;
-            position: sticky;
-            top: 0;
-        }
-        .topbar .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--accent);
-            white-space: nowrap;
-        }
-        .topbar .logo svg {
-            width: 32px;
-            height: 32px;
-            flex-shrink: 0;
-        }
-        .topbar .actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 10px 18px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            background: var(--panel-bg);
-            color: var(--text);
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: var(--transition);
-            white-space: nowrap;
-            font-family: var(--font);
-            text-decoration: none;
-        }
-        .btn:hover {
-            background: #f8f9fb;
-            border-color: #c5cad3;
-        }
-        .btn.primary {
-            background: var(--accent);
-            color: #fff;
-            border-color: var(--accent);
-            font-weight: 600;
-        }
-        .btn.primary:hover {
-            background: var(--accent-hover);
-            border-color: var(--accent-hover);
-        }
-        .btn.success {
-            background: var(--success);
-            color: #fff;
-            border-color: var(--success);
-        }
-        .btn.success:hover {
-            background: #219a52;
-            border-color: #219a52;
-        }
-        .btn.outline-accent {
-            border-color: var(--accent);
-            color: var(--accent);
-            background: transparent;
-        }
-        .btn.outline-accent:hover {
-            background: #f0f3ff;
-        }
-        .btn svg {
-            width: 16px;
-            height: 16px;
-            flex-shrink: 0;
-        }
-
-        /* ========== 主体布局 ========== */
-        .main-container {
-            display: flex;
-            flex: 1;
-            gap: 0;
-            overflow: hidden;
-            height: calc(100vh - 130px);
-        }
-        @media (max-width: 1100px) {
-            .main-container {
-                flex-direction: column;
-                height: auto;
-            }
-        }
-
-        /* ========== 左侧配置面板 ========== */
-        .config-panel {
-            width: 420px;
-            min-width: 380px;
-            background: var(--panel-bg);
-            border-right: 1px solid var(--border);
-            overflow-y: auto;
-            padding: 20px 18px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            scroll-behavior: smooth;
-            flex-shrink: 0;
-        }
-        @media (max-width: 1100px) {
-            .config-panel {
-                width: 100%;
-                min-width: auto;
-                max-height: 55vh;
-                border-right: none;
-                border-bottom: 1px solid var(--border);
-            }
-        }
-        .config-panel::-webkit-scrollbar {
-            width: 5px;
-        }
-        .config-panel::-webkit-scrollbar-thumb {
-            background: #d0d5dd;
-            border-radius: 10px;
-        }
-        .section-title {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            color: #888;
-            font-weight: 700;
-            margin-bottom: 2px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .section-title::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: var(--border);
-        }
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-        .form-group label {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #444;
-        }
-        .form-group input[type="text"],
-        .form-group input[type="url"],
-        .form-group input[type="number"],
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 9px 12px;
-            border: 1.5px solid var(--border);
-            border-radius: 7px;
-            font-size: 0.9rem;
-            font-family: var(--font);
-            transition: var(--transition);
-            background: #fafbfc;
-            color: var(--text);
-            resize: vertical;
-        }
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.1);
-            background: #fff;
-        }
-        .form-group textarea {
-            min-height: 55px;
-            resize: vertical;
-        }
-        .form-row {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .form-row .form-group {
-            flex: 1;
-            min-width: 90px;
-        }
-        .color-input-wrap {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .color-input-wrap input[type="color"] {
-            width: 38px;
-            height: 36px;
-            border: 2px solid var(--border);
-            border-radius: 7px;
-            cursor: pointer;
-            padding: 2px;
-            background: #fff;
-            flex-shrink: 0;
-        }
-        .color-input-wrap input[type="text"] {
-            flex: 1;
-            min-width: 80px;
-        }
-        .preset-btns {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-        .preset-btn {
-            padding: 7px 12px;
-            border-radius: 6px;
-            border: 1.5px solid var(--border);
-            background: #fff;
-            cursor: pointer;
-            font-size: 0.78rem;
-            font-weight: 500;
-            transition: var(--transition);
-            white-space: nowrap;
-            font-family: var(--font);
-        }
-        .preset-btn:hover,
-        .preset-btn.active {
-            border-color: var(--accent);
-            background: #f0f3ff;
-            color: var(--accent);
-            font-weight: 600;
-        }
-        .ad-type-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 8px;
-        }
-        .ad-type-card {
-            padding: 12px 8px;
-            border-radius: 8px;
-            border: 2px solid var(--border);
-            cursor: pointer;
+        
+        .header {
             text-align: center;
-            transition: var(--transition);
-            font-size: 0.78rem;
-            font-weight: 500;
-            background: #fff;
+            margin-bottom: 20px;
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .tool-container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .section {
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #555;
+        }
+        
+        .ad-type-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .ad-type-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .ad-type-btn.active {
+            border-color: #4285f4;
+            background: #e8f0fe;
+        }
+        
+        .color-selector {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .color-option.active {
+            border-color: #333;
+            transform: scale(1.1);
+        }
+        
+        .text-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .text-input:focus {
+            outline: none;
+            border-color: #4285f4;
+        }
+        
+        .preview-container {
+            background: #f9f9f9;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .preview-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .preview-ad {
+            width: 100%;
+            min-height: 200px;
+            border-radius: 8px;
             display: flex;
             flex-direction: column;
+            justify-content: center;
             align-items: center;
-            gap: 5px;
-        }
-        .ad-type-card:hover {
-            border-color: #bcc4f0;
-            background: #fafbff;
-        }
-        .ad-type-card.active {
-            border-color: var(--accent);
-            background: #eef1ff;
-            font-weight: 700;
-            box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.08);
-        }
-        .ad-type-card svg {
-            width: 24px;
-            height: 24px;
-            flex-shrink: 0;
-        }
-        .toggle-switch {
+            padding: 20px;
+            text-align: center;
             position: relative;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 500;
+            overflow: hidden;
         }
-        .toggle-switch input {
+        
+        .preview-title-text {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: white;
+        }
+        
+        .preview-desc {
+            font-size: 16px;
+            color: white;
+            max-width: 80%;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #4285f4;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #f1f1f1;
+            color: #333;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .html-output {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            margin-top: 20px;
             display: none;
         }
-        .toggle-track {
-            width: 44px;
-            height: 24px;
-            background: #d0d5dd;
-            border-radius: 12px;
-            position: relative;
-            transition: var(--transition);
-            flex-shrink: 0;
-        }
-        .toggle-track::after {
-            content: '';
-            position: absolute;
-            top: 3px;
-            left: 3px;
-            width: 18px;
-            height: 18px;
-            background: #fff;
-            border-radius: 50%;
-            transition: var(--transition);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-        }
-        .toggle-switch input:checked+.toggle-track {
-            background: var(--accent);
-        }
-        .toggle-switch input:checked+.toggle-track::after {
-            left: 23px;
-        }
-
-        /* ========== 右侧预览区 ========== */
-        .preview-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: #e8ecf1;
-            overflow: hidden;
-        }
-        .preview-toolbar {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 16px;
-            background: #fff;
-            border-bottom: 1px solid var(--border);
-            flex-wrap: wrap;
-        }
-        .preview-toolbar span {
-            font-weight: 600;
-            font-size: 0.85rem;
-            color: #666;
-            white-space: nowrap;
-        }
-        .viewport-btn {
-            padding: 6px 14px;
-            border-radius: 20px;
-            border: 1.5px solid var(--border);
-            background: #fff;
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: 500;
-            transition: var(--transition);
-            font-family: var(--font);
-        }
-        .viewport-btn.active {
-            background: var(--accent);
-            color: #fff;
-            border-color: var(--accent);
-        }
-        .preview-frame-wrap {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            overflow: auto;
-            transition: all 0.3s ease;
-        }
-        .preview-frame-wrap.desktop .mock-page {
-            width: 100%;
-            max-width: 960px;
-        }
-        .preview-frame-wrap.tablet .mock-page {
-            width: 100%;
-            max-width: 600px;
-        }
-        .preview-frame-wrap.mobile .mock-page {
-            width: 100%;
-            max-width: 360px;
-        }
-        .mock-page {
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.13);
-            overflow: hidden;
-            transition: all 0.35s ease;
-            position: relative;
-            min-height: 400px;
-        }
-        .mock-page-header {
-            background: #2c3e50;
-            color: #fff;
-            padding: 10px 16px;
-            font-size: 0.8rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            opacity: 0.85;
-        }
-        .mock-page-header .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #95a5a6;
-        }
-        .mock-page-content {
-            padding: 20px 24px;
-            position: relative;
-            min-height: 320px;
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
-        .mock-text-line {
-            height: 10px;
-            background: #eef1f5;
-            border-radius: 4px;
-        }
-        .mock-text-line.w60 {
-            width: 60%;
-        }
-        .mock-text-line.w80 {
-            width: 80%;
-        }
-        .mock-text-line.w40 {
-            width: 40%;
-        }
-        .mock-text-line.w90 {
-            width: 90%;
-        }
-        .mock-img-placeholder {
-            height: 120px;
-            background: linear-gradient(135deg, #e8ecf1 0%, #dce1e8 100%);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #b0b8c1;
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-        /* 广告在预览中的位置 */
-        .ad-preview-slot {
-            position: relative;
-            z-index: 5;
-            margin: 10px 0;
-            transition: all 0.3s ease;
-        }
-        /* 弹窗覆盖层模拟 */
-        .mock-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.55);
-            z-index: 50;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 0 0 12px 12px;
-            pointer-events: none;
-        }
-
-        /* ========== 代码模态框 ========== */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.55);
-            z-index: 999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.2s ease;
-        }
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-        .modal {
-            background: #fff;
-            border-radius: 14px;
-            width: 90%;
-            max-width: 800px;
-            max-height: 85vh;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
-            animation: slideUp 0.25s ease;
-        }
-        @keyframes slideUp {
-            from {
-                transform: translateY(30px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-        .modal-header {
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-weight: 700;
-            font-size: 1rem;
-        }
-        .modal-body {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px 20px;
-        }
-        .modal-body pre {
-            background: #1e1e2e;
-            color: #cdd6f4;
-            padding: 16px;
-            border-radius: 8px;
-            overflow-x: auto;
-            font-size: 0.82rem;
-            line-height: 1.6;
-            white-space: pre-wrap;
-            word-break: break-all;
-            max-height: 50vh;
-            font-family: 'SF Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
-        }
-        .modal-footer {
-            padding: 12px 20px;
-            border-top: 1px solid var(--border);
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-            flex-wrap: wrap;
-        }
-        .close-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
+        
+        .copy-btn {
+            background: #4285f4;
+            color: white;
+            padding: 8px 16px;
             border: none;
-            background: #f0f2f5;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-            line-height: 1;
+            margin-top: 10px;
         }
-        .close-btn:hover {
-            background: #e0e3e8;
-        }
-
-        /* ========== Toast ========== */
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #1e1e2e;
-            color: #fff;
-            padding: 12px 24px;
-            border-radius: 30px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            z-index: 2000;
-            animation: toastIn 0.35s ease, toastOut 0.35s ease 1.8s forwards;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-            pointer-events: none;
-        }
-        @keyframes toastIn {
-            from {
-                transform: translateX(-50%) translateY(40px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(-50%) translateY(0);
-                opacity: 1;
-            }
-        }
-        @keyframes toastOut {
-            from {
-                opacity: 1;
-            }
-            to {
-                opacity: 0;
-                transform: translateX(-50%) translateY(-20px);
-            }
-        }
-
-        /* ========== 响应式 ========== */
-        @media (max-width: 768px) {
-            .topbar {
-                padding: 8px 12px;
-            }
-            .topbar .logo {
-                font-size: 1rem;
-            }
-            .btn {
-                padding: 8px 12px;
-                font-size: 0.78rem;
-                gap: 4px;
-            }
-            .config-panel {
-                padding: 12px 10px;
-                gap: 10px;
-                max-height: 50vh;
-            }
-            .ad-type-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 5px;
-            }
-            .ad-type-card {
-                padding: 10px 6px;
-                font-size: 0.7rem;
-            }
-            .preview-frame-wrap {
+        
+        @media (max-width: 480px) {
+            body {
                 padding: 10px;
             }
-            .mock-page-content {
-                padding: 12px 14px;
-                min-height: 240px;
+            
+            .header h1 {
+                font-size: 20px;
             }
-            .form-row {
-                flex-direction: column;
-                gap: 8px;
+            
+            .section-title {
+                font-size: 14px;
             }
         }
     </style>
 </head>
 <body>
-
-    <!-- 顶部导航 -->
-    <header class="topbar">
-        <div class="logo">
-            <svg viewBox="0 0 32 32" fill="none"><rect x="2" y="6" width="28" height="20" rx="3" fill="#4f6ef7" opacity="0.15"/><rect x="5" y="9" width="22" height="14" rx="2" fill="#4f6ef7"/><text x="16" y="19" text-anchor="middle" fill="#fff" font-size="9" font-weight="700">AD</text></svg>
-            广告创建器
-        </div>
-        <div class="actions">
-            <button class="btn outline-accent" onclick="previewCode()" title="查看生成的HTML代码">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-                查看代码
-            </button>
-            <button class="btn" onclick="copyCode()" title="复制HTML代码到剪贴板">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                复制代码
-            </button>
-            <button class="btn success" onclick="downloadHTML()" title="下载完整HTML文件到本地">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                下载HTML文件
-            </button>
-        </div>
-    </header>
-
-    <!-- 主体 -->
-    <div class="main-container">
-        <!-- 左侧配置面板 -->
-        <aside class="config-panel" id="configPanel">
-            <!-- 广告类型 -->
-            <div class="section-title">📋 广告类型</div>
-            <div class="ad-type-grid" id="adTypeGrid">
-                <div class="ad-type-card active" data-type="banner">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="5" rx="1"/></svg>
-                    横幅广告
-                </div>
-                <div class="ad-type-card" data-type="square">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
-                    方形广告
-                </div>
-                <div class="ad-type-card" data-type="skyscraper">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="2" width="12" height="20" rx="1"/></svg>
-                    竖版广告
-                </div>
-                <div class="ad-type-card" data-type="popup">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="13" rx="2"/><rect x="6" y="8" width="12" height="10" rx="2"/></svg>
-                    弹窗广告
-                </div>
-                <div class="ad-type-card" data-type="sticky-bottom">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="17" width="20" height="5" rx="1"/><line x1="8" y1="19" x2="16" y2="19"/></svg>
-                    底部固定栏
-                </div>
-                <div class="ad-type-card" data-type="interstitial">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="1" width="22" height="22" rx="3"/><rect x="4" y="5" width="16" height="10" rx="2"/></svg>
-                    插屏广告
-                </div>
-            </div>
-
-            <!-- 尺寸预设 -->
-            <div class="section-title">📐 广告尺寸</div>
-            <div class="preset-btns" id="sizePresets">
-                <button class="preset-btn active" data-width="728" data-height="90">728×90 排行榜</button>
-                <button class="preset-btn" data-width="300" data-height="250">300×250 中矩形</button>
-                <button class="preset-btn" data-width="336" data-height="280">336×280 大矩形</button>
-                <button class="preset-btn" data-width="160" data-height="600">160×600 摩天楼</button>
-                <button class="preset-btn" data-width="320" data-height="100">320×100 移动横幅</button>
-                <button class="preset-btn" data-width="970" data-height="250">970×250 广告牌</button>
-                <button class="preset-btn" data-width="300" data-height="600">300×600 半页</button>
-                <button class="preset-btn custom-size" data-width="0" data-height="0">✏️ 自定义</button>
-            </div>
-            <div class="form-row" id="customSizeRow" style="display:none;">
-                <div class="form-group">
-                    <label>宽度 (px)</label>
-                    <input type="number" id="customWidth" value="728" min="100" max="1920" placeholder="宽度">
-                </div>
-                <div class="form-group">
-                    <label>高度 (px)</label>
-                    <input type="number" id="customHeight" value="90" min="50" max="2000" placeholder="高度">
-                </div>
-            </div>
-            <input type="hidden" id="adWidth" value="728">
-            <input type="hidden" id="adHeight" value="90">
-
-            <!-- 内容设置 -->
-            <div class="section-title">✏️ 广告内容</div>
-            <div class="form-group">
-                <label>广告标题</label>
-                <input type="text" id="adTitle" value="限时特惠！全场5折起" placeholder="输入广告标题">
-            </div>
-            <div class="form-group">
-                <label>广告描述</label>
-                <textarea id="adDescription" rows="2" placeholder="输入广告描述文字">精选好物，品质保障，限时折扣不容错过！</textarea>
-            </div>
-            <div class="form-group">
-                <label>图片链接 (URL)</label>
-                <input type="url" id="adImageUrl" value="https://picsum.photos/600/300" placeholder="https://... 留空则使用占位图">
-            </div>
-            <div class="form-group">
-                <label>点击跳转链接</label>
-                <input type="url" id="adLinkUrl" value="https://example.com/landing" placeholder="https://...">
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>按钮文字</label>
-                    <input type="text" id="adBtnText" value="立即抢购">
-                </div>
-                <div class="form-group">
-                    <label>按钮链接</label>
-                    <input type="url" id="adBtnLink" value="https://example.com/shop" placeholder="https://...">
-                </div>
-            </div>
-
-            <!-- 样式设置 -->
-            <div class="section-title">🎨 样式配色</div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>背景颜色</label>
-                    <div class="color-input-wrap">
-                        <input type="color" id="bgColor" value="#ffffff">
-                        <input type="text" id="bgColorHex" value="#ffffff" maxlength="7">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>标题颜色</label>
-                    <div class="color-input-wrap">
-                        <input type="color" id="titleColor" value="#1a1a2e">
-                        <input type="text" id="titleColorHex" value="#1a1a2e" maxlength="7">
-                    </div>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>描述颜色</label>
-                    <div class="color-input-wrap">
-                        <input type="color" id="descColor" value="#555555">
-                        <input type="text" id="descColorHex" value="#555555" maxlength="7">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>按钮背景色</label>
-                    <div class="color-input-wrap">
-                        <input type="color" id="btnBgColor" value="#4f6ef7">
-                        <input type="text" id="btnBgColorHex" value="#4f6ef7" maxlength="7">
-                    </div>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>按钮文字色</label>
-                    <div class="color-input-wrap">
-                        <input type="color" id="btnTextColor" value="#ffffff">
-                        <input type="text" id="btnTextColorHex" value="#ffffff" maxlength="7">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>边框圆角 (px)</label>
-                    <input type="number" id="borderRadius" value="8" min="0" max="50">
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>阴影强度</label>
-                    <select id="shadowLevel">
-                        <option value="none">无阴影</option>
-                        <option value="light">轻微</option>
-                        <option value="medium" selected>中等</option>
-                        <option value="heavy">强烈</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>动画效果</label>
-                    <select id="animationType">
-                        <option value="none">无动画</option>
-                        <option value="fadeIn">淡入</option>
-                        <option value="slideUp">向上滑入</option>
-                        <option value="scaleIn">缩放弹入</option>
-                        <option value="bounceIn">弹跳进入</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- 高级选项 -->
-            <div class="section-title">⚙️ 高级选项</div>
-            <div class="form-row">
-                <label class="toggle-switch">
-                    <input type="checkbox" id="showCloseBtn" checked>
-                    <span class="toggle-track"></span>
-                    显示关闭按钮
-                </label>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="responsiveMode" checked>
-                    <span class="toggle-track"></span>
-                    响应式自适应
-                </label>
-            </div>
-            <div class="form-group" id="overlayOpacityGroup">
-                <label>覆盖层透明度 (弹窗/插屏)</label>
-                <input type="range" id="overlayOpacity" min="0.2" max="0.9" step="0.05" value="0.55" style="width:100%;">
-                <span style="font-size:0.75rem;color:#888;" id="overlayOpacityLabel">0.55</span>
-            </div>
-        </aside>
-
-        <!-- 右侧预览区 -->
-        <section class="preview-area">
-            <div class="preview-toolbar">
-                <span>📱 预览：</span>
-                <button class="viewport-btn active" data-view="desktop">🖥 桌面</button>
-                <button class="viewport-btn" data-view="tablet">📋 平板</button>
-                <button class="viewport-btn" data-view="mobile">📱 手机</button>
-                <span style="margin-left:auto;font-size:0.75rem;color:#aaa;">实时预览</span>
-            </div>
-            <div class="preview-frame-wrap desktop" id="previewFrameWrap">
-                <div class="mock-page" id="mockPage">
-                    <div class="mock-page-header">
-                        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-                        模拟网页预览
-                    </div>
-                    <div class="mock-page-content" id="mockPageContent">
-                        <!-- 模拟网页内容 -->
-                        <div class="mock-text-line w80"></div>
-                        <div class="mock-text-line w60"></div>
-                        <div class="mock-text-line w90"></div>
-                        <div class="mock-img-placeholder">📷 模拟图片区域</div>
-                        <div class="mock-text-line w40"></div>
-                        <div class="mock-text-line w80"></div>
-                        <div class="mock-text-line w60"></div>
-                        <!-- 广告预览插槽 -->
-                        <div class="ad-preview-slot" id="adPreviewSlot"></div>
-                        <div class="mock-text-line w90"></div>
-                        <div class="mock-text-line w60"></div>
-                        <div class="mock-text-line w40"></div>
-                    </div>
-                    <!-- 弹窗覆盖层（默认隐藏） -->
-                    <div class="mock-overlay" id="mockOverlay" style="display:none;"></div>
-                </div>
-            </div>
-        </section>
+    <div class="header">
+        <h1>广告创建工具</h1>
     </div>
-
-    <!-- 代码模态框 -->
-    <div class="modal-overlay" id="modalOverlay" style="display:none;">
-        <div class="modal">
-            <div class="modal-header">
-                📄 生成的广告HTML代码
-                <button class="close-btn" onclick="closeModal()">✕</button>
+    
+    <div class="tool-container">
+        <div class="section">
+            <div class="section-title">选择广告类型</div>
+            <div class="ad-type-selector">
+                <div class="ad-type-btn active" data-type="banner">横幅广告</div>
+                <div class="ad-type-btn" data-type="vertical">竖版广告</div>
+                <div class="ad-type-btn" data-type="square">方形广告</div>
             </div>
-            <div class="modal-body">
-                <pre id="modalCodeContent"></pre>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">选择颜色主题</div>
+            <div class="color-selector">
+                <div class="color-option active" style="background: #4285f4;" data-color="#4285f4"></div>
+                <div class="color-option" style="background: #34a853;" data-color="#34a853"></div>
+                <div class="color-option" style="background: #ea4335;" data-color="#ea4335"></div>
+                <div class="color-option" style="background: #fbbc05;" data-color="#fbbc05"></div>
+                <div class="color-option" style="background: #9c27b0;" data-color="#9c27b0"></div>
+                <div class="color-option" style="background: #00bcd4;" data-color="#00bcd4"></div>
             </div>
-            <div class="modal-footer">
-                <button class="btn" onclick="closeModal()">关闭</button>
-                <button class="btn outline-accent" onclick="copyFromModal()">📋 复制代码</button>
-                <button class="btn success" onclick="downloadFromModal()">💾 下载文件</button>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">广告内容</div>
+            <input type="text" class="text-input" id="adTitle" placeholder="输入广告标题" value="限时优惠">
+            <input type="text" class="text-input" id="adDesc" placeholder="输入广告描述" value="立即抢购，享8折优惠">
+        </div>
+        
+        <div class="section">
+            <div class="section-title">预览</div>
+            <div class="preview-container">
+                <div class="preview-title">广告预览</div>
+                <div class="preview-ad" id="previewAd">
+                    <div class="preview-title-text" id="previewTitle">限时优惠</div>
+                    <div class="preview-desc" id="previewDesc">立即抢购，享8折优惠</div>
+                </div>
             </div>
+        </div>
+        
+        <div class="action-buttons">
+            <button class="btn btn-primary" id="generateBtn">生成HTML</button>
+            <button class="btn btn-secondary" id="resetBtn">重置</button>
+        </div>
+        
+        <div class="html-output" id="htmlOutput">
+            <pre id="htmlCode"></pre>
+            <button class="copy-btn" id="copyBtn">复制代码</button>
         </div>
     </div>
-
+    
     <script>
-        (function() {
-            // ============ DOM元素缓存 ============
-            const $ = (sel) => document.querySelector(sel);
-            const $$ = (sel) => document.querySelectorAll(sel);
-
-            const adTypeGrid = $('#adTypeGrid');
-            const sizePresets = $('#sizePresets');
-            const customSizeRow = $('#customSizeRow');
-            const customWidth = $('#customWidth');
-            const customHeight = $('#customHeight');
-            const adWidthInput = $('#adWidth');
-            const adHeightInput = $('#adHeight');
-            const adPreviewSlot = $('#adPreviewSlot');
-            const mockOverlay = $('#mockOverlay');
-            const mockPage = $('#mockPage');
-            const mockPageContent = $('#mockPageContent');
-            const previewFrameWrap = $('#previewFrameWrap');
-            const modalOverlay = $('#modalOverlay');
-            const modalCodeContent = $('#modalCodeContent');
-            const overlayOpacityInput = $('#overlayOpacity');
-            const overlayOpacityLabel = $('#overlayOpacityLabel');
-
-            // ============ 状态管理 ============
-            const state = {
-                adType: 'banner',
-                width: 728,
-                height: 90,
-                title: '限时特惠！全场5折起',
-                description: '精选好物，品质保障，限时折扣不容错过！',
-                imageUrl: 'https://picsum.photos/600/300',
-                linkUrl: 'https://example.com/landing',
-                btnText: '立即抢购',
-                btnLink: 'https://example.com/shop',
-                bgColor: '#ffffff',
-                titleColor: '#1a1a2e',
-                descColor: '#555555',
-                btnBgColor: '#4f6ef7',
-                btnTextColor: '#ffffff',
-                borderRadius: 8,
-                shadowLevel: 'medium',
-                animationType: 'fadeIn',
-                showCloseBtn: true,
-                responsiveMode: true,
-                overlayOpacity: 0.55,
-            };
-
-            // 从DOM同步状态
-            function syncStateFromDOM() {
-                state.adType = adTypeGrid.querySelector('.ad-type-card.active')?.dataset?.type || 'banner';
-                state.width = parseInt(adWidthInput.value) || 728;
-                state.height = parseInt(adHeightInput.value) || 90;
-                state.title = $('#adTitle').value;
-                state.description = $('#adDescription').value;
-                state.imageUrl = $('#adImageUrl').value;
-                state.linkUrl = $('#adLinkUrl').value;
-                state.btnText = $('#adBtnText').value;
-                state.btnLink = $('#adBtnLink').value;
-                state.bgColor = $('#bgColorHex').value || $('#bgColor').value;
-                state.titleColor = $('#titleColorHex').value || $('#titleColor').value;
-                state.descColor = $('#descColorHex').value || $('#descColor').value;
-                state.btnBgColor = $('#btnBgColorHex').value || $('#btnBgColor').value;
-                state.btnTextColor = $('#btnTextColorHex').value || $('#btnTextColor').value;
-                state.borderRadius = parseInt($('#borderRadius').value) || 8;
-                state.shadowLevel = $('#shadowLevel').value;
-                state.animationType = $('#animationType').value;
-                state.showCloseBtn = $('#showCloseBtn').checked;
-                state.responsiveMode = $('#responsiveMode').checked;
-                state.overlayOpacity = parseFloat(overlayOpacityInput.value);
-            }
-
-            function syncDOMFromState() {
-                $('#adTitle').value = state.title;
-                $('#adDescription').value = state.description;
-                $('#adImageUrl').value = state.imageUrl;
-                $('#adLinkUrl').value = state.linkUrl;
-                $('#adBtnText').value = state.btnText;
-                $('#adBtnLink').value = state.btnLink;
-                $('#bgColor').value = state.bgColor;
-                $('#bgColorHex').value = state.bgColor;
-                $('#titleColor').value = state.titleColor;
-                $('#titleColorHex').value = state.titleColor;
-                $('#descColor').value = state.descColor;
-                $('#descColorHex').value = state.descColor;
-                $('#btnBgColor').value = state.btnBgColor;
-                $('#btnBgColorHex').value = state.btnBgColor;
-                $('#btnTextColor').value = state.btnTextColor;
-                $('#btnTextColorHex').value = state.btnTextColor;
-                $('#borderRadius').value = state.borderRadius;
-                $('#shadowLevel').value = state.shadowLevel;
-                $('#animationType').value = state.animationType;
-                $('#showCloseBtn').checked = state.showCloseBtn;
-                $('#responsiveMode').checked = state.responsiveMode;
-                overlayOpacityInput.value = state.overlayOpacity;
-                overlayOpacityLabel.textContent = state.overlayOpacity.toFixed(2);
-                adWidthInput.value = state.width;
-                adHeightInput.value = state.height;
-                customWidth.value = state.width;
-                customHeight.value = state.height;
-            }
-
-            // ============ 阴影映射 ============
-            function getShadowCSS(level) {
-                switch (level) {
-                    case 'none':
-                        return 'none';
-                    case 'light':
-                        return '0 1px 4px rgba(0,0,0,0.08)';
-                    case 'medium':
-                        return '0 4px 16px rgba(0,0,0,0.13)';
-                    case 'heavy':
-                        return '0 8px 32px rgba(0,0,0,0.2)';
-                    default:
-                        return '0 4px 16px rgba(0,0,0,0.13)';
-                }
-            }
-
-            // ============ 动画CSS映射 ============
-            function getAnimationCSS(type) {
-                switch (type) {
-                    case 'fadeIn':
-                        return '@keyframes adAnim{from{opacity:0;}to{opacity:1;}}';
-                    case 'slideUp':
-                        return '@keyframes adAnim{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}';
-                    case 'scaleIn':
-                        return '@keyframes adAnim{from{opacity:0;transform:scale(0.85);}to{opacity:1;transform:scale(1);}}';
-                    case 'bounceIn':
-                        return '@keyframes adAnim{0%{opacity:0;transform:scale(0.7);}60%{opacity:1;transform:scale(1.05);}80%{transform:scale(0.95);}100%{opacity:1;transform:scale(1);}}';
-                    default:
-                        return '';
-                }
-            }
-
-            function getAnimationName(type) {
-                return type === 'none' ? 'none' : 'adAnim 0.5s ease forwards';
-            }
-
-            // ============ 生成唯一ID ============
-            function generateUniqueId() {
-                return 'ad_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 6);
-            }
-
-            // ============ 构建广告HTML（用于预览和嵌入） ============
-            function buildAdInnerHTML(uniqueId, forEmbed) {
-                const s = state;
-                const shadowCSS = getShadowCSS(s.shadowLevel);
-                const isOverlayType = ['popup', 'interstitial', 'sticky-bottom'].includes(s.adType);
-                const containerStyle = [];
-                const adId = uniqueId || generateUniqueId();
-
-                // 容器基础样式
-                if (s.adType === 'sticky-bottom') {
-                    containerStyle.push('position:fixed;bottom:0;left:0;right:0;z-index:99999;');
-                    if (s.responsiveMode) {
-                        containerStyle.push('width:100%;max-width:100%;');
-                    } else {
-                        containerStyle.push(`width:100%;max-width:${s.width}px;margin:0 auto;`);
-                    }
-                } else if (s.adType === 'popup') {
-                    containerStyle.push(
-                        'position:relative;z-index:1;max-width:90vw;max-height:85vh;overflow:auto;');
-                } else if (s.adType === 'interstitial') {
-                    containerStyle.push(
-                        'position:relative;z-index:1;width:90vw;max-width:600px;max-height:85vh;overflow:auto;');
-                } else {
-                    // 嵌入式广告
-                    if (s.responsiveMode) {
-                        containerStyle.push(`width:100%;max-width:${s.width}px;`);
-                    } else {
-                        containerStyle.push(`width:${s.width}px;`);
-                    }
-                    containerStyle.push('margin:0 auto;');
-                }
-                containerStyle.push(`background:${s.bgColor};`);
-                containerStyle.push(`border-radius:${s.borderRadius}px;`);
-                containerStyle.push(`box-shadow:${shadowCSS};`);
-                containerStyle.push(`overflow:hidden;`);
-                containerStyle.push(`font-family:'Segoe UI','PingFang SC','Microsoft YaHei','Helvetica Neue',sans-serif;`);
-                containerStyle.push(`box-sizing:border-box;`);
-                if (s.animationType !== 'none' && !forEmbed) {
-                    containerStyle.push(`animation:${getAnimationName(s.animationType)};`);
-                }
-
-                // 构建图片HTML
-                const hasImage = s.imageUrl && s.imageUrl.trim().length > 0;
-                let imageHTML = '';
-                if (hasImage) {
-                    const imgStyle =
-                        `width:100%;height:auto;display:block;object-fit:cover;max-height:${s.adType==='skyscraper'?'50%':'220px'};`;
-                    imageHTML =
-                        `<img src="${escapeHTML(s.imageUrl)}" alt="广告图片" style="${imgStyle}" onerror="this.style.display='none';this.parentElement.querySelector('.ad-fallback-img').style.display='flex';"><div class="ad-fallback-img" style="display:none;width:100%;min-height:80px;background:linear-gradient(135deg,#e8ecf1,#dce1e8);align-items:center;justify-content:center;color:#b0b8c1;font-size:14px;border-radius:4px;">📷 广告图片</div>`;
-                }
-
-                // 构建内容区
-                const isHorizontal = s.adType === 'banner' && s.width >= 500;
-                const contentFlexDir = isHorizontal ? 'row' : 'column';
-                const contentPadding = s.adType === 'skyscraper' ? '12px 10px' : '16px';
-
-                let btnHTML = '';
-                if (s.btnText.trim()) {
-                    btnHTML = `
-                <a href="${escapeHTML(s.btnLink||'#')}" target="_blank" rel="noopener" 
-                   style="display:inline-block;padding:10px 20px;background:${s.btnBgColor};color:${s.btnTextColor};
-                   text-decoration:none;border-radius:${Math.max(4,s.borderRadius-2)}px;font-weight:600;font-size:14px;
-                   text-align:center;transition:all 0.2s;white-space:nowrap;flex-shrink:0;"
-                   onmouseover="this.style.opacity='0.85';this.style.transform='translateY(-1px)';"
-                   onmouseout="this.style.opacity='1';this.style.transform='translateY(0)';">
-                   ${escapeHTML(s.btnText)}
-                </a>`;
-                }
-
-                let closeBtnHTML = '';
-                if (s.showCloseBtn && isOverlayType) {
-                    closeBtnHTML = `
-                <button class="ad-close-btn" onclick="this.closest('.ad-root-container')?this.closest('.ad-root-container').remove():this.parentElement?.parentElement?.remove?.();" 
-                        style="position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;border:none;
-                        background:rgba(0,0,0,0.5);color:#fff;font-size:16px;cursor:pointer;z-index:10;display:flex;
-                        align-items:center;justify-content:center;line-height:1;transition:all 0.2s;"
-                        onmouseover="this.style.background='rgba(0,0,0,0.75)';"
-                        onmouseout="this.style.background='rgba(0,0,0,0.5)';"
-                        title="关闭">✕</button>`;
-                }
-
-                const innerHTML = `
-            <div class="ad-inner" style="display:flex;flex-direction:${contentFlexDir};align-items:${isHorizontal?'center':'stretch'};gap:12px;padding:${contentPadding};position:relative;box-sizing:border-box;">
-              ${closeBtnHTML}
-              ${hasImage ? `<div style="flex-shrink:0;${isHorizontal?'width:40%;max-width:280px;':'width:100%;'}">${imageHTML}</div>` : ''}
-              <div style="flex:1;display:flex;flex-direction:column;gap:8px;justify-content:center;min-width:0;">
-                ${s.title?`<h3 style="margin:0;font-size:${s.adType==='skyscraper'?'15px':'18px'};color:${s.titleColor};font-weight:700;line-height:1.3;word-break:break-word;">${escapeHTML(s.title)}</h3>`:''}
-                ${s.description?`<p style="margin:0;font-size:13px;color:${s.descColor};line-height:1.5;word-break:break-word;">${escapeHTML(s.description)}</p>`:''}
-                ${btnHTML}
-              </div>
-            </div>`;
-
-                return { innerHTML, containerStyle: containerStyle.join(';'), adId, isOverlayType };
-            }
-
-            function escapeHTML(str) {
-                const div = document.createElement('div');
-                div.textContent = str;
-                return div.innerHTML;
-            }
-
-            // ============ 生成完整HTML文件代码 ============
-            function generateFullHTMLCode() {
-                syncStateFromDOM();
-                const uniqueId = generateUniqueId();
-                const { innerHTML, containerStyle, adId, isOverlayType } = buildAdInnerHTML(uniqueId, false);
-                const s = state;
-                const animCSS = getAnimationCSS(s.animationType);
-                const animName = getAnimationName(s.animationType);
-                const shadowCSS = getShadowCSS(s.shadowLevel);
-
-                // 响应式媒体查询CSS
-                let responsiveCSS = '';
-                if (s.responsiveMode) {
-                    responsiveCSS = `
-            @media (max-width: 600px) {
-              #${adId} .ad-inner {
-                flex-direction: column !important;
-                padding: 12px !important;
-                gap: 8px !important;
-              }
-              #${adId} .ad-inner h3 { font-size: 15px !important; }
-              #${adId} .ad-inner p { font-size: 12px !important; }
-              #${adId} .ad-inner a { font-size: 13px !important; padding: 8px 16px !important; }
-              #${adId} { border-radius: ${Math.max(2,s.borderRadius-2)}px !important; }
-            }`;
-                }
-
-                let overlayHTML = '';
-                let overlayCSS = '';
-                let overlayJS = '';
-                if (isOverlayType && ['popup', 'interstitial'].includes(s.adType)) {
-                    overlayCSS = `
-            .ad-overlay-${adId} {
-              position: fixed; inset: 0; background: rgba(0,0,0,${s.overlayOpacity.toFixed(2)});
-              z-index: 99998; display: flex; align-items: center; justify-content: center;
-              animation: overlayFadeIn 0.3s ease;
-            }
-            @keyframes overlayFadeIn { from { opacity: 0; } to { opacity: 1; } }`;
-                    overlayHTML =
-                        `<div class="ad-overlay-${adId}" id="overlay_${adId}" onclick="if(event.target===this)this.remove();document.getElementById('${adId}')?.remove();">
-                <div id="${adId}" class="ad-root-container" style="${containerStyle};animation:${animName};position:relative;max-width:${s.adType==='interstitial'?'600px':'500px'};width:90vw;max-height:85vh;overflow:auto;background:${s.bgColor};border-radius:${s.borderRadius}px;box-shadow:${shadowCSS};">
-                  ${innerHTML}
-                </div>
-              </div>`;
-                    overlayJS = `
-            document.addEventListener('DOMContentLoaded', function() {
-              setTimeout(function() {
-                var overlay = document.getElementById('overlay_${adId}');
-                if (overlay) overlay.style.display = 'flex';
-              }, 800);
-            });`;
-                } else if (s.adType === 'sticky-bottom') {
-                    overlayHTML = `
-            <div id="${adId}" class="ad-root-container" style="${containerStyle};animation:${animName};">
-              ${innerHTML}
-            </div>`;
-                    overlayJS = `
-            document.addEventListener('DOMContentLoaded', function() {
-              var ad = document.getElementById('${adId}');
-              if (ad) ad.style.display = 'block';
-            });`;
-                } else {
-                    overlayHTML = `
-            <div id="${adId}" class="ad-root-container" style="${containerStyle};animation:${animName};display:block;">
-              ${innerHTML}
-            </div>`;
-                }
-
-                const fullCode = `<!DOCTYPE html>
-        <html lang="zh-CN">
-        <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>广告 - ${escapeHTML(s.title||'广告内容')}</title>
-        <style>
-        /* ===== 广告样式（由广告创建器生成） ===== */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-          font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
-          ${isOverlayType && ['popup','interstitial'].includes(s.adType) ? 'background: transparent; min-height: 100vh;' : 'background: #f5f5f5; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px;'}
-        }
-        ${animCSS}
-        ${overlayCSS}
-        ${responsiveCSS}
-        .ad-root-container {
-          transition: all 0.3s ease;
-        }
-        .ad-root-container a:hover {
-          opacity: 0.85;
-        }
-        /* 关闭按钮 */
-        .ad-close-btn {
-          position: absolute;
-          top: 8px;
-          right: 8px;
-          width: 28px;
-          height: 28px;
-          border-radius: 50%;
-          border: none;
-          background: rgba(0,0,0,0.5);
-          color: #fff;
-          font-size: 16px;
-          cursor: pointer;
-          z-index: 10;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          line-height: 1;
-          transition: all 0.2s;
-        }
-        .ad-close-btn:hover {
-          background: rgba(0,0,0,0.75);
-        }
-        .ad-fallback-img {
-          display: none;
-        }
-        </style>
-        </head>
-        <body>
-        ${overlayHTML}
-        ${overlayJS ? `<script>${overlayJS}</script>` : ''}
-        </body>
-        </html>`;
-
-                return { fullCode, adId, uniqueId };
-            }
-
-            // ============ 更新预览 ============
-            function updatePreview() {
-                syncStateFromDOM();
-                const uniqueId = 'preview_ad';
-                const { innerHTML, containerStyle, isOverlayType } = buildAdInnerHTML(uniqueId, true);
-                const s = state;
-
-                // 更新广告预览槽
-                const slotStyle = [];
-                if (!isOverlayType) {
-                    if (s.responsiveMode) {
-                        slotStyle.push(`width:100%;max-width:${s.width}px;`);
-                    } else {
-                        slotStyle.push(`width:${s.width}px;`);
-                    }
-                    slotStyle.push('margin:10px auto;');
-                } else if (s.adType === 'sticky-bottom') {
-                    slotStyle.push('width:100%;position:sticky;bottom:0;z-index:50;');
-                } else if (s.adType === 'popup') {
-                    slotStyle.push('width:85%;max-width:480px;margin:0 auto;');
-                } else if (s.adType === 'interstitial') {
-                    slotStyle.push('width:88%;max-width:560px;margin:0 auto;');
-                }
-                slotStyle.push(`background:${s.bgColor};`);
-                slotStyle.push(`border-radius:${s.borderRadius}px;`);
-                slotStyle.push(`box-shadow:${getShadowCSS(s.shadowLevel)};`);
-                slotStyle.push('overflow:hidden;');
-                slotStyle.push('font-family:inherit;');
-                slotStyle.push('box-sizing:border-box;');
-
-                adPreviewSlot.style.cssText = slotStyle.join(';');
-                adPreviewSlot.innerHTML = innerHTML;
-
-                // 处理覆盖层
-                if (['popup', 'interstitial'].includes(s.adType)) {
-                    mockOverlay.style.display = 'flex';
-                    mockOverlay.style.background = `rgba(0,0,0,${s.overlayOpacity.toFixed(2)})`;
-                    // 把广告移到覆盖层内显示
-                    if (adPreviewSlot.parentElement === mockPageContent) {
-                        mockOverlay.appendChild(adPreviewSlot);
-                    }
-                    adPreviewSlot.style.position = 'relative';
-                    adPreviewSlot.style.zIndex = '1';
-                    adPreviewSlot.style.maxWidth = s.adType === 'interstitial' ? '88%' : '85%';
-                } else if (s.adType === 'sticky-bottom') {
-                    if (adPreviewSlot.parentElement === mockOverlay) {
-                        mockPageContent.appendChild(adPreviewSlot);
-                    }
-                    mockOverlay.style.display = 'none';
-                    adPreviewSlot.style.position = 'sticky';
-                    adPreviewSlot.style.bottom = '0';
-                    adPreviewSlot.style.zIndex = '50';
-                    adPreviewSlot.style.width = '100%';
-                } else {
-                    if (adPreviewSlot.parentElement === mockOverlay) {
-                        mockPageContent.appendChild(adPreviewSlot);
-                    }
-                    mockOverlay.style.display = 'none';
-                    adPreviewSlot.style.position = 'relative';
-                    adPreviewSlot.style.zIndex = '5';
-                }
-
-                // 重新触发动画
-                if (s.animationType !== 'none') {
-                    const innerEl = adPreviewSlot.querySelector('.ad-inner');
-                    if (innerEl) {
-                        innerEl.style.animation = 'none';
-                        requestAnimationFrame(() => {
-                            innerEl.style.animation = getAnimationName(s.animationType);
-                        });
-                    }
-                }
-            }
-
-            // ============ 广告类型切换 ============
-            adTypeGrid.addEventListener('click', function(e) {
-                const card = e.target.closest('.ad-type-card');
-                if (!card) return;
-                adTypeGrid.querySelectorAll('.ad-type-card').forEach(c => c.classList.remove('active'));
-                card.classList.add('active');
-                const type = card.dataset.type;
-                state.adType = type;
-
-                // 根据类型调整默认尺寸
-                const sizeMap = {
-                    'banner': { w: 728, h: 90 },
-                    'square': { w: 300, h: 250 },
-                    'skyscraper': { w: 160, h: 600 },
-                    'popup': { w: 500, h: 320 },
-                    'sticky-bottom': { w: 728, h: 80 },
-                    'interstitial': { w: 600, h: 400 },
-                };
-                if (sizeMap[type]) {
-                    state.width = sizeMap[type].w;
-                    state.height = sizeMap[type].h;
-                    adWidthInput.value = state.width;
-                    adHeightInput.value = state.height;
-                    customWidth.value = state.width;
-                    customHeight.value = state.height;
-                    // 取消尺寸预设选中
-                    sizePresets.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
-                    const matchingPreset = sizePresets.querySelector(
-                        `.preset-btn[data-width="${state.width}"][data-height="${state.height}"]`);
-                    if (matchingPreset) {
-                        matchingPreset.classList.add('active');
-                        customSizeRow.style.display = 'none';
-                    } else {
-                        sizePresets.querySelector('.custom-size')?.classList.add('active');
-                        customSizeRow.style.display = 'flex';
-                    }
-                }
-                syncDOMFromState();
-                updatePreview();
-            });
-
-            // ============ 尺寸预设切换 ============
-            sizePresets.addEventListener('click', function(e) {
-                const btn = e.target.closest('.preset-btn');
-                if (!btn) return;
-                sizePresets.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+        // 获取DOM元素
+        const adTypeBtns = document.querySelectorAll('.ad-type-btn');
+        const colorOptions = document.querySelectorAll('.color-option');
+        const adTitleInput = document.getElementById('adTitle');
+        const adDescInput = document.getElementById('adDesc');
+        const previewAd = document.getElementById('previewAd');
+        const previewTitle = document.getElementById('previewTitle');
+        const previewDesc = document.getElementById('previewDesc');
+        const generateBtn = document.getElementById('generateBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const htmlOutput = document.getElementById('htmlOutput');
+        const htmlCode = document.getElementById('htmlCode');
+        const copyBtn = document.getElementById('copyBtn');
+        
+        let currentType = 'banner';
+        let currentColor = '#4285f4';
+        
+        // 广告类型选择
+        adTypeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                adTypeBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                if (btn.classList.contains('custom-size')) {
-                    customSizeRow.style.display = 'flex';
-                    state.width = parseInt(customWidth.value) || 728;
-                    state.height = parseInt(customHeight.value) || 90;
-                } else {
-                    customSizeRow.style.display = 'none';
-                    const w = parseInt(btn.dataset.width);
-                    const h = parseInt(btn.dataset.height);
-                    state.width = w;
-                    state.height = h;
-                    customWidth.value = w;
-                    customHeight.value = h;
-                }
-                adWidthInput.value = state.width;
-                adHeightInput.value = state.height;
-                syncDOMFromState();
+                currentType = btn.dataset.type;
                 updatePreview();
             });
-
-            // ============ 自定义尺寸输入 ============
-            [customWidth, customHeight].forEach(el => {
-                el.addEventListener('input', function() {
-                    if (customSizeRow.style.display !== 'none') {
-                        state.width = parseInt(customWidth.value) || 300;
-                        state.height = parseInt(customHeight.value) || 250;
-                        adWidthInput.value = state.width;
-                        adHeightInput.value = state.height;
-                        updatePreview();
-                    }
-                });
-            });
-
-            // ============ 颜色同步 ============
-            function syncColorPair(colorInput, hexInput) {
-                colorInput.addEventListener('input', function() {
-                    hexInput.value = this.value;
-                    updatePreview();
-                });
-                hexInput.addEventListener('input', function() {
-                    const val = this.value;
-                    if (/^#[0-9a-fA-F]{6}$/.test(val)) {
-                        colorInput.value = val;
-                    }
-                    updatePreview();
-                });
-                hexInput.addEventListener('blur', function() {
-                    if (!/^#[0-9a-fA-F]{6}$/.test(this.value)) {
-                        this.value = colorInput.value;
-                    }
-                    updatePreview();
-                });
-            }
-            syncColorPair($('#bgColor'), $('#bgColorHex'));
-            syncColorPair($('#titleColor'), $('#titleColorHex'));
-            syncColorPair($('#descColor'), $('#descColorHex'));
-            syncColorPair($('#btnBgColor'), $('#btnBgColorHex'));
-            syncColorPair($('#btnTextColor'), $('#btnTextColorHex'));
-
-            // ============ 覆盖层透明度 ============
-            overlayOpacityInput.addEventListener('input', function() {
-                state.overlayOpacity = parseFloat(this.value);
-                overlayOpacityLabel.textContent = state.overlayOpacity.toFixed(2);
+        });
+        
+        // 颜色选择
+        colorOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                colorOptions.forEach(o => o.classList.remove('active'));
+                option.classList.add('active');
+                currentColor = option.dataset.color;
                 updatePreview();
             });
-
-            // ============ 通用输入监听 ============
-            const inputIds = [
-                'adTitle', 'adDescription', 'adImageUrl', 'adLinkUrl',
-                'adBtnText', 'adBtnLink', 'borderRadius', 'shadowLevel', 'animationType'
-            ];
-            inputIds.forEach(id => {
-                const el = $('#' + id);
-                if (!el) return;
-                el.addEventListener('input', updatePreview);
-                el.addEventListener('change', updatePreview);
-            });
-            $('#showCloseBtn').addEventListener('change', updatePreview);
-            $('#responsiveMode').addEventListener('change', updatePreview);
-
-            // ============ 视口切换 ============
-            $$('.viewport-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    $$('.viewport-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    const view = this.dataset.view;
-                    previewFrameWrap.className = 'preview-frame-wrap ' + view;
-                });
-            });
-
-            // ============ 模态框 ============
-            function previewCode() {
-                const { fullCode } = generateFullHTMLCode();
-                modalCodeContent.textContent = fullCode;
-                modalOverlay.style.display = 'flex';
-                document.body.style.overflow = 'hidden';
+        });
+        
+        // 文本输入更新
+        adTitleInput.addEventListener('input', updatePreview);
+        adDescInput.addEventListener('input', updatePreview);
+        
+        // 更新预览
+        function updatePreview() {
+            previewTitle.textContent = adTitleInput.value || '广告标题';
+            previewDesc.textContent = adDescInput.value || '广告描述';
+            previewAd.style.background = currentColor;
+            
+            // 根据广告类型调整样式
+            if (currentType === 'vertical') {
+                previewAd.style.height = '400px';
+                previewTitle.style.fontSize = '28px';
+                previewDesc.style.fontSize = '18px';
+            } else if (currentType === 'square') {
+                previewAd.style.height = '300px';
+                previewTitle.style.fontSize = '24px';
+                previewDesc.style.fontSize = '16px';
+            } else {
+                previewAd.style.height = '200px';
+                previewTitle.style.fontSize = '24px';
+                previewDesc.style.fontSize = '16px';
             }
-
-            function closeModal() {
-                modalOverlay.style.display = 'none';
-                document.body.style.overflow = '';
+        }
+        
+        // 生成HTML
+        generateBtn.addEventListener('click', () => {
+            const title = adTitleInput.value || '广告标题';
+            const desc = adDescInput.value || '广告描述';
+            const bgColor = currentColor;
+            
+            let html = `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${title}</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f5f5f5;
+        }
+        
+        .ad-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: ${bgColor};
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .ad-content {
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+        
+        .ad-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .ad-desc {
+            font-size: 18px;
+            line-height: 1.5;
+        }
+        
+        @media (max-width: 480px) {
+            .ad-title {
+                font-size: 24px;
             }
-            modalOverlay.addEventListener('click', function(e) {
-                if (e.target === modalOverlay) closeModal();
-            });
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && modalOverlay.style.display === 'flex') closeModal();
-            });
-
-            function copyFromModal() {
-                const code = modalCodeContent.textContent;
-                copyToClipboard(code, '代码已复制到剪贴板！');
+            
+            .ad-desc {
+                font-size: 16px;
             }
-
-            function downloadFromModal() {
-                const code = modalCodeContent.textContent;
-                downloadAsFile(code, 'advertisement.html');
-            }
-
-            // ============ 全局复制和下载 ============
-            function copyCode() {
-                const { fullCode } = generateFullHTMLCode();
-                copyToClipboard(fullCode, '广告HTML代码已复制！可直接粘贴到网站中');
-            }
-
-            function downloadHTML() {
-                const { fullCode } = generateFullHTMLCode();
-                downloadAsFile(fullCode, 'advertisement.html');
-            }
-
-            function copyToClipboard(text, toastMsg) {
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(text).then(() => showToast(toastMsg)).catch(() => {
-                        fallbackCopy(text, toastMsg);
-                    });
-                } else {
-                    fallbackCopy(text, toastMsg);
-                }
-            }
-
-            function fallbackCopy(text, toastMsg) {
-                const ta = document.createElement('textarea');
-                ta.value = text;
-                ta.style.cssText = 'position:fixed;left:-9999px;top:-9999px;';
-                document.body.appendChild(ta);
-                ta.select();
-                try { document.execCommand('copy');
-                    showToast(toastMsg); } catch (e) { showToast('复制失败，请手动复制'); }
-                document.body.removeChild(ta);
-            }
-
-            function downloadAsFile(content, filename) {
-                const blob = new Blob([content], { type: 'text/html;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                showToast('文件下载成功！可上传到任意网站使用');
-            }
-
-            function showToast(msg) {
-                const existing = document.querySelector('.toast');
-                if (existing) existing.remove();
-                const toast = document.createElement('div');
-                toast.className = 'toast';
-                toast.textContent = msg;
-                document.body.appendChild(toast);
-                setTimeout(() => toast.remove(), 2300);
-            }
-
-            // ============ 暴露全局函数 ============
-            window.previewCode = previewCode;
-            window.closeModal = closeModal;
-            window.copyFromModal = copyFromModal;
-            window.downloadFromModal = downloadFromModal;
-            window.copyCode = copyCode;
-            window.downloadHTML = downloadHTML;
-
-            // ============ 初始化 ============
-            function init() {
-                syncDOMFromState();
-                updatePreview();
-                // 初始状态：横幅广告使用728x90预设
-                customSizeRow.style.display = 'none';
-            }
-            init();
-
-            console.log('✅ 广告创建器已就绪');
-            console.log('📋 功能：设计广告 → 实时预览 → 生成HTML代码 → 下载/复制');
-            console.log('💡 提示：修改任何配置项都会实时更新预览');
-            console.log('🌐 生成的HTML文件完全独立，可上传到任何网站，自动响应式适配');
-        })();
+        }
+    </style>
+</head>
+<body>
+    <div class="ad-container">
+        <div class="ad-content">
+            <div class="ad-title">${title}</div>
+            <div class="ad-desc">${desc}</div>
+        </div>
+    </div>
+</body>
+</html>`;
+            
+            htmlCode.textContent = html;
+            htmlOutput.style.display = 'block';
+            htmlOutput.scrollIntoView({ behavior: 'smooth' });
+        });
+        
+        // 重置
+        resetBtn.addEventListener('click', () => {
+            adTitleInput.value = '';
+            adDescInput.value = '';
+            adTypeBtns[0].click();
+            colorOptions[0].click();
+            htmlOutput.style.display = 'none';
+        });
+        
+        // 复制代码
+        copyBtn.addEventListener('click', () => {
+            const textArea = document.createElement('textarea');
+            textArea.value = htmlCode.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            copyBtn.textContent = '已复制!';
+            setTimeout(() => {
+                copyBtn.textContent = '复制代码';
+            }, 2000);
+        });
+        
+        // 初始化预览
+        updatePreview();
     </script>
 </body>
 </html>
