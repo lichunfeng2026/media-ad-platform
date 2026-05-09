@@ -1,435 +1,915 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>广告创建工具</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-        
-        body {
-            background-color: #f5f5f5;
-            padding: 20px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        
-        .header h1 {
-            color: #333;
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-        
-        .tool-container {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .section {
-            margin-bottom: 20px;
-        }
-        
-        .section-title {
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #555;
-        }
-        
-        .ad-type-selector {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        
-        .ad-type-btn {
-            flex: 1;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            background: white;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
-        }
-        
-        .ad-type-btn.active {
-            border-color: #4285f4;
-            background: #e8f0fe;
-        }
-        
-        .color-selector {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 15px;
-        }
-        
-        .color-option {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            cursor: pointer;
-            border: 3px solid transparent;
-            transition: all 0.3s;
-        }
-        
-        .color-option.active {
-            border-color: #333;
-            transform: scale(1.1);
-        }
-        
-        .text-input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            font-size: 16px;
-        }
-        
-        .text-input:focus {
-            outline: none;
-            border-color: #4285f4;
-        }
-        
-        .preview-container {
-            background: #f9f9f9;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        
-        .preview-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        
-        .preview-ad {
-            width: 100%;
-            min-height: 200px;
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .preview-title-text {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: white;
-        }
-        
-        .preview-desc {
-            font-size: 16px;
-            color: white;
-            max-width: 80%;
-        }
-        
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .btn {
-            flex: 1;
-            padding: 14px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .btn-primary {
-            background: #4285f4;
-            color: white;
-        }
-        
-        .btn-secondary {
-            background: #f1f1f1;
-            color: #333;
-        }
-        
-        .btn:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-        }
-        
-        .html-output {
-            background: #2d2d2d;
-            color: #f8f8f2;
-            padding: 15px;
-            border-radius: 8px;
-            font-family: monospace;
-            font-size: 12px;
-            white-space: pre-wrap;
-            margin-top: 20px;
-            display: none;
-        }
-        
-        .copy-btn {
-            background: #4285f4;
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        
-        @media (max-width: 480px) {
-            body {
-                padding: 10px;
-            }
-            
-            .header h1 {
-                font-size: 20px;
-            }
-            
-            .section-title {
-                font-size: 14px;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>广告管理平台</title>
+<style>
+:root{
+  --bg:#0e0f14;--card:#17181f;--card2:#1e2029;--fg:#eaedf3;--muted:#6b7084;
+  --accent:#ff6b3d;--accent2:#ff9a5c;--border:#2a2c38;--radius:12px;
+  --success:#3ddc84;--danger:#f43f5e;--warn:#f59e0b;--info:#0ea5e9;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;line-height:1.5;overflow-x:hidden}
+body::before{content:'';position:fixed;top:-100px;left:50%;transform:translateX(-50%);width:360px;height:260px;background:radial-gradient(ellipse,rgba(255,107,61,.1) 0%,transparent 70%);pointer-events:none;z-index:0}
+#app{position:relative;z-index:1;max-width:520px;margin:0 auto;padding:0 0 72px}
+.page{padding:16px;animation:fadeUp .35s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* 头部 */
+.pg-head{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-top:8px}
+.pg-head .back{width:36px;height:36px;border-radius:10px;background:var(--card2);border:1px solid var(--border);color:var(--fg);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0;transition:background .2s}
+.pg-head .back:active{background:var(--border)}
+.pg-head h2{font-size:20px;font-weight:800;flex:1}
+.pg-head .badge{font-size:11px;padding:4px 10px;border-radius:20px;font-weight:700}
+
+/* 卡片 */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;transition:border-color .25s}
+.card:active{border-color:rgba(255,107,61,.3)}
+.card+.card{margin-top:0}
+
+/* 标签 */
+.lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:10px}
+
+/* 输入 */
+.fi{width:100%;padding:11px 14px;background:var(--card2);border:2px solid var(--border);border-radius:10px;color:var(--fg);font-size:15px;outline:none;transition:border-color .2s;font-family:inherit}
+.fi:focus{border-color:var(--accent)}
+.fi::placeholder{color:var(--muted)}
+select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%236b7084'%3E%3Cpath d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+textarea.fi{resize:vertical;min-height:80px}
+
+/* 按钮 */
+.btn{padding:12px 20px;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn:active{transform:scale(.97)}
+.btn-p{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 16px rgba(255,107,61,.25)}
+.btn-s{background:var(--card2);color:var(--muted);border:1px solid var(--border)}
+.btn-d{background:rgba(244,63,94,.12);color:var(--danger)}
+.btn-g{background:rgba(61,220,132,.12);color:var(--success)}
+.btn-i{background:rgba(14,165,233,.12);color:var(--info)}
+.btn-w{background:rgba(245,158,11,.12);color:var(--warn)}
+.btn-sm{padding:7px 14px;font-size:12px;border-radius:8px}
+.btn-block{width:100%}
+.btn-row{display:flex;gap:8px}
+.btn-row .btn{flex:1}
+
+/* 状态标签 */
+.tag{display:inline-block;font-size:11px;padding:3px 8px;border-radius:6px;font-weight:700}
+.tag-success{background:rgba(61,220,132,.12);color:var(--success)}
+.tag-danger{background:rgba(244,63,94,.12);color:var(--danger)}
+.tag-warn{background:rgba(245,158,11,.12);color:var(--warn)}
+.tag-info{background:rgba(14,165,233,.12);color:var(--info)}
+.tag-accent{background:rgba(255,107,61,.12);color:var(--accent)}
+
+/* 底部导航 */
+.nav-bar{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom)}
+.nav-item{flex:1;padding:8px 4px 6px;text-align:center;cursor:pointer;transition:color .2s;color:var(--muted)}
+.nav-item.on{color:var(--accent)}
+.nav-item .ni-icon{font-size:20px;margin-bottom:2px;display:block}
+.nav-item .ni-text{font-size:10px;font-weight:700}
+
+/* 模态框 */
+.modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:flex;align-items:flex-end;justify-content:center;animation:mFadeIn .2s}
+@keyframes mFadeIn{from{opacity:0}to{opacity:1}}
+.modal-box{background:var(--card);border-radius:16px 16px 0 0;width:100%;max-width:520px;max-height:80vh;overflow-y:auto;padding:20px;animation:mSlideUp .3s cubic-bezier(.4,0,.2,1)}
+@keyframes mSlideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:36px;height:4px;background:var(--border);border-radius:4px;margin:0 auto 16px}
+.modal-title{font-size:17px;font-weight:800;margin-bottom:16px}
+
+/* Toast */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--card2);color:var(--fg);border:1px solid var(--border);padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 8px 30px rgba(0,0,0,.4);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);z-index:999;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* 广告项 */
+.ad-item{display:flex;gap:12px;align-items:center}
+.ad-item .ad-color{width:44px;height:44px;border-radius:10px;flex-shrink:0}
+.ad-item .ad-info{flex:1;min-width:0}
+.ad-item .ad-info h4{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ad-item .ad-info p{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ad-item .ad-actions{display:flex;gap:6px;flex-shrink:0}
+
+/* 用户项 */
+.user-item{display:flex;gap:12px;align-items:center}
+.user-avatar{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;flex-shrink:0}
+.user-info{flex:1;min-width:0}
+.user-info h4{font-size:14px;font-weight:700}
+.user-info p{font-size:12px;color:var(--muted)}
+
+/* 登录页 */
+.login-wrap{padding:60px 24px;text-align:center}
+.login-logo{width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,var(--accent),var(--accent2));margin:0 auto 20px;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;color:#fff}
+.login-wrap h1{font-size:24px;font-weight:900;margin-bottom:6px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.login-wrap p{color:var(--muted);font-size:14px;margin-bottom:32px}
+.role-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px}
+.role-card{background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:18px 8px;cursor:pointer;transition:all .25s;text-align:center}
+.role-card:active{transform:scale(.96)}
+.role-card.on{border-color:var(--accent);background:rgba(255,107,61,.06)}
+.role-card .rc-icon{font-size:24px;margin-bottom:6px;display:block}
+.role-card .rc-name{font-size:12px;font-weight:700;color:var(--muted)}
+.role-card.on .rc-name{color:var(--fg)}
+
+/* 编辑器 */
+.ed-toolbar{display:flex;flex-wrap:wrap;gap:4px;padding:8px;background:var(--card2);border:1px solid var(--border);border-bottom:none;border-radius:var(--radius) var(--radius) 0 0}
+.ed-btn{width:34px;height:34px;border:1px solid transparent;border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;transition:all .15s;font-family:inherit}
+.ed-btn:active{background:var(--border);color:var(--fg)}
+.ed-btn.on{background:rgba(255,107,61,.12);color:var(--accent);border-color:rgba(255,107,61,.2)}
+.ed-sep{width:1px;height:24px;background:var(--border);margin:5px 2px;align-self:center}
+.ed-select{height:34px;padding:0 8px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--fg);font-size:12px;outline:none;font-family:inherit}
+.ed-color{width:34px;height:34px;border:1px solid var(--border);border-radius:8px;cursor:pointer;background:transparent;padding:2px}
+.ed-color input{width:100%;height:100%;border:none;border-radius:6px;cursor:pointer;background:transparent}
+.ed-body{min-height:180px;max-height:300px;overflow-y:auto;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:0 0 var(--radius) var(--radius);outline:none;font-size:15px;line-height:1.7;color:var(--fg)}
+.ed-body:empty::before{content:attr(data-placeholder);color:var(--muted);pointer-events:none}
+.ed-body h1{font-size:24px;font-weight:800;margin:8px 0 4px}
+.ed-body h2{font-size:20px;font-weight:700;margin:6px 0 4px}
+.ed-body h3{font-size:17px;font-weight:700;margin:4px 0}
+.ed-body blockquote{border-left:3px solid var(--accent);padding-left:12px;margin:8px 0;color:var(--muted)}
+.ed-body img{max-width:100%;border-radius:8px;margin:8px 0}
+.ed-body video{max-width:100%;border-radius:8px;margin:8px 0}
+.ed-body a{color:var(--accent);text-decoration:underline}
+.ed-body ul,.ed-body ol{padding-left:20px;margin:6px 0}
+
+/* 展示形式选择 */
+.dm-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.dm-item{padding:10px 4px;text-align:center;background:var(--card2);border:2px solid transparent;border-radius:8px;cursor:pointer;transition:all .2s}
+.dm-item.on{border-color:var(--accent);background:rgba(255,107,61,.06)}
+.dm-item .dm-icon{font-size:18px;display:block;margin-bottom:2px}
+.dm-item .dm-name{font-size:10px;font-weight:600;color:var(--muted)}
+.dm-item.on .dm-name{color:var(--fg)}
+
+/* 预览舞台 */
+.preview-stage{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:14px;min-height:120px;position:relative;overflow:hidden}
+.preview-stage .ps-label{position:absolute;top:8px;right:8px;font-size:10px;color:var(--muted);background:var(--bg);padding:2px 8px;border-radius:4px;z-index:2}
+
+/* 代码展示 */
+.code-block{background:var(--bg);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-top:10px}
+.code-head{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--card2);border-bottom:1px solid var(--border)}
+.code-head span{font-size:11px;font-weight:700;color:var(--muted)}
+.code-body{padding:12px;max-height:200px;overflow:auto;-webkit-overflow-scrolling:touch}
+.code-body pre{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:11px;line-height:1.5;color:#c8ccd8;white-space:pre-wrap;word-break:break-all}
+.code-body::-webkit-scrollbar{width:3px}
+.code-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* 详情页 */
+.detail-content{padding:16px;line-height:1.8;font-size:15px}
+.detail-content h1{font-size:24px;font-weight:800;margin-bottom:8px}
+.detail-content h2{font-size:20px;font-weight:700;margin:12px 0 6px}
+.detail-content h3{font-size:17px;font-weight:700;margin:8px 0 4px}
+.detail-content blockquote{border-left:3px solid var(--accent);padding-left:12px;margin:8px 0;color:var(--muted)}
+.detail-content img{max-width:100%;border-radius:8px;margin:8px 0}
+.detail-content video{max-width:100%;border-radius:8px;margin:8px 0}
+.detail-content a{color:var(--accent)}
+
+/* 视频播放页 */
+.video-wrap{background:#000;border-radius:var(--radius);overflow:hidden;margin-bottom:14px}
+.video-wrap video{width:100%;display:block;max-height:300px;object-fit:contain}
+
+/* 空状态 */
+.empty{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty .em-icon{font-size:40px;margin-bottom:10px;opacity:.3;display:block}
+.empty p{font-size:14px}
+
+/* 统计条 */
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.stat-item{background:var(--card2);border-radius:10px;padding:14px;text-align:center}
+.stat-item .sv{font-size:22px;font-weight:800}
+.stat-item .sl{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* 颜色选择 */
+.clr-row{display:flex;gap:8px;flex-wrap:wrap}
+.clr-dot{width:34px;height:34px;border-radius:8px;cursor:pointer;border:3px solid transparent;transition:all .2s;position:relative}
+.clr-dot::after{content:'';position:absolute;inset:-3px;border-radius:11px;border:2px solid transparent;transition:border-color .2s}
+.clr-dot.on::after{border-color:var(--fg)}
+.clr-dot:active{transform:scale(.9)}
+
+/* 类型选择 */
+.tp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tp-item{padding:12px 6px;text-align:center;background:var(--card2);border:2px solid transparent;border-radius:10px;cursor:pointer;transition:all .2s}
+.tp-item.on{border-color:var(--accent);background:rgba(255,107,61,.06)}
+.tp-item .tp-i{font-size:20px;display:block;margin-bottom:3px}
+.tp-item .tp-n{font-size:11px;font-weight:600;color:var(--muted)}
+.tp-item.on .tp-n{color:var(--fg)}
+
+/* 搜索栏 */
+.search-bar{display:flex;gap:8px;margin-bottom:14px}
+.search-bar .fi{flex:1}
+
+/* 筛选标签 */
+.filter-row{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px}
+.filter-row::-webkit-scrollbar{display:none}
+.ftag{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;background:var(--card2);color:var(--muted);cursor:pointer;white-space:nowrap;border:1px solid transparent;transition:all .2s}
+.ftag.on{border-color:var(--accent);color:var(--accent);background:rgba(255,107,61,.08)}
+
+/* 视频预览卡 */
+.video-thumb{background:var(--card2);border-radius:10px;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden;margin-bottom:10px}
+.video-thumb::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,107,61,.1),rgba(255,154,92,.05))}
+.play-icon{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.15);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;z-index:1;border:2px solid rgba(255,255,255,.2)}
+
+@media(max-width:360px){
+  .dm-grid{grid-template-columns:repeat(3,1fr)}
+  .role-cards{grid-template-columns:repeat(3,1fr);gap:8px}
+}
+</style>
 </head>
 <body>
-    <div class="header">
-        <h1>广告创建工具</h1>
+<div id="app"></div>
+<div id="modalMask" style="display:none"></div>
+<div id="toastEl" class="toast"></div>
+<script>
+/* ===================== 数据层 ===================== */
+const DB={
+  get(k){try{return JSON.parse(localStorage.getItem('adp_'+k))||[]}catch(e){return[]}},
+  set(k,v){localStorage.setItem('adp_'+k,JSON.stringify(v))},
+  getUsers(){return this.get('users')},
+  setUsers(u){this.set('users',u)},
+  getAds(){return this.get('ads')},
+  setAds(a){this.set('ads',a)},
+};
+
+/* 初始化默认数据 */
+function initDB(){
+  if(DB.getUsers().length===0){
+    DB.setUsers([
+      {id:'u1',name:'系统管理员',pass:'admin123',role:'admin',status:'active',time:Date.now()},
+      {id:'u2',name:'品牌方甲',pass:'123456',role:'advertiser',status:'active',time:Date.now()},
+      {id:'u3',name:'推广者乙',pass:'123456',role:'sharer',status:'active',time:Date.now()},
+    ]);
+  }
+  if(DB.getAds().length===0){
+    DB.setAds([
+      {id:'a1',uid:'u2',title:'双十一大促',desc:'全场5折起',type:'banner',color:'#ff6b3d',grad:'linear-gradient(135deg,#ff6b3d,#ff9a5c)',display:'fixed-top',content:'<h2>双十一大促</h2><p>全场商品5折起，限时抢购</p>',videoUrl:'',status:'approved',time:Date.now()},
+      {id:'a2',uid:'u2',title:'新品首发',desc:'限量100份',type:'vertical',color:'#6366f1',grad:'linear-gradient(135deg,#6366f1,#818cf8)',display:'popup',content:'<h2>新品首发</h2><p>限量100份，售完即止</p>',videoUrl:'https://www.w3schools.com/html/mov_bbb.mp4',status:'approved',time:Date.now()-86400000},
+      {id:'a3',uid:'u2',title:'会员日',desc:'积分翻倍',type:'square',color:'#10b981',grad:'linear-gradient(135deg,#10b981,#34d399)',display:'float',content:'<h2>会员日</h2><p>今日积分翻倍</p>',videoUrl:'',status:'pending',time:Date.now()-172800000},
+    ]);
+  }
+}
+
+/* ===================== 状态 ===================== */
+let S={user:null,view:'login',role:'admin',filter:'all',search:'',editId:null,editorContent:''};
+
+/* ===================== 工具 ===================== */
+const $=s=>document.querySelector(s);
+const app=()=>document.getElementById('app');
+const gid=()=>'id_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
+function toast(msg){const t=$('#toastEl');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1800)}
+function timeAgo(ts){const d=Date.now()-ts,m=d/60000;if(m<1)return'刚刚';if(m<60)return Math.floor(m)+'分钟前';const h=d/3600000;if(h<24)return Math.floor(h)+'小时前';return Math.floor(d/86400000)+'天前'}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function roleLabel(r){return r==='admin'?'管理员':r==='advertiser'?'投放商':'分享者'}
+function roleTag(r){const c={admin:'tag-accent',advertiser:'tag-info',sharer:'tag-warn'};return `<span class="tag ${c[r]||'tag-info'}">${roleLabel(r)}</span>`}
+function statusTag(s){const m={approved:['tag-success','已通过'],pending:['tag-warn','待审核'],locked:['tag-danger','已锁定']};const t=m[s]||['tag-info',s];return `<span class="tag ${t[0]}">${t[1]}</span>`}
+const colors=[
+  {c:'#ff6b3d',g:'linear-gradient(135deg,#ff6b3d,#ff9a5c)'},
+  {c:'#6366f1',g:'linear-gradient(135deg,#6366f1,#818cf8)'},
+  {c:'#10b981',g:'linear-gradient(135deg,#10b981,#34d399)'},
+  {c:'#f43f5e',g:'linear-gradient(135deg,#f43f5e,#fb7185)'},
+  {c:'#0ea5e9',g:'linear-gradient(135deg,#0ea5e9,#38bdf8)'},
+  {c:'#f59e0b',g:'linear-gradient(135deg,#f59e0b,#fbbf24)'},
+  {c:'#8b5cf6',g:'linear-gradient(135deg,#8b5cf6,#a78bfa)'},
+  {c:'#1e1e2e',g:'linear-gradient(135deg,#1e1e2e,#2a2a3e)'},
+];
+const displayModes=[
+  {id:'fixed-top',name:'固定头部',icon:'上'},
+  {id:'fixed-mid',name:'固定中部',icon:'中'},
+  {id:'fixed-bot',name:'固定底部',icon:'下'},
+  {id:'popup',name:'弹窗',icon:'窗'},
+  {id:'float',name:'浮窗',icon:'浮'},
+  {id:'sidebar',name:'侧边',icon:'侧'},
+  {id:'banner',name:'横幅',icon:'幅'},
+  {id:'scroll-bot',name:'底部滚动',icon:'滚'},
+];
+const adTypes=[
+  {id:'banner',name:'横幅',icon:'▭'},
+  {id:'vertical',name:'竖版',icon:'▯'},
+  {id:'square',name:'方形',icon:'◻'},
+];
+
+/* ===================== 模态框 ===================== */
+function showModal(html){
+  const m=$('#modalMask');
+  m.innerHTML=`<div class="modal-mask" onclick="if(event.target===this)closeModal()"><div class="modal-box"><div class="modal-handle"></div>${html}</div></div>`;
+  m.style.display='block';
+}
+function closeModal(){$('#modalMask').style.display='none';$('#modalMask').innerHTML=''}
+
+/* ===================== 路由 ===================== */
+function nav(view){S.view=view;S.filter='all';S.search='';render()}
+
+function render(){
+  const a=app();
+  let html='',navHtml='';
+  switch(S.view){
+    case'login':html=pgLogin();navHtml='';break;
+    case'create':html=pgCreate();navHtml=navBar(['create','my-ads','library']);break;
+    case'my-ads':html=pgMyAds();navHtml=navBar(['create','my-ads','library']);break;
+    case'admin-users':html=pgAdminUsers();navHtml=navBar(['admin-users','admin-ads','library']);break;
+    case'admin-ads':html=pgAdminAds();navHtml=navBar(['admin-users','admin-ads','library']);break;
+    case'library':html=pgLibrary();navHtml=navBar(S.user?.role==='admin'?['admin-users','admin-ads','library']:S.user?.role==='advertiser'?['create','my-ads','library']:['library','sharer']);break;
+    case'sharer':html=pgSharer();navHtml=navBar(['library','sharer']);break;
+    default:if(S.view.startsWith('detail/'))html=pgDetail(S.view.split('/')[1]);else if(S.view.startsWith('video/'))html=pgVideo(S.view.split('/')[1]);else html='<div class="page empty"><span class="em-icon">?</span><p>页面不存在</p></div>';
+  }
+  a.innerHTML=html+navHtml;
+  bindEvents();
+  if(S.view==='create')initEditor();
+}
+
+function navBar(items){
+  const icons={
+    'create':['+','创建'],
+    'my-ads':['☰','我的'],
+    'library':['≡','代码库'],
+    'admin-users':['☻','用户'],
+    'admin-ads':['☑','审核'],
+    'sharer':['↗','分享'],
+  };
+  return `<nav class="nav-bar">${items.map(id=>{const[ic,lb]=icons[id]||['',''];return `<div class="nav-item${S.view===id?' on':''}" onclick="nav('${id}')"><span class="ni-icon">${ic}</span><span class="ni-text">${lb}</span></div>`}).join('')}</nav>`;
+}
+
+/* ===================== 登录页 ===================== */
+function pgLogin(){
+  return `<div class="login-wrap">
+    <div class="login-logo">A</div>
+    <h1>广告管理平台</h1>
+    <p>多角色协作 · 可视化创建 · 一键投放</p>
+    <div class="role-cards">
+      <div class="role-card${S.role==='admin'?' on':''}" onclick="S.role='admin';render()">
+        <span class="rc-icon" style="color:var(--accent)">A</span>
+        <span class="rc-name">管理员</span>
+      </div>
+      <div class="role-card${S.role==='advertiser'?' on':''}" onclick="S.role='advertiser';render()">
+        <span class="rc-icon" style="color:var(--info)">B</span>
+        <span class="rc-name">投放商</span>
+      </div>
+      <div class="role-card${S.role==='sharer'?' on':''}" onclick="S.role='sharer';render()">
+        <span class="rc-icon" style="color:var(--warn)">S</span>
+        <span class="rc-name">分享者</span>
+      </div>
     </div>
-    
-    <div class="tool-container">
-        <div class="section">
-            <div class="section-title">选择广告类型</div>
-            <div class="ad-type-selector">
-                <div class="ad-type-btn active" data-type="banner">横幅广告</div>
-                <div class="ad-type-btn" data-type="vertical">竖版广告</div>
-                <div class="ad-type-btn" data-type="square">方形广告</div>
-            </div>
-        </div>
-        
-        <div class="section">
-            <div class="section-title">选择颜色主题</div>
-            <div class="color-selector">
-                <div class="color-option active" style="background: #4285f4;" data-color="#4285f4"></div>
-                <div class="color-option" style="background: #34a853;" data-color="#34a853"></div>
-                <div class="color-option" style="background: #ea4335;" data-color="#ea4335"></div>
-                <div class="color-option" style="background: #fbbc05;" data-color="#fbbc05"></div>
-                <div class="color-option" style="background: #9c27b0;" data-color="#9c27b0"></div>
-                <div class="color-option" style="background: #00bcd4;" data-color="#00bcd4"></div>
-            </div>
-        </div>
-        
-        <div class="section">
-            <div class="section-title">广告内容</div>
-            <input type="text" class="text-input" id="adTitle" placeholder="输入广告标题" value="限时优惠">
-            <input type="text" class="text-input" id="adDesc" placeholder="输入广告描述" value="立即抢购，享8折优惠">
-        </div>
-        
-        <div class="section">
-            <div class="section-title">预览</div>
-            <div class="preview-container">
-                <div class="preview-title">广告预览</div>
-                <div class="preview-ad" id="previewAd">
-                    <div class="preview-title-text" id="previewTitle">限时优惠</div>
-                    <div class="preview-desc" id="previewDesc">立即抢购，享8折优惠</div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="action-buttons">
-            <button class="btn btn-primary" id="generateBtn">生成HTML</button>
-            <button class="btn btn-secondary" id="resetBtn">重置</button>
-        </div>
-        
-        <div class="html-output" id="htmlOutput">
-            <pre id="htmlCode"></pre>
-            <button class="copy-btn" id="copyBtn">复制代码</button>
-        </div>
+    <div style="text-align:left">
+      <div class="lbl" style="margin-top:8px">账号</div>
+      <input class="fi" id="loginName" placeholder="输入用户名" value="${S.role==='admin'?'系统管理员':S.role==='advertiser'?'品牌方甲':'推广者乙'}">
+      <div class="lbl" style="margin-top:12px">密码</div>
+      <input class="fi" id="loginPass" type="password" placeholder="输入密码" value="${S.role==='admin'?'admin123':'123456'}">
     </div>
-    
-    <script>
-        // 获取DOM元素
-        const adTypeBtns = document.querySelectorAll('.ad-type-btn');
-        const colorOptions = document.querySelectorAll('.color-option');
-        const adTitleInput = document.getElementById('adTitle');
-        const adDescInput = document.getElementById('adDesc');
-        const previewAd = document.getElementById('previewAd');
-        const previewTitle = document.getElementById('previewTitle');
-        const previewDesc = document.getElementById('previewDesc');
-        const generateBtn = document.getElementById('generateBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const htmlOutput = document.getElementById('htmlOutput');
-        const htmlCode = document.getElementById('htmlCode');
-        const copyBtn = document.getElementById('copyBtn');
-        
-        let currentType = 'banner';
-        let currentColor = '#4285f4';
-        
-        // 广告类型选择
-        adTypeBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                adTypeBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentType = btn.dataset.type;
-                updatePreview();
-            });
-        });
-        
-        // 颜色选择
-        colorOptions.forEach(option => {
-            option.addEventListener('click', () => {
-                colorOptions.forEach(o => o.classList.remove('active'));
-                option.classList.add('active');
-                currentColor = option.dataset.color;
-                updatePreview();
-            });
-        });
-        
-        // 文本输入更新
-        adTitleInput.addEventListener('input', updatePreview);
-        adDescInput.addEventListener('input', updatePreview);
-        
-        // 更新预览
-        function updatePreview() {
-            previewTitle.textContent = adTitleInput.value || '广告标题';
-            previewDesc.textContent = adDescInput.value || '广告描述';
-            previewAd.style.background = currentColor;
-            
-            // 根据广告类型调整样式
-            if (currentType === 'vertical') {
-                previewAd.style.height = '400px';
-                previewTitle.style.fontSize = '28px';
-                previewDesc.style.fontSize = '18px';
-            } else if (currentType === 'square') {
-                previewAd.style.height = '300px';
-                previewTitle.style.fontSize = '24px';
-                previewDesc.style.fontSize = '16px';
-            } else {
-                previewAd.style.height = '200px';
-                previewTitle.style.fontSize = '24px';
-                previewDesc.style.fontSize = '16px';
-            }
-        }
-        
-        // 生成HTML
-        generateBtn.addEventListener('click', () => {
-            const title = adTitleInput.value || '广告标题';
-            const desc = adDescInput.value || '广告描述';
-            const bgColor = currentColor;
-            
-            let html = `<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${title}</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 20px;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: #f5f5f5;
-        }
-        
-        .ad-container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: ${bgColor};
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        
-        .ad-content {
-            padding: 30px;
-            text-align: center;
-            color: white;
-        }
-        
-        .ad-title {
-            font-size: 28px;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-        
-        .ad-desc {
-            font-size: 18px;
-            line-height: 1.5;
-        }
-        
-        @media (max-width: 480px) {
-            .ad-title {
-                font-size: 24px;
-            }
-            
-            .ad-desc {
-                font-size: 16px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="ad-container">
-        <div class="ad-content">
-            <div class="ad-title">${title}</div>
-            <div class="ad-desc">${desc}</div>
-        </div>
+    <button class="btn btn-p btn-block" style="margin-top:20px" id="loginBtn">登录</button>
+    <div style="margin-top:16px;font-size:12px;color:var(--muted)">
+      <p>管理员: 系统管理员 / admin123</p>
+      <p>投放商: 品牌方甲 / 123456</p>
+      <p>分享者: 推广者乙 / 123456</p>
     </div>
-</body>
-</html>`;
-            
-            htmlCode.textContent = html;
-            htmlOutput.style.display = 'block';
-            htmlOutput.scrollIntoView({ behavior: 'smooth' });
-        });
-        
-        // 重置
-        resetBtn.addEventListener('click', () => {
-            adTitleInput.value = '';
-            adDescInput.value = '';
-            adTypeBtns[0].click();
-            colorOptions[0].click();
-            htmlOutput.style.display = 'none';
-        });
-        
-        // 复制代码
-        copyBtn.addEventListener('click', () => {
-            const textArea = document.createElement('textarea');
-            textArea.value = htmlCode.textContent;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            
-            copyBtn.textContent = '已复制!';
-            setTimeout(() => {
-                copyBtn.textContent = '复制代码';
-            }, 2000);
-        });
-        
-        // 初始化预览
-        updatePreview();
-    </script>
+  </div>`;
+}
+
+/* ===================== 创建页 ===================== */
+let editorSelColor='#ffffff',editorSelSize='16px';
+function pgCreate(){
+  const ad=S.editId?DB.getAds().find(a=>a.id===S.editId):null;
+  const t=ad?ad.title:'',d=ad?ad.desc:'',tp=ad?ad.type:'banner',cl=ad?ad.color:'#ff6b3d',dm=ad?ad.display:'fixed-top',vid=ad?ad.videoUrl:'';
+  if(ad&&!S.editorContent)S.editorContent=ad.content||'';
+  return `<div class="page">
+    <div class="pg-head"><div class="back" onclick="S.editId=null;S.editorContent='';nav('my-ads')">←</div><h2>${ad?'编辑广告':'创建广告'}</h2></div>
+
+    <div class="card"><div class="lbl">广告类型</div>
+      <div class="tp-grid">${adTypes.map(a=>`<div class="tp-item${tp===a.id?' on':''}" data-tp="${a.id}"><span class="tp-i">${a.icon}</span><span class="tp-n">${a.name}</span></div>`).join('')}</div>
+    </div>
+
+    <div class="card"><div class="lbl">颜色主题</div>
+      <div class="clr-row">${colors.map(c=>`<div class="clr-dot${cl===c.c?' on':''}" style="background:${c.g}" data-clr="${c.c}" data-grad="${c.g}"></div>`).join('')}</div>
+    </div>
+
+    <div class="card"><div class="lbl">展示形式</div>
+      <div class="dm-grid">${displayModes.map(d=>`<div class="dm-item${dm===d.id?' on':''}" data-dm="${d.id}"><span class="dm-icon">${d.icon}</span><span class="dm-name">${d.name}</span></div>`).join('')}</div>
+    </div>
+
+    <div class="card">
+      <div class="lbl">基本信息</div>
+      <input class="fi" id="adTitle" placeholder="广告标题" value="${esc(t)}" style="margin-bottom:8px">
+      <input class="fi" id="adDesc" placeholder="简短描述" value="${esc(d)}" style="margin-bottom:8px">
+      <input class="fi" id="adVideo" placeholder="视频URL（可选，留空则无视频）" value="${esc(vid)}">
+    </div>
+
+    <div class="card" style="padding:0;overflow:hidden">
+      <div class="lbl" style="padding:16px 16px 0">富文本编辑器</div>
+      <div class="ed-toolbar" id="edToolbar">
+        <button class="ed-btn" data-cmd="h1" title="标题1">H1</button>
+        <button class="ed-btn" data-cmd="h2" title="标题2">H2</button>
+        <button class="ed-btn" data-cmd="h3" title="标题3">H3</button>
+        <div class="ed-sep"></div>
+        <button class="ed-btn" data-cmd="bold" title="加粗"><b>B</b></button>
+        <button class="ed-btn" data-cmd="italic" title="斜体"><i>I</i></button>
+        <button class="ed-btn" data-cmd="bigger" title="加大">A+</button>
+        <div class="ed-sep"></div>
+        <select class="ed-select" id="edSize" title="字号">
+          ${['12px','14px','15px','16px','18px','20px','24px','28px','32px','36px'].map(s=>`<option value="${s}"${editorSelSize===s?' selected':''}>${s}</option>`).join('')}
+        </select>
+        <div class="ed-color" title="字体颜色"><input type="color" id="edColor" value="${editorSelColor}"></div>
+        <div class="ed-sep"></div>
+        <button class="ed-btn" data-cmd="insertUnorderedList" title="无序列表">UL</button>
+        <button class="ed-btn" data-cmd="insertOrderedList" title="有序列表">OL</button>
+        <button class="ed-btn" data-cmd="blockquote" title="引用">"</button>
+        <div class="ed-sep"></div>
+        <button class="ed-btn" data-cmd="justifyLeft" title="左对齐">左</button>
+        <button class="ed-btn" data-cmd="justifyCenter" title="居中">中</button>
+        <button class="ed-btn" data-cmd="justifyRight" title="右对齐">右</button>
+        <div class="ed-sep"></div>
+        <button class="ed-btn" data-cmd="img" title="插入图片">IMG</button>
+        <button class="ed-btn" data-cmd="video" title="插入视频">VID</button>
+        <button class="ed-btn" data-cmd="link" title="插入链接">URL</button>
+        <button class="ed-btn" data-cmd="hr" title="分隔线">—</button>
+      </div>
+      <div class="ed-body" contenteditable="true" id="edBody" data-placeholder="输入广告正文内容...">${S.editorContent}</div>
+    </div>
+
+    <div class="card"><div class="lbl">预览效果</div>
+      <div class="preview-stage" id="previewStage"><span class="ps-label" id="psLabel">固定头部</span><div id="previewInner"></div></div>
+    </div>
+
+    <button class="btn btn-p btn-block" id="saveAdBtn">${ad?'保存修改':'保存广告'}</button>
+  </div>`;
+}
+
+function initEditor(){
+  const body=document.getElementById('edBody');
+  if(!body)return;
+  /* 保存编辑器内容 */
+  body.addEventListener('input',()=>{S.editorContent=body.innerHTML;updatePreview()});
+  /* 工具栏命令 */
+  document.getElementById('edToolbar').addEventListener('click',e=>{
+    const btn=e.target.closest('.ed-btn');
+    if(!btn)return;
+    const cmd=btn.dataset.cmd;
+    body.focus();
+    switch(cmd){
+      case'h1':case'h2':case'h3':document.execCommand('formatBlock',false,cmd);break;
+      case'bold':case'italic':case'insertUnorderedList':case'insertOrderedList':case'justifyLeft':case'justifyCenter':case'justifyRight':document.execCommand(cmd);break;
+      case'bigger':document.execCommand('fontSize',false,'5');break;
+      case'blockquote':document.execCommand('formatBlock',false,'blockquote');break;
+      case'hr':document.execCommand('insertHorizontalRule');break;
+      case'img':showModal(`<div class="modal-title">插入图片</div><input class="fi" id="mImgUrl" placeholder="输入图片URL" style="margin-bottom:12px"><div class="btn-row"><button class="btn btn-s" onclick="closeModal()">取消</button><button class="btn btn-p" onclick="insertImg()">插入</button></div>`);break;
+      case'video':showModal(`<div class="modal-title">插入视频</div><input class="fi" id="mVidUrl" placeholder="输入视频URL" style="margin-bottom:12px"><div class="btn-row"><button class="btn btn-s" onclick="closeModal()">取消</button><button class="btn btn-p" onclick="insertVid()">插入</button></div>`);break;
+      case'link':showModal(`<div class="modal-title">插入链接</div><input class="fi" id="mLinkUrl" placeholder="输入链接URL" style="margin-bottom:8px"><input class="fi" id="mLinkText" placeholder="链接文字" style="margin-bottom:12px"><div class="btn-row"><button class="btn btn-s" onclick="closeModal()">取消</button><button class="btn btn-p" onclick="insertLink()">插入</button></div>`);break;
+    }
+    S.editorContent=body.innerHTML;
+    setTimeout(updatePreview,50);
+  });
+  /* 字号 */
+  document.getElementById('edSize').addEventListener('change',e=>{
+    body.focus();document.execCommand('fontSize',false,'7');
+    const fonts=body.querySelectorAll('font[size="7"]');
+    fonts.forEach(f=>{f.removeAttribute('size');f.style.fontSize=e.target.value});
+    S.editorContent=body.innerHTML;
+    setTimeout(updatePreview,50);
+  });
+  /* 颜色 */
+  document.getElementById('edColor').addEventListener('input',e=>{
+    body.focus();document.execCommand('foreColor',false,e.target.value);
+    S.editorContent=body.innerHTML;
+    setTimeout(updatePreview,50);
+  });
+  updatePreview();
+}
+
+function insertImg(){const u=$('#mImgUrl').value;if(u){document.getElementById('edBody').focus();document.execCommand('insertImage',false,u);S.editorContent=document.getElementById('edBody').innerHTML;closeModal();setTimeout(updatePreview,50)}}
+function insertVid(){const u=$('#mVidUrl').value;if(u){document.getElementById('edBody').focus();document.execCommand('insertHTML',false,`<video src="${esc(u)}" controls style="max-width:100%;border-radius:8px;margin:8px 0"></video>`);S.editorContent=document.getElementById('edBody').innerHTML;closeModal();setTimeout(updatePreview,50)}}
+function insertLink(){const u=$('#mLinkUrl').value,t=$('#mLinkText').value||u;if(u){document.getElementById('edBody').focus();document.execCommand('insertHTML',false,`<a href="${esc(u)}" target="_blank">${esc(t)}</a>`);S.editorContent=document.getElementById('edBody').innerHTML;closeModal();setTimeout(updatePreview,50)}}
+
+/* 实时预览 */
+function updatePreview(){
+  const title=$('#adTitle')?.value||'广告标题';
+  const desc=$('#adDesc')?.value||'';
+  const tp=document.querySelector('.tp-item.on')?.dataset.tp||'banner';
+  const clr=document.querySelector('.clr-dot.on')?.dataset.clr||'#ff6b3d';
+  const grad=document.querySelector('.clr-dot.on')?.dataset.grad||colors[0].g;
+  const dm=document.querySelector('.dm-item.on')?.dataset.dm||'fixed-top';
+  const content=S.editorContent||`<p>${desc}</p>`;
+  const label=displayModes.find(d=>d.id===dm)?.name||'';
+
+  const psLabel=document.getElementById('psLabel');
+  const psInner=document.getElementById('previewInner');
+  if(psLabel)psLabel.textContent=label;
+  if(!psInner)return;
+
+  const dmInfo=displayModes.find(d=>d.id===dm);
+  const hMap={banner:'80px',vertical:'260px',square:'200px'};
+  const h=hMap[tp]||'120px';
+
+  let wrapStyle='';
+  if(dm==='popup')wrapStyle=`position:relative;min-height:${parseInt(h)+40}px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.3);border-radius:10px`;
+  else if(dm==='float')wrapStyle=`display:flex;justify-content:flex-end;align-items:flex-end;min-height:${parseInt(h)+20}px`;
+  else if(dm==='sidebar')wrapStyle=`display:flex;gap:0;min-height:${parseInt(h)}px`;
+  else wrapStyle='';
+
+  let adStyle=`background:${grad};border-radius:8px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.2);position:relative;`;
+  if(dm==='fixed-top'||dm==='fixed-mid'||dm==='fixed-bot'||dm==='banner')adStyle+=`width:100%;height:${h};`;
+  else if(dm==='popup')adStyle+=`width:80%;max-width:280px;padding:20px;`;
+  else if(dm==='float')adStyle+=`width:120px;padding:12px;border-radius:12px;`;
+  else if(dm==='sidebar')adStyle+=`width:80px;padding:12px;flex-shrink:0;`;
+  else if(dm==='scroll-bot')adStyle+=`width:200px;height:${h};flex-shrink:0;`;
+
+  let innerHtml=`<div style="color:#fff;font-family:-apple-system,sans-serif;padding:${dm==='popup'?'0':'16px'};position:relative;z-index:1;height:100%;display:flex;flex-direction:column;justify-content:center;${dm==='float'||dm==='sidebar'?'align-items:center;text-align:center':''}">`;
+  innerHtml+=`<div style="font-size:${dm==='float'||dm==='sidebar'?'11px':'18px'};font-weight:800;margin-bottom:4px;text-shadow:0 1px 4px rgba(0,0,0,.2)">${esc(title)}</div>`;
+  if(desc&&dm!=='float'&&dm!=='sidebar')innerHtml+=`<div style="font-size:12px;color:rgba(255,255,255,.85);margin-bottom:8px">${esc(desc)}</div>`;
+  if(dm!=='float'&&dm!=='sidebar')innerHtml+=`<div style="font-size:11px;background:rgba(255,255,255,.15);display:inline-block;padding:4px 12px;border-radius:6px;align-self:center;border:1px solid rgba(255,255,255,.2)">了解更多</div>`;
+  innerHtml+=`</div>`;
+
+  let wrapExtra='';
+  if(dm==='popup')wrapExtra=`<div style="position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;cursor:pointer">x</div>`;
+  if(dm==='float')wrapExtra=`<div style="position:absolute;top:4px;right:4px;width:16px;height:16px;border-radius:50%;background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px">x</div>`;
+  if(dm==='scroll-bot')wrapExtra=`<div style="display:flex;gap:8px;overflow-x:auto">${innerHtml.replace('</div></div>','</div></div>')}${innerHtml.replace('</div></div>','</div></div>')}${innerHtml.replace('</div></div>','</div></div>')}</div>`;
+
+  let full='';
+  if(dm==='scroll-bot'){
+    full=`<div style="${wrapStyle}">${wrapExtra}</div>`;
+  } else {
+    full=`<div style="${wrapStyle}">${wrapExtra}<div style="${adStyle}">${innerHtml}</div></div>`;
+  }
+  psInner.innerHTML=full;
+}
+
+/* ===================== 投放商-我的广告 ===================== */
+function pgMyAds(){
+  const ads=DB.getAds().filter(a=>a.uid===S.user.id);
+  const pending=ads.filter(a=>a.status==='pending').length;
+  const approved=ads.filter(a=>a.status==='approved').length;
+  return `<div class="page">
+    <div class="pg-head"><h2>我的广告</h2><span class="badge tag-info">${ads.length}条</span></div>
+    <div class="stat-row">
+      <div class="stat-item"><div class="sv">${ads.length}</div><div class="sl">全部</div></div>
+      <div class="stat-item"><div class="sv" style="color:var(--warn)">${pending}</div><div class="sl">待审核</div></div>
+      <div class="stat-item"><div class="sv" style="color:var(--success)">${approved}</div><div class="sl">已通过</div></div>
+    </div>
+    <div class="filter-row">${['all','pending','approved','locked'].map(f=>`<div class="ftag${S.filter===f?' on':''}" onclick="S.filter='${f}';render()">${f==='all'?'全部':f==='pending'?'待审核':f==='approved'?'已通过':'已锁定'}</div>`).join('')}</div>
+    <div class="search-bar"><input class="fi" id="searchInput" placeholder="搜索广告标题..." value="${esc(S.search)}"></div>
+    ${ads.filter(a=>S.filter==='all'||a.status===S.filter).filter(a=>!S.search||a.title.includes(S.search)).map(a=>adCard(a,'advertiser')).join('')||'<div class="empty"><span class="em-icon">☐</span><p>暂无广告</p></div>'}
+    <button class="btn btn-p btn-block" style="margin-top:12px" onclick="S.editId=null;S.editorContent='';nav('create')">+ 新建广告</button>
+  </div>`;
+}
+
+function adCard(a,role){
+  const actions={
+    advertiser:`<button class="btn btn-sm btn-s" data-act="edit" data-id="${a.id}">编辑</button><button class="btn btn-sm btn-d" data-act="del" data-id="${a.id}">删除</button>`,
+    admin:`<button class="btn btn-sm btn-g" data-act="approve" data-id="${a.id}">通过</button>${a.status!=='locked'?`<button class="btn btn-sm btn-w" data-act="lock" data-id="${a.id}">锁定</button>`:`<button class="btn btn-sm btn-i" data-act="unlock" data-id="${a.id}">解锁</button>`}<button class="btn btn-sm btn-d" data-act="del" data-id="${a.id}">删除</button>`,
+    sharer:`<button class="btn btn-sm btn-p" data-act="use" data-id="${a.id}">使用</button>`,
+    library:`<button class="btn btn-sm btn-i" data-act="code" data-id="${a.id}">代码</button><button class="btn btn-sm btn-s" data-act="detail" data-id="${a.id}">详情</button>`,
+  };
+  return `<div class="card ad-card" data-id="${a.id}">
+    <div class="ad-item">
+      <div class="ad-color" style="background:${a.grad||a.color}"></div>
+      <div class="ad-info">
+        <h4>${esc(a.title)} ${statusTag(a.status)}</h4>
+        <p>${esc(a.desc)} · ${displayModes.find(d=>d.id===a.display)?.name||''} · ${timeAgo(a.time)}</p>
+      </div>
+      <div class="ad-actions">${actions[role]||''}</div>
+    </div>
+    ${a.videoUrl?`<div class="video-thumb" data-act="play" data-id="${a.id}" style="margin-top:10px;height:80px"><div class="play-icon" style="width:36px;height:36px;font-size:14px">&#9654;</div></div>`:''}
+  </div>`;
+}
+
+/* ===================== 管理员-用户管理 ===================== */
+function pgAdminUsers(){
+  const users=DB.getUsers();
+  return `<div class="page">
+    <div class="pg-head"><h2>用户管理</h2><span class="badge tag-accent">${users.length}人</span></div>
+    <button class="btn btn-p btn-block" style="margin-bottom:14px" id="addUserBtn">+ 添加用户</button>
+    <div class="filter-row">${['all','admin','advertiser','sharer'].map(f=>`<div class="ftag${S.filter===f?' on':''}" onclick="S.filter='${f}';render()">${f==='all'?'全部':roleLabel(f)}</div>`).join('')}</div>
+    ${users.filter(u=>S.filter==='all'||u.role===S.filter).map(u=>{
+      const color=u.role==='admin'?'var(--accent)':u.role==='advertiser'?'var(--info)':'var(--warn)';
+      return `<div class="card">
+        <div class="user-item">
+          <div class="user-avatar" style="background:${color}">${u.name[0]}</div>
+          <div class="user-info">
+            <h4>${esc(u.name)} ${roleTag(u.role)} ${u.status==='locked'?'<span class="tag tag-danger">已锁定</span>':''}</h4>
+            <p>注册于 ${timeAgo(u.time)}</p>
+          </div>
+          <div class="ad-actions">
+            <button class="btn btn-sm btn-s" data-uact="edit" data-uid="${u.id}">编辑</button>
+            ${u.id!=='u1'?(u.status==='locked'?`<button class="btn btn-sm btn-i" data-uact="unlock" data-uid="${u.id}">解锁</button>`:`<button class="btn btn-sm btn-w" data-uact="lock" data-uid="${u.id}">锁定</button>`)+`<button class="btn btn-sm btn-d" data-uact="del" data-uid="${u.id}">删除</button>`:''}
+          </div>
+        </div>
+      </div>`}).join('')}
+  </div>`;
+}
+
+/* ===================== 管理员-广告审核 ===================== */
+function pgAdminAds(){
+  const ads=DB.getAds();
+  return `<div class="page">
+    <div class="pg-head"><h2>广告审核</h2><span class="badge tag-info">${ads.length}条</span></div>
+    <div class="stat-row">
+      <div class="stat-item"><div class="sv">${ads.length}</div><div class="sl">全部</div></div>
+      <div class="stat-item"><div class="sv" style="color:var(--warn)">${ads.filter(a=>a.status==='pending').length}</div><div class="sl">待审核</div></div>
+      <div class="stat-item"><div class="sv" style="color:var(--success)">${ads.filter(a=>a.status==='approved').length}</div><div class="sl">已通过</div></div>
+    </div>
+    <div class="filter-row">${['all','pending','approved','locked'].map(f=>`<div class="ftag${S.filter===f?' on':''}" onclick="S.filter='${f}';render()">${f==='all'?'全部':f==='pending'?'待审核':f==='approved'?'已通过':'已锁定'}</div>`).join('')}</div>
+    <div class="search-bar"><input class="fi" id="searchInput" placeholder="搜索广告..." value="${esc(S.search)}"></div>
+    ${ads.filter(a=>S.filter==='all'||a.status===S.filter).filter(a=>!S.search||a.title.includes(S.search)).map(a=>adCard(a,'admin')).join('')||'<div class="empty"><span class="em-icon">☐</span><p>暂无广告</p></div>'}
+  </div>`;
+}
+
+/* ===================== 代码库 ===================== */
+function pgLibrary(){
+  const ads=DB.getAds().filter(a=>a.status==='approved');
+  return `<div class="page">
+    <div class="pg-head"><h2>广告代码库</h2><span class="badge tag-success">${ads.length}条</span></div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px">已通过审核的广告代码，可直接复制使用</p>
+    <div class="search-bar"><input class="fi" id="searchInput" placeholder="搜索广告..." value="${esc(S.search)}"></div>
+    ${ads.filter(a=>!S.search||a.title.includes(S.search)).map(a=>{
+      const code=genAdCode(a);
+      return `<div class="card">
+        <div class="ad-item" style="margin-bottom:8px">
+          <div class="ad-color" style="background:${a.grad||a.color}"></div>
+          <div class="ad-info">
+            <h4>${esc(a.title)} ${statusTag(a.status)}</h4>
+            <p>${esc(a.desc)} · ${displayModes.find(d=>d.id===a.display)?.name||''}</p>
+          </div>
+          <div class="ad-actions">
+            <button class="btn btn-sm btn-i" data-act="detail" data-id="${a.id}">详情</button>
+            ${a.videoUrl?`<button class="btn btn-sm btn-s" data-act="play" data-id="${a.id}">视频</button>`:''}
+          </div>
+        </div>
+        <div class="code-block">
+          <div class="code-head"><span>HTML 代码</span><button class="btn btn-sm btn-p" data-act="copycode" data-id="${a.id}">复制</button></div>
+          <div class="code-body"><pre>${esc(code)}</pre></div>
+        </div>
+      </div>`}).join('')||'<div class="empty"><span class="em-icon">≡</span><p>暂无已通过的广告代码</p></div>'}
+  </div>`;
+}
+
+/* ===================== 分享者页 ===================== */
+function pgSharer(){
+  const ads=DB.getAds().filter(a=>a.status==='approved');
+  return `<div class="page">
+    <div class="pg-head"><h2>分享使用</h2></div>
+    <div class="card" style="background:rgba(14,165,233,.06);border-color:rgba(14,165,233,.2)">
+      <p style="font-size:13px;color:var(--info);line-height:1.7">分享者可以浏览已通过的广告，复制代码嵌入到自媒体平台、博客、网站等渠道进行推广传播。点击"使用"按钮获取广告代码。</p>
+    </div>
+    <div class="search-bar"><input class="fi" id="searchInput" placeholder="搜索广告..." value="${esc(S.search)}"></div>
+    ${ads.filter(a=>!S.search||a.title.includes(S.search)).map(a=>{
+      return `<div class="card">
+        <div class="ad-item">
+          <div class="ad-color" style="background:${a.grad||a.color}"></div>
+          <div class="ad-info">
+            <h4>${esc(a.title)}</h4>
+            <p>${esc(a.desc)} · ${displayModes.find(d=>d.id===a.display)?.name||''}</p>
+          </div>
+          <div class="ad-actions">
+            <button class="btn btn-sm btn-p" data-act="use" data-id="${a.id}">使用</button>
+            <button class="btn btn-sm btn-s" data-act="detail" data-id="${a.id}">详情</button>
+            ${a.videoUrl?`<button class="btn btn-sm btn-s" data-act="play" data-id="${a.id}">视频</button>`:''}
+          </div>
+        </div>
+      </div>`}).join('')||'<div class="empty"><span class="em-icon">↗</span><p>暂无可分享的广告</p></div>'}
+  </div>`;
+}
+
+/* ===================== 详情页 ===================== */
+function pgDetail(id){
+  const a=DB.getAds().find(x=>x.id===id);
+  if(!a)return '<div class="page empty"><span class="em-icon">?</span><p>广告不存在</p></div>';
+  return `<div class="page">
+    <div class="pg-head"><div class="back" onclick="history.back();render()">←</div><h2>广告详情</h2>${statusTag(a.status)}</div>
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="background:${a.grad||a.color};padding:24px;text-align:center;color:#fff">
+        <div style="font-size:24px;font-weight:800;text-shadow:0 2px 8px rgba(0,0,0,.2)">${esc(a.title)}</div>
+        <div style="font-size:14px;color:rgba(255,255,255,.85);margin-top:6px">${esc(a.desc)}</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="lbl">展示形式 · ${displayModes.find(d=>d.id===a.display)?.name||'未知'} · ${adTypes.find(t=>t.id===a.type)?.name||'未知'}</div>
+      <div class="lbl">创建时间 · ${new Date(a.time).toLocaleString('zh-CN')}</div>
+      ${a.videoUrl?`<div class="video-thumb" data-act="play" data-id="${a.id}" style="margin-top:10px"><div class="play-icon">&#9654;</div></div>`:''}
+    </div>
+    <div class="card"><div class="lbl">广告正文</div><div class="detail-content">${a.content||'<p style="color:var(--muted)">无正文内容</p>'}</div></div>
+    <div class="btn-row">
+      <button class="btn btn-i" data-act="use" data-id="${a.id}">复制代码</button>
+      ${a.videoUrl?`<button class="btn btn-s" data-act="play" data-id="${a.id}">播放视频</button>`:''}
+    </div>
+  </div>`;
+}
+
+/* ===================== 视频页 ===================== */
+function pgVideo(id){
+  const a=DB.getAds().find(x=>x.id===id);
+  if(!a||!a.videoUrl)return '<div class="page empty"><span class="em-icon">?</span><p>视频不存在</p></div>';
+  return `<div class="page">
+    <div class="pg-head"><div class="back" onclick="history.back();render()">←</div><h2>视频播放</h2></div>
+    <div class="video-wrap"><video src="${esc(a.videoUrl)}" controls autoplay style="width:100%;display:block;border-radius:var(--radius)"></video></div>
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="background:${a.grad||a.color};padding:20px;text-align:center;color:#fff">
+        <div style="font-size:20px;font-weight:800">${esc(a.title)}</div>
+        <div style="font-size:13px;color:rgba(255,255,255,.85);margin-top:4px">${esc(a.desc)}</div>
+      </div>
+    </div>
+    <div class="card"><div class="lbl">广告详情</div><div class="detail-content">${a.content||''}</div></div>
+    <button class="btn btn-p btn-block" data-act="use" data-id="${a.id}">获取广告代码</button>
+  </div>`;
+}
+
+/* ===================== 生成广告代码 ===================== */
+function genAdCode(a){
+  const dm=a.display||'fixed-top';
+  const grad=a.grad||a.color;
+  const content=a.content||`<p>${esc(a.desc)}</p>`;
+  let style='',wrap='',close='';
+  switch(dm){
+    case'fixed-top':style='position:fixed;top:0;left:0;right:0;z-index:9999;';wrap=`<div style="width:100%;background:${grad};padding:16px 24px;text-align:center;color:#fff;font-family:-apple-system,sans-serif;box-shadow:0 2px 12px rgba(0,0,0,.15)"><div style="font-size:20px;font-weight:800">${esc(a.title)}</div>${content.replace(/color:[^;"]+/g,'color:#fff').replace(/font-size:[^;"]+/g,'')}<a href="#" style="display:inline-block;margin-top:8px;padding:6px 18px;background:rgba(255,255,255,.2);border-radius:6px;color:#fff;text-decoration:none;font-size:13px;font-weight:700">了解更多</a></div>`;break;
+    case'fixed-mid':style='';wrap=`<div style="max-width:600px;margin:20px auto;background:${grad};border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.15)"><div style="padding:24px;color:#fff;font-family:-apple-system,sans-serif"><div style="font-size:24px;font-weight:800;margin-bottom:8px">${esc(a.title)}</div><div style="color:rgba(255,255,255,.9)">${content.replace(/color:[^;"]+/g,'color:rgba(255,255,255,.9)')}</div><a href="#" style="display:inline-block;margin-top:12px;padding:8px 24px;background:rgba(255,255,255,.2);border-radius:8px;color:#fff;text-decoration:none;font-size:14px;font-weight:700">了解更多</a></div></div>`;break;
+    case'fixed-bot':style='position:fixed;bottom:0;left:0;right:0;z-index:9999;';wrap=`<div style="width:100%;background:${grad};padding:12px 24px;text-align:center;color:#fff;font-family:-apple-system,sans-serif;box-shadow:0 -2px 12px rgba(0,0,0,.15)"><span style="font-weight:700">${esc(a.title)}</span> · ${esc(a.desc)} <a href="#" style="color:#fff;text-decoration:underline;font-weight:700;margin-left:8px">查看</a></div>`;break;
+    case'popup':close=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center" id="adPopup" onclick="this.style.display='none'">`;wrap=`<div style="max-width:340px;width:90%;background:${grad};border-radius:16px;padding:28px;text-align:center;color:#fff;font-family:-apple-system,sans-serif;box-shadow:0 8px 40px rgba(0,0,0,.3);position:relative" onclick="event.stopPropagation()"><div style="position:absolute;top:10px;right:14px;cursor:pointer;font-size:18px;opacity:.7" onclick="document.getElementById('adPopup').style.display='none'">x</div><div style="font-size:22px;font-weight:800;margin-bottom:8px">${esc(a.title)}</div><div style="color:rgba(255,255,255,.9);font-size:14px">${content.replace(/color:[^;"]+/g,'color:rgba(255,255,255,.9)')}</div><a href="#" style="display:inline-block;margin-top:14px;padding:10px 28px;background:rgba(255,255,255,.2);border-radius:8px;color:#fff;text-decoration:none;font-size:14px;font-weight:700">了解更多</a></div>`;style='';break;
+    case'float':style='position:fixed;right:16px;bottom:16px;z-index:9998;';wrap=`<div style="width:100px;background:${grad};border-radius:12px;padding:12px;text-align:center;color:#fff;font-family:-apple-system,sans-serif;box-shadow:0 4px 20px rgba(0,0,0,.2);position:relative"><div style="position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;cursor:pointer" onclick="this.parentElement.style.display='none'">x</div><div style="font-size:12px;font-weight:800">${esc(a.title)}</div><a href="#" style="font-size:10px;color:rgba(255,255,255,.8);text-decoration:none">了解更多</a></div>`;break;
+    case'sidebar':style='position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:9997;';wrap=`<div style="width:80px;background:${grad};padding:14px 8px;text-align:center;color:#fff;font-family:-apple-system,sans-serif;writing-mode:vertical-rl;border-radius:0 10px 10px 0;box-shadow:2px 0 12px rgba(0,0,0,.15)"><div style="font-weight:800;font-size:13px">${esc(a.title)}</div></div>`;break;
+    case'banner':style='position:fixed;top:0;left:0;right:0;z-index:9996;';wrap=`<div style="width:100%;background:${grad};padding:10px 20px;text-align:center;color:#fff;font-family:-apple-system,sans-serif;box-shadow:0 2px 10px rgba(0,0,0,.15)"><span style="font-weight:700;font-size:14px">${esc(a.title)}</span> <span style="font-size:13px;color:rgba(255,255,255,.85)">${esc(a.desc)}</span> <a href="#" style="color:#fff;font-size:13px;text-decoration:underline;margin-left:8px">查看详情</a></div>`;break;
+    case'scroll-bot':style='position:fixed;bottom:0;left:0;right:0;z-index:9995;background:rgba(0,0,0,.8);overflow-x:auto;white-space:nowrap;padding:8px;';wrap=Array(3).fill(0).map(()=>`<div style="display:inline-block;width:200px;background:${grad};border-radius:8px;padding:14px;margin-right:8px;color:#fff;font-family:-apple-system,sans-serif;vertical-align:top"><div style="font-size:13px;font-weight:800">${esc(a.title)}</div><div style="font-size:11px;color:rgba(255,255,255,.85)">${esc(a.desc)}</div></div>`).join('');break;
+  }
+  if(dm==='popup')return close+wrap+'</div>';
+  return `<div style="${style}">${wrap}</div>`;
+}
+
+/* ===================== 事件绑定 ===================== */
+function bindEvents(){
+  /* 登录 */
+  const loginBtn=document.getElementById('loginBtn');
+  if(loginBtn)loginBtn.onclick=()=>{
+    const name=$('#loginName').value.trim(),pass=$('#loginPass').value.trim();
+    if(!name||!pass)return toast('请输入账号和密码');
+    const users=DB.getUsers();
+    const u=users.find(x=>x.name===name&&x.pass===pass&&x.role===S.role);
+    if(!u)return toast('账号、密码或角色不匹配');
+    if(u.status==='locked')return toast('该账号已被锁定');
+    S.user=u;nav(u.role==='admin'?'admin-users':u.role==='advertiser'?'my-ads':'sharer');
+    toast('登录成功');
+  };
+
+  /* 搜索 */
+  const si=document.getElementById('searchInput');
+  if(si)si.oninput=e=>{S.search=e.target.value;render()};
+
+  /* 广告操作 - 事件委托 */
+  app().addEventListener('click',e=>{
+    const btn=e.target.closest('[data-act]');
+    if(!btn)return;
+    const act=btn.dataset.act,id=btn.dataset.id;
+    const ads=DB.getAds();
+    const idx=ads.findIndex(a=>a.id===id);
+    if(idx<0&&act!=='use')return;
+
+    switch(act){
+      case'edit':
+        const ad=ads[idx];
+        S.editId=id;S.editorContent=ad.content||'';nav('create');break;
+      case'del':
+        showModal(`<div class="modal-title">确认删除</div><p style="color:var(--muted);margin-bottom:16px">删除后无法恢复，确定要删除吗？</p><div class="btn-row"><button class="btn btn-s" onclick="closeModal()">取消</button><button class="btn btn-d" id="confirmDel">删除</button></div>`);
+        setTimeout(()=>{const cd=document.getElementById('confirmDel');if(cd)cd.onclick=()=>{ads.splice(idx,1);DB.setAds(ads);closeModal();render();toast('已删除')}},50);break;
+      case'approve':ads[idx].status='approved';DB.setAds(ads);render();toast('已通过审核');break;
+      case'lock':ads[idx].status='locked';DB.setAds(ads);render();toast('已锁定');break;
+      case'unlock':ads[idx].status='pending';DB.setAds(ads);render();toast('已解锁');break;
+      case'play':S.view='video/'+id;render();break;
+      case'detail':S.view='detail/'+id;render();break;
+      case'use':case'copycode':{
+        const a=ads.find(x=>x.id===id)||DB.getAds().find(x=>x.id===id);
+        if(!a)return;
+        const code=genAdCode(a);
+        copyText(code);toast('代码已复制到剪贴板');
+        if(act==='use'&&S.user?.role==='sharer')toast('代码已复制，可粘贴到自媒体平台使用');
+      }break;
+    }
+  });
+
+  /* 用户操作 */
+  app().addEventListener('click',e=>{
+    const btn=e.target.closest('[data-uact]');
+    if(!btn)return;
+    const act=btn.dataset.uact,uid=btn.dataset.uid;
+    const users=DB.getUsers();
+    const idx=users.findIndex(u=>u.id===uid);
+    if(idx<0)return;
+    switch(act){
+      case'edit':
+        showModal(`<div class="modal-title">编辑用户</div>
+          <div style="margin-bottom:10px"><div class="lbl">用户名</div><input class="fi" id="muName" value="${esc(users[idx].name)}"></div>
+          <div style="margin-bottom:10px"><div class="lbl">密码</div><input class="fi" id="muPass" value="${esc(users[idx].pass)}"></div>
+          <div style="margin-bottom:16px"><div class="lbl">角色</div><select class="fi" id="muRole"><option value="admin"${users[idx].role==='admin'?' selected':''}>管理员</option><option value="advertiser"${users[idx].role==='advertiser'?' selected':''}>投放商</option><option value="sharer"${users[idx].role==='sharer'?' selected':''}>分享者</option></select></div>
+          <div class="btn-row"><button class="btn btn-s" onclick="closeModal()">取消</button><button class="btn btn-p" id="muSave">保存</button></div>`);
+        setTimeout(()=>{document.getElementById('muSave').onclick=()=>{
+          users[idx].name=$('#muName').value.trim()||users[idx].name;
+          users[idx].pass=$('#muPass').value.trim()||users[idx].pass;
+          users[idx].role=$('#muRole').value;
+          DB.setUsers(users);closeModal();render();toast('已保存');
+          if(uid===S.user?.id)S.user=users[idx];
+        }},50);break;
+      case'lock':users[idx].status='locked';DB.setUsers(users);render();toast('已锁定');break;
+      case'unlock':users[idx].status='active';DB.setUsers(users);render();toast('已解锁');break;
+      case'del':
+        showModal(`<div class="modal-title">确认删除</div><p style="color:var(--muted);margin-bottom:16px">确定要删除该用户吗？</p><div class="btn-row"><button class="btn btn-s" onclick="closeModal()">取消</button><button class="btn btn-d" id="confirmUDel">删除</button></div>`);
+        setTimeout(()=>{document.getElementById('confirmUDel').onclick=()=>{users.splice(idx,1);DB.setUsers(users);closeModal();render();toast('已删除')}},50);break;
+    }
+  });
+
+  /* 添加用户 */
+  const addUBtn=document.getElementById('addUserBtn');
+  if(addUBtn)addUBtn.onclick=()=>{
+    showModal(`<div class="modal-title">添加用户</div>
+      <div style="margin-bottom:10px"><div class="lbl">用户名</div><input class="fi" id="nuName" placeholder="输入用户名"></div>
+      <div style="margin-bottom:10px"><div class="lbl">密码</div><input class="fi" id="nuPass" placeholder="输入密码"></div>
+      <div style="margin-bottom:16px"><div class="lbl">角色</div><select class="fi" id="nuRole"><option value="advertiser">投放商</option><option value="sharer">分享者</option><option value="admin">管理员</option></select></div>
+      <div class="btn-row"><button class="btn btn-s" onclick="closeModal()">取消</button><button class="btn btn-p" id="nuSave">添加</button></div>`);
+    setTimeout(()=>{document.getElementById('nuSave').onclick=()=>{
+      const n=$('#nuName').value.trim(),p=$('#nuPass').value.trim(),r=$('#nuRole').value;
+      if(!n||!p)return toast('请填写完整信息');
+      const users=DB.getUsers();
+      if(users.find(u=>u.name===n))return toast('用户名已存在');
+      users.push({id:gid(),name:n,pass:p,role:r,status:'active',time:Date.now()});
+      DB.setUsers(users);closeModal();render();toast('已添加');
+    }},50);
+  };
+
+  /* 类型选择 */
+  app().addEventListener('click',e=>{
+    const tp=e.target.closest('.tp-item');
+    if(!tp)return;
+    document.querySelectorAll('.tp-item').forEach(t=>t.classList.remove('on'));
+    tp.classList.add('on');
+    setTimeout(updatePreview,50);
+  });
+
+  /* 颜色选择 */
+  app().addEventListener('click',e=>{
+    const cl=e.target.closest('.clr-dot');
+    if(!cl)return;
+    document.querySelectorAll('.clr-dot').forEach(c=>c.classList.remove('on'));
+    cl.classList.add('on');
+    setTimeout(updatePreview,50);
+  });
+
+  /* 展示形式选择 */
+  app().addEventListener('click',e=>{
+    const dm=e.target.closest('.dm-item');
+    if(!dm)return;
+    document.querySelectorAll('.dm-item').forEach(d=>d.classList.remove('on'));
+    dm.classList.add('on');
+    setTimeout(updatePreview,50);
+  });
+
+  /* 标题/描述输入更新预览 */
+  const at=document.getElementById('adTitle');
+  if(at)at.oninput=updatePreview;
+  const ad2=document.getElementById('adDesc');
+  if(ad2)ad2.oninput=updatePreview;
+
+  /* 保存广告 */
+  const saveBtn=document.getElementById('saveAdBtn');
+  if(saveBtn)saveBtn.onclick=()=>{
+    const title=$('#adTitle').value.trim();
+    const desc=$('#adDesc').value.trim();
+    if(!title)return toast('请输入广告标题');
+    const tp=document.querySelector('.tp-item.on')?.dataset.tp||'banner';
+    const clr=document.querySelector('.clr-dot.on')?.dataset.clr||'#ff6b3d';
+    const grad=document.querySelector('.clr-dot.on')?.dataset.grad||colors[0].g;
+    const dm=document.querySelector('.dm-item.on')?.dataset.dm||'fixed-top';
+    const vid=$('#adVideo').value.trim();
+    const content=S.editorContent||`<p>${esc(desc)}</p>`;
+    const ads=DB.getAds();
+
+    if(S.editId){
+      const idx=ads.findIndex(a=>a.id===S.editId);
+      if(idx>=0){
+        ads[idx]={...ads[idx],title,desc,type:tp,color:clr,grad,display:dm,videoUrl:vid,content};
+        DB.setAds(ads);toast('已保存修改');
+      }
+    }else{
+      ads.push({id:gid(),uid:S.user.id,title,desc,type:tp,color:clr,grad,display:dm,videoUrl:vid,content,status:'pending',time:Date.now()});
+      DB.setAds(ads);toast('广告已提交，等待审核');
+    }
+    S.editId=null;S.editorContent='';
+    nav('my-ads');
+  };
+
+  /* 广告卡片点击跳转详情（投放商视角） */
+  app().addEventListener('click',e=>{
+    const card=e.target.closest('.ad-card');
+    if(!card)return;
+    /* 如果点击的是按钮，不处理 */
+    if(e.target.closest('[data-act]')||e.target.closest('[data-uact]'))return;
+    const id=card.dataset.id;
+    if(id&&S.view==='my-ads'){S.view='detail/'+id;render()}
+  });
+}
+
+/* ===================== 剪贴板 ===================== */
+function copyText(text){
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).catch(()=>fallbackCopy(text));
+  }else{fallbackCopy(text)}
+}
+function fallbackCopy(text){
+  const ta=document.createElement('textarea');
+  ta.value=text;ta.style.cssText='position:fixed;left:-9999px';
+  document.body.appendChild(ta);ta.select();
+  try{document.execCommand('copy')}catch(e){}
+  document.body.removeChild(ta);
+}
+
+/* ===================== 初始化 ===================== */
+initDB();
+render();
+</script>
 </body>
 </html>
