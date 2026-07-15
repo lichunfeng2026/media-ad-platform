@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html 朗="zh-CN">
-<头>
+<html lang="zh-CN">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>悦享广告工坊 | 全局共享 · 抽成结算 · 自动备份</title>
@@ -3782,43 +3782,43 @@
             if (!canCreateAd(currentUser)) createTab.style.display = 'none';
             else createTab.style.display = 'block';
             if (!canSeeDraft(currentUser)) draftTab.style.display = 'none';
-px
-身体
-            其他的 reviewTab.风格.显示 = "阻止";
-如果（！canManageUsers（currentUser）） 结算Tab.风格.显示 = "无"；
-否则 结算Tab
-；
-"阻止"
-;
-)
-结算Tab});
-风格
-“图书馆”；
-} 其他 {
-文档。查询选择器所有（“侧边栏里【数据标签】”）为每个（li=>李.风格.显示=“灵活”；=>李.风格.显示=“灵活”；
-切换标签（“广告”）；
+            else draftTab.style.display = 'block';
+            if (!canReviewAd(currentUser)) reviewTab.style.display = 'none';
+            else reviewTab.style.display = 'block';
+            if (!canManageUsers(currentUser)) settlementTab.style.display = 'none';
+            else settlementTab.style.display = 'block';
+            if (isSharer(currentUser)) {
+                document.querySelectorAll('.sidebar li[data-tab]').forEach(li => {
+                    const tab = li.dataset.tab;
+                    if (tab !== 'library' && tab !== 'profile') li.style.display = 'none';
+                });
+                document.querySelector('.sidebar li[data-tab="ads"]').style.display = 'block';
+                switchTab('library');
+            } else {
+                document.querySelectorAll('.sidebar li[data-tab]').forEach(li => li.style.display = 'flex');
+                switchTab('ads');
             }
-如果（当前用户名）{
-“灵活”；
-显示
-{
-moneyDisplay.innerText = '0.00'；
+            if (currentUser.username !== 'admin') {
+                startTimer();
+            } else {
+                timerDisplay.innerText = '⏱️ 管理员无限制';
+                moneyDisplay.innerText = '0.00';
             }
-updateShareStats（）；
-}
-renderDraftBox（）；
-renderReviewList（）；
-renderLibrary（）；
-updateProfile（）；
-renderTemplateSelect（）；
-renderTemplateList（）；
-；
-'0.00'
-{
-主要应用。风格。显示=‘无’；=‘无’；
+            updateShareStats();
+            renderAdList();
+            renderDraftBox();
+            renderReviewList();
+            renderLibrary();
+            updateProfile();
+            renderTemplateSelect();
+            renderTemplateList();
+            updateSettlement();
+        } else {
+            loginOverlay.style.display = 'flex';
+            appMain.style.display = 'none';
         }
 
-        安慰.日志('✅ 悦享广告工坊v8.4已启动（管理员广告自动通过审核）’）；安慰.日志('✅ 悦享广告工坊v8.4已启动（管理员广告自动通过审核）’）；
-    </脚本></脚本></脚本></脚本>
-</身体>>>>
-</html html </html>
+        console.log('✅ 悦享广告工坊 v8.4 已启动 (管理员广告自动通过审核)');
+    </script>
+</body>
+    </html>
