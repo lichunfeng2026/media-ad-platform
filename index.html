@@ -1836,8 +1836,8 @@
         const registerSubmitBtn = document.getElementById('registerSubmitBtn');
         const regUsername = document.getElementById('regUsername');
         const regEmail = document.getElementById('regEmail');
-        常量 reg密码 = 文档.元素('regPassword');
-        常量 角色 = 文档.元素('角色');
+        const regPassword = document.getElementById('regPassword');
+        const regRole = document.getElementById('regRole');
         const forgotSubmitBtn = document.getElementById('forgotSubmitBtn');
         const forgotEmail = document.getElementById('forgotEmail');
         const logoutBtn = document.getElementById('logoutBtn');
@@ -4010,97 +4010,97 @@
                     f_imgSizeVal.innerText = '85px';
                     f_padding.value = 18;
                     f_paddingVal.innerText = '18px';
-f_radius.value = 20；
+                    f_radius.value = 20;
                     f_radiusVal.innerText = '20px';
-f_gap.value = 14；
+                    f_gap.value = 14;
                     f_gapVal.innerText = '14px';
-f_width_auto.checked = true；
-高度自动。检查=真；
-f_width.value = 'auto'；
-f_height.value = '自动'；
-f_宽度滑块.value = 80；
-f_width_val.innerText = '80%'；
-f_高度滑块.value = 60；
-f_height_val.innerText = '60%'；
-f_opacity.value = 100；
-f_opacity_val.innerText = '100%'；
-f_budget.value=10；
-f_reward.value = 0.1；
-f_anti_adblock.checked = false；
-创建新广告；
-editId.value = ''；
+                    f_width_auto.checked = true;
+                    f_height_auto.checked = true;
+                    f_width.value = 'auto';
+                    f_height.value = 'auto';
+                    f_width_slider.value = 80;
+                    f_width_val.innerText = '80%';
+                    f_height_slider.value = 60;
+                    f_height_val.innerText = '60%';
+                    f_opacity.value = 100;
+                    f_opacity_val.innerText = '100%';
+                    f_budget.value = 10;
+                    f_reward.value = 0.1;
+                    f_anti_adblock.checked = false;
+                    createTitle.innerText = '创建新广告';
+                    editId.value = '';
                 }
-生成预览代码（）；
-renderTemplateSelect（）；
+                generatePreviewCode();
+                renderTemplateSelect();
             }
-        // Toast
-</html>
+            if (tabId === 'draft') {
+                renderDraftBox();
             }
-如果（表===‘审查’）{
-renderReviewList（）；
+            if (tabId === 'review') {
+                renderReviewList();
             }
-如果用户名为“用户名”，则用户名为“用户名”。
-如果（标签==="配置文件"）{
-updateProfile（）；
-renderTemplateList（）；
+            if (tabId === 'users') renderUserList();
+            if (tabId === 'profile') {
+                updateProfile();
+                renderTemplateList();
             }
-如果（表===‘结算’）{
-更新结算；
+            if (tabId === 'settlement') {
+                updateSettlement();
             }
-如果（表=="仪表板"）{
-更新仪表板（）；
+            if (tabId === 'dashboard') {
+                updateDashboard();
             }
         }
 
         // ============================================================
-//吐司
+        // Toast
         // ============================================================
-函数showToast（msg） {
-t = document.getElementById（'toastMsg'）；
-t.innerText = msg；
-t.style.opacity = '1'；
-setTimeout（（） => t.style.opacity = '0'， 2200）；
+        function showToast(msg) {
+            const t = document.getElementById('toastMsg');
+            t.innerText = msg;
+            t.style.opacity = '1';
+            setTimeout(() => t.style.opacity = '0', 2200);
         }
 
         // ============================================================
         // 事件绑定
         // ============================================================
-tabs.forEachli={
+        tabs.forEach(li => {
             li.onclick = () => {
                 const tab = li.dataset.tab;
-如果（选项卡===“用户”&&！可以管理用户（当前用户））{显示列表（“仅管理员可访问”）；返回；}
-如果（选项卡==="创建"&&！可以创建广告（当前用户））{显示列表（"您无权限创建广告"）；返回；}
-如果（选项卡==='草稿'&&！可以查看草稿（当前用户））{显示草稿（'您无权限查看草稿箱'）；返回；}
-如果（选项卡===“审核”&&！可以审核（当前用户））{显示列表（“仅管理员可访问审核列表”）；返回；}
-如果（选项卡===‘结算’&&！可以管理用户（当前用户））{显示列表（‘仅管理员可访问结算管理’）；返回；}
+                if (tab === 'users' && !canManageUsers(currentUser)) { showToast('仅管理员可访问'); return; }
+                if (tab === 'create' && !canCreateAd(currentUser)) { showToast('您无权限创建广告'); return; }
+                if (tab === 'draft' && !canSeeDraft(currentUser)) { showToast('您无权限查看草稿箱'); return; }
+                if (tab === 'review' && !canReviewAd(currentUser)) { showToast('仅管理员可访问审核列表'); return; }
+                if (tab === 'settlement' && !canManageUsers(currentUser)) { showToast('仅管理员可访问结算管理'); return; }
                 if (tab === 'dashboard' && !canManageUsers(currentUser)) { showToast('仅管理员可访问平台看板'); return; }
-switchTab（tab）；
+                switchTab(tab);
             };
         });
 
         adForm.onsubmit = saveAd;
 
-f_width_slider.oninput = （） => {
-f_width_val.innerText = f_width_2Slider.value + '%'；
-如果 （！f_width_auto.checked） { f_width.value = f_width_slider.value + '%'；
-生成预览代码（）； }
+        f_width_slider.oninput = () => {
+            f_width_val.innerText = f_width_slider.value + '%';
+            if (!f_width_auto.checked) { f_width.value = f_width_slider.value + '%';
+                generatePreviewCode(); }
         };
-f_height_slider.oninput = （） => {
-f_height_val.innerText = f_height_3Slider.value + '%'；
-如果 （！f_height_auto.checked） { f_height.value = f_height_slider.value + '%'；
-生成预览代码（）； }
+        f_height_slider.oninput = () => {
+            f_height_val.innerText = f_height_slider.value + '%';
+            if (!f_height_auto.checked) { f_height.value = f_height_slider.value + '%';
+                generatePreviewCode(); }
         };
-f_width_auto.onchange = （） => {
-f_width.value = f_width_auto.checked？'auto': f_width滑块.value + '%'；
-生成预览代码（）；
+        f_width_auto.onchange = () => {
+            f_width.value = f_width_auto.checked ? 'auto' : f_width_slider.value + '%';
+            generatePreviewCode();
         };
-f_高度_自动.onchange = （） => {
-f_height.value = f_height_auto.checked？'auto': f_height滑块.value + '%'；
-生成预览代码（）；
+        f_height_auto.onchange = () => {
+            f_height.value = f_height_auto.checked ? 'auto' : f_height_slider.value + '%';
+            generatePreviewCode();
         };
         f_opacity.oninput = () => {
             f_opacity_val.innerText = f_opacity.value + '%';
-生成预览代码（）；
+            generatePreviewCode();
         };
 
         f_imgSize.oninput = () => { f_imgSizeVal.innerText = f_imgSize.value + 'px';
@@ -4116,7 +4116,7 @@ f_height.value = f_height_auto.checked？'auto': f_height滑块.value + '%'；
         document.querySelectorAll('.rich-btn').forEach(btn => {
             btn.onclick = () => {
                 btn.classList.toggle('active');
-生成预览代码（）；
+                generatePreviewCode();
             };
         });
 
@@ -4188,24 +4188,24 @@ f_height.value = f_height_auto.checked？'auto': f_height滑块.value + '%'；
         // ============================================================
         // 初始化 - 修复：延迟初始化颜色选择器，确保 DOM 已就绪
         // ============================================================
-        // 使用set Time out确保DOM完全加载
-setTimeout={
-initColorPickers（）；
+        // 使用 setTimeout 确保 DOM 完全加载
+        setTimeout(() => {
+            initColorPickers();
         }, 0);
-启动自动备份（）；
+        startAutoBackup();
 
         // ============================================================
         // 检查当前登录状态
         // ============================================================
-如果（当前用户） {
-登录Overlay.style.display = 'none'；
-appMain.style.display = 'block'；
-displayName.innerText = `👤 ${currentUser.username}`;
-displayRole.innerText = roleChinese[currentUser.role] || currentUser.role；
-如果（！canManageUsers（currentUser）） usersTab.style.display = 'none'；
-否则 usersTab.style.display = 'block'；
-如果（！canCreateAd（currentUser）） createTab.style.display = 'none'；
-否则 createTab.style.display = 'block'；
+        if (currentUser) {
+            loginOverlay.style.display = 'none';
+            appMain.style.display = 'block';
+            displayName.innerText = `👤 ${currentUser.username}`;
+            displayRole.innerText = roleChinese[currentUser.role] || currentUser.role;
+            if (!canManageUsers(currentUser)) usersTab.style.display = 'none';
+            else usersTab.style.display = 'block';
+            if (!canCreateAd(currentUser)) createTab.style.display = 'none';
+            else createTab.style.display = 'block';
             if (!canSeeDraft(currentUser)) draftTab.style.display = 'none';
             else draftTab.style.display = 'block';
             if (!canReviewAd(currentUser)) reviewTab.style.display = 'none';
@@ -4225,7 +4225,7 @@ displayRole.innerText = roleChinese[currentUser.role] || currentUser.role；
                 document.querySelectorAll('.sidebar li[data-tab]').forEach(li => li.style.display = 'flex');
                 switchTab('ads');
             }
-            showToast('✅ 手动备份完成');
+            if (currentUser.username !== 'admin') {
                 startTimer();
             } else {
                 timerDisplay.innerText = '⏱️ 管理员无限制';
