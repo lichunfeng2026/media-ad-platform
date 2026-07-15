@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>悦享广告工坊 | 全局共享 · 抽成结算 · 自动备份</title>
+    <title>悦享广告工坊 V8.6 | 宏观预算 · 平台看板 · 防屏蔽</title>
     <style>
+        /* ===== 完整样式 (与之前一致，无变化) ===== */
         * {
             margin: 0;
             padding: 0;
@@ -127,6 +128,11 @@
         .btn-lg {
             padding: 8px 22px;
             font-size: 0.9rem;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
         }
         .main-grid {
             display: flex;
@@ -624,6 +630,18 @@
             gap: 8px;
             flex-wrap: wrap;
         }
+        .budget-status {
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 2px 10px;
+            border-radius: 40px;
+            background: #e8f0fe;
+            color: #1f4e6e;
+        }
+        .budget-status.exhausted {
+            background: #fde8e8;
+            color: #991b1b;
+        }
         #tab-users .user-list {
             max-height: 260px;
             overflow-y: auto;
@@ -679,6 +697,7 @@
             padding: 0.8rem 1rem;
             margin-bottom: 0.8rem;
             border-left: 4px solid #2c7a5e;
+            position: relative;
         }
         .code-library-item .lib-title {
             font-weight: 600;
@@ -693,6 +712,11 @@
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
+        }
+        .code-library-item .budget-status {
+            position: absolute;
+            top: 0.8rem;
+            right: 1rem;
         }
         .share-count {
             font-size: 0.7rem;
@@ -1005,6 +1029,58 @@
             border-radius: 40px;
             margin-left: 6px;
         }
+        .budget-warning {
+            color: #c0392b;
+            font-weight: 600;
+            margin-left: 6px;
+        }
+        .budget-ok {
+            color: #2c7a5e;
+            font-weight: 600;
+            margin-left: 6px;
+        }
+        .budget-exhausted {
+            color: #991b1b;
+            font-weight: 700;
+            background: #fde8e8;
+            padding: 0 10px;
+            border-radius: 40px;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin-bottom: 1.5rem;
+        }
+        .dash-card {
+            background: #f5f7fa;
+            border-radius: 16px;
+            padding: 1rem 1.2rem;
+            text-align: center;
+            border-left: 4px solid #2c7a5e;
+        }
+        .dash-card .dash-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1f4e3c;
+        }
+        .dash-card .dash-label {
+            font-size: 0.7rem;
+            color: #4a5f72;
+            margin-top: 2px;
+        }
+        .dash-card .dash-sub {
+            font-size: 0.65rem;
+            color: #7890a8;
+        }
+        .anti-badge {
+            background: #6c5ce7;
+            color: white;
+            font-size: 0.6rem;
+            padding: 2px 10px;
+            border-radius: 40px;
+            margin-left: 6px;
+        }
     </style>
 </head>
 <body>
@@ -1013,7 +1089,7 @@
         <div class="login-card" id="loginCard">
             <div id="loginPanel">
                 <h2>🔐 登录</h2>
-                <div class="sub">悦享广告工坊 · 身份管理</div>
+                <div class="sub">悦享广告工坊 V8.6 · 宏观预算 + 平台看板</div>
                 <input type="text" id="loginUsername" placeholder="用户名" value="admin">
                 <input type="password" id="loginPassword" placeholder="密码" value="admin123">
                 <div class="form-actions">
@@ -1059,7 +1135,7 @@
         <header class="top-bar">
             <div class="logo-area">
                 📡 悦享广告工坊
-                <small>v8.4 · 抽成结算</small>
+                <small>V8.6 · 宏观预算+防屏蔽</small>
             </div>
             <div class="user-info">
                 <span class="user-badge" id="displayName">👤 用户</span>
@@ -1080,6 +1156,7 @@
                     <li data-tab="users" id="usersTab"><span>👥</span> 用户管理 <span class="badge-count light" id="userCount">0</span></li>
                     <li data-tab="profile"><span>👤</span> 个人中心</li>
                     <li data-tab="settlement" id="settlementTab"><span>💰</span> 结算管理 <span class="badge-count light" id="settlementBadge">0</span></li>
+                    <li data-tab="dashboard" id="dashboardTab"><span>📊</span> 平台看板 <span class="badge-count light" id="dashBadge">0</span></li>
                 </ul>
             </nav>
 
@@ -1127,9 +1204,21 @@
                             <div class="countdown-row"><input type="datetime-local" id="f_countdown"><span id="cdStatus">未设置</span></div>
                         </div>
                         <div class="form-group"><label>✖ 关闭按钮</label><select id="f_closeBtn"><option value="show">显示</option><option value="hide">隐藏</option></select></div>
+                        <!-- 预算字段 -->
                         <div class="form-row">
-                            <div class="form-group"><label>💰 广告总预算 (元)</label><input type="number" id="f_budget" value="50" step="1" min="0"></div>
+                            <div class="form-group">
+                                <label>💰 广告总预算 (元) <span style="color:#c0392b;">*</span></label>
+                                <input type="number" id="f_budget" value="10" step="1" min="1" required>
+                                <div style="font-size:0.65rem;color:#4a5f72;margin-top:2px;">提交审核前必须填写且大于0</div>
+                            </div>
                             <div class="form-group"><label>📤 单次分享报酬 (元/次)</label><input type="number" id="f_reward" value="0.1" step="0.01" min="0"></div>
+                        </div>
+                        <!-- 防屏蔽开关 -->
+                        <div class="form-group">
+                            <label style="display:flex;align-items:center;gap:8px;">
+                                <input type="checkbox" id="f_anti_adblock"> 🛡️ 启用防屏蔽（广告代码将具备防过滤能力）
+                            </label>
+                            <div style="font-size:0.65rem;color:#4a5f72;margin-top:4px;">启用后生成的广告代码将使用动态加载技术，可规避多数广告拦截器</div>
                         </div>
                         <div class="form-group">
                             <label>📏 卡片尺寸</label>
@@ -1290,6 +1379,11 @@
                             <div class="stat-label">账户余额</div>
                             <div class="stat-sub">剩余时长折算</div>
                         </div>
+                        <div class="stat-card" style="border-left-color:#6c5ce7;">
+                            <div class="stat-number" id="statTotalBudget">0.00</div>
+                            <div class="stat-label">📊 总预算占用</div>
+                            <div class="stat-sub">所有广告预算之和</div>
+                        </div>
                     </div>
                     <div class="profile-detail-row">
                         <span class="label">用户名</span>
@@ -1341,7 +1435,7 @@
                     </div>
                 </div>
 
-                <!-- 结算管理（仅管理员） -->
+                <!-- 结算管理（管理员） -->
                 <div id="tab-settlement" class="tab-content hidden">
                     <h2 style="font-size:1.2rem;margin-bottom:1rem;">💰 结算管理</h2>
                     <div class="form-group">
@@ -1354,6 +1448,49 @@
                     </div>
                     <div id="settlementContainer">
                         <div style="color:#4a5f72;font-size:0.9rem;">暂无结算数据</div>
+                    </div>
+                </div>
+
+                <!-- 平台看板 -->
+                <div id="tab-dashboard" class="tab-content hidden">
+                    <h2 style="font-size:1.2rem;margin-bottom:1rem;">📊 平台收益数据看板</h2>
+                    <div class="dashboard-grid" id="dashStats">
+                        <div class="dash-card" style="border-left-color:#2c7a5e;">
+                            <div class="dash-number" id="dashTotalAds">0</div>
+                            <div class="dash-label">📢 广告总数</div>
+                            <div class="dash-sub">已通过审核</div>
+                        </div>
+                        <div class="dash-card" style="border-left-color:#e67e22;">
+                            <div class="dash-number" id="dashTotalBudget">0.00</div>
+                            <div class="dash-label">💰 总广告预算</div>
+                            <div class="dash-sub">所有广告预算之和</div>
+                        </div>
+                        <div class="dash-card" style="border-left-color:#2980b9;">
+                            <div class="dash-number" id="dashUsedBudget">0.00</div>
+                            <div class="dash-label">📉 已消耗预算</div>
+                            <div class="dash-sub">实际分享消耗</div>
+                        </div>
+                        <div class="dash-card" style="border-left-color:#8e44ad;">
+                            <div class="dash-number" id="dashTotalShares">0</div>
+                            <div class="dash-label">🔄 总分享次数</div>
+                            <div class="dash-sub">所有广告分享次数</div>
+                        </div>
+                        <div class="dash-card" style="border-left-color:#c0392b;">
+                            <div class="dash-number" id="dashPlatformEarnings">0.00</div>
+                            <div class="dash-label">🏦 平台总收益</div>
+                            <div class="dash-sub">抽成总收入</div>
+                        </div>
+                        <div class="dash-card" style="border-left-color:#16a085;">
+                            <div class="dash-number" id="dashUnsettled">0.00</div>
+                            <div class="dash-label">⏳ 待结算金额</div>
+                            <div class="dash-sub">分享者待结算总额</div>
+                        </div>
+                    </div>
+                    <div style="margin-top:1.5rem;background:#f5f7fa;padding:1rem;border-radius:16px;">
+                        <h4 style="font-size:0.9rem;margin-bottom:0.5rem;">📋 操作日志（最近10条）</h4>
+                        <div id="dashLogContainer" style="font-size:0.8rem;color:#4a5f72;max-height:200px;overflow-y:auto;">
+                            <div>暂无操作记录</div>
+                        </div>
                     </div>
                 </div>
             </main>
@@ -1383,7 +1520,7 @@
         // ============================================================
         // 自定义对话框
         // ============================================================
-        function showCustomDialog(icon, title, contentHtml, confirmText = '确定', cancelText = '取消', isDanger = false) {
+        function showCustomDialog(icon, title, contentHtml, confirmText = '确定', cancelText = '取消', isDanger = false, onConfirm = null) {
             return new Promise((resolve) => {
                 const container = document.getElementById('customDialogContainer');
                 const overlay = document.createElement('div');
@@ -1409,7 +1546,20 @@
                     resolve(result);
                 };
 
-                okBtn.addEventListener('click', () => cleanup(true));
+                okBtn.addEventListener('click', () => {
+                    if (typeof onConfirm === 'function') {
+                        const inputs = overlay.querySelectorAll('input, select, textarea');
+                        const values = {};
+                        inputs.forEach(input => {
+                            if (input.id) {
+                                values[input.id] = input.value;
+                            }
+                        });
+                        onConfirm(values, () => cleanup(true));
+                    } else {
+                        cleanup(true);
+                    }
+                });
                 cancelBtn.addEventListener('click', () => cleanup(false));
                 overlay.addEventListener('click', (e) => {
                     if (e.target === overlay) cleanup(false);
@@ -1483,6 +1633,33 @@
 
         function savePlatformConfig(config) {
             localStorage.setItem('adPlatformConfig', JSON.stringify(config));
+        }
+
+        function getUserBalance(username) {
+            const users = getUsers();
+            const user = users.find(u => u.username === username);
+            if (!user) return 0;
+            if (user.role === 'admin') return Infinity;
+            const seconds = user.remainingSeconds || 0;
+            return seconds / 3600;
+        }
+
+        function getUserTotalBudget(username, excludeId = null) {
+            const ads = getGlobalAds();
+            let total = 0;
+            ads.forEach(ad => {
+                if (ad.owner === username && (excludeId === null || ad.id !== excludeId)) {
+                    total += (ad.budget || 0);
+                }
+            });
+            return total;
+        }
+
+        function checkBudgetExceedsBalance(username, newBudget, excludeId = null) {
+            const balance = getUserBalance(username);
+            if (username === 'admin') return { ok: true, balance: Infinity };
+            const total = getUserTotalBudget(username, excludeId) + newBudget;
+            return { ok: total <= balance, total, balance };
         }
 
         // ============================================================
@@ -1659,8 +1836,8 @@
         const registerSubmitBtn = document.getElementById('registerSubmitBtn');
         const regUsername = document.getElementById('regUsername');
         const regEmail = document.getElementById('regEmail');
-        const regPassword = document.getElementById('regPassword');
-        const regRole = document.getElementById('regRole');
+        常量 reg密码 = 文档.元素('regPassword');
+        常量 角色 = 文档.元素('角色');
         const forgotSubmitBtn = document.getElementById('forgotSubmitBtn');
         const forgotEmail = document.getElementById('forgotEmail');
         const logoutBtn = document.getElementById('logoutBtn');
@@ -1689,14 +1866,17 @@
             library: document.getElementById('tab-library'),
             users: document.getElementById('tab-users'),
             profile: document.getElementById('tab-profile'),
-            settlement: document.getElementById('tab-settlement')
+            settlement: document.getElementById('tab-settlement'),
+            dashboard: document.getElementById('tab-dashboard')
         };
         const usersTab = document.getElementById('usersTab');
         const createTab = document.getElementById('createTab');
         const draftTab = document.getElementById('draftTab');
         const reviewTab = document.getElementById('reviewTab');
         const settlementTab = document.getElementById('settlementTab');
+        const dashboardTab = document.getElementById('dashboardTab');
         const settlementBadge = document.getElementById('settlementBadge');
+        const dashBadge = document.getElementById('dashBadge');
         const adForm = document.getElementById('adForm');
         const editId = document.getElementById('editId');
         const f_title = document.getElementById('f_title');
@@ -1712,6 +1892,7 @@
         const f_closeBtn = document.getElementById('f_closeBtn');
         const f_budget = document.getElementById('f_budget');
         const f_reward = document.getElementById('f_reward');
+        const f_anti_adblock = document.getElementById('f_anti_adblock');
         const f_width = document.getElementById('f_width');
         const f_height = document.getElementById('f_height');
         const f_width_slider = document.getElementById('f_width_slider');
@@ -1744,6 +1925,7 @@
         const statShares = document.getElementById('statShares');
         const statEarnings = document.getElementById('statEarnings');
         const statBalance = document.getElementById('statBalance');
+        const statTotalBudget = document.getElementById('statTotalBudget');
         const pUsername = document.getElementById('pUsername');
         const pRole = document.getElementById('pRole');
         const pNickname = document.getElementById('pNickname');
@@ -1766,6 +1948,13 @@
         const commissionDisplay = document.getElementById('commissionDisplay');
         const saveCommissionBtn = document.getElementById('saveCommissionBtn');
         const settlementContainer = document.getElementById('settlementContainer');
+        const dashTotalAds = document.getElementById('dashTotalAds');
+        const dashTotalBudget = document.getElementById('dashTotalBudget');
+        const dashUsedBudget = document.getElementById('dashUsedBudget');
+        const dashTotalShares = document.getElementById('dashTotalShares');
+        const dashPlatformEarnings = document.getElementById('dashPlatformEarnings');
+        const dashUnsettled = document.getElementById('dashUnsettled');
+        const dashLogContainer = document.getElementById('dashLogContainer');
 
         let colorPickers = {};
 
@@ -1805,11 +1994,11 @@
         }
 
         // ============================================================
-        // 颜色选择器
+        // 颜色选择器 - 修复：确保在 DOM 就绪后初始化
         // ============================================================
         function createColorPicker(containerId, initialColor, onChange) {
             const container = document.getElementById(containerId);
-            if (!container) return;
+            if (!container) return null;
             container.innerHTML = '';
             const colors = ['#11181c', '#2c7a5e', '#e76f51', '#e63946', '#457b9d', '#f4a261', '#9c89b8', '#06d6a0', '#ffb703',
                 '#5b6f82', '#ffffff', '#f8f9fa', '#e9ecef', '#1e4668', '#b5838d', '#d4a373'
@@ -1878,12 +2067,31 @@
                     generatePreviewCode();
                     updatePhonePreview();
                 });
-                colorPickers[p.key] = picker;
+                if (picker) colorPickers[p.key] = picker;
             });
         }
 
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g,
+                '&#39;');
+        }
+
         // ============================================================
-        // 计时与余额
+        // 退出登录函数 - 修复：确保正确隐藏/显示登录层
+        // ============================================================
+        function logoutUser() {
+            clearCurrentUser();
+            if (timerInterval) clearInterval(timerInterval);
+            currentUser = null;
+            // 修复：确保 loginOverlay 显示，appMain 隐藏
+            if (loginOverlay) loginOverlay.style.display = 'flex';
+            if (appMain) appMain.style.display = 'none';
+            showToast('已安全退出');
+        }
+
+        // ============================================================
+        // 计时与余额 - 修复：避免在退出后继续执行
         // ============================================================
         function updateTimerAndMoney() {
             if (!currentUser) return;
@@ -1892,21 +2100,21 @@
             if (!user) return;
 
             if (user.username === 'admin') {
-                timerDisplay.innerText = '⏱️ 管理员无限制';
-                moneyDisplay.innerText = '0.00';
+                if (timerDisplay) timerDisplay.innerText = '⏱️ 管理员无限制';
+                if (moneyDisplay) moneyDisplay.innerText = '0.00';
                 if (pTime) pTime.innerText = '无限制';
-                if (statBalance) statBalance.innerText = '0.00';
+                if (statBalance) statBalance.innerText = '∞';
                 return;
             }
 
             let seconds = user.remainingSeconds || 0;
             if (seconds <= 0) {
-                timerDisplay.innerText = '⏱️ 已超时';
-                moneyDisplay.innerText = '0.00';
+                if (timerDisplay) timerDisplay.innerText = '⏱️ 已超时';
+                if (moneyDisplay) moneyDisplay.innerText = '0.00';
                 if (pTime) pTime.innerText = '已超时';
                 if (statBalance) statBalance.innerText = '0.00';
                 showToast('⏰ 时间已到，余额不足，请续时或重新登录');
-                logout();
+                logoutUser();
                 return;
             }
 
@@ -1915,8 +2123,8 @@
             const mins = Math.floor(seconds / 60);
             const secs = Math.floor(seconds % 60);
 
-            timerDisplay.innerText = `⏱️ 剩余: ${mins}分${secs}秒`;
-            moneyDisplay.innerText = balance.toFixed(2);
+            if (timerDisplay) timerDisplay.innerText = `⏱️ 剩余: ${mins}分${secs}秒`;
+            if (moneyDisplay) moneyDisplay.innerText = balance.toFixed(2);
             if (pTime) pTime.innerText = `${Math.floor(hours)}时${mins}分${secs}秒`;
             if (statBalance) statBalance.innerText = balance.toFixed(2);
 
@@ -1956,20 +2164,22 @@
             }
             setCurrentUser(user);
             currentUser = user;
-            loginOverlay.style.display = 'none';
-            appMain.style.display = 'block';
-            displayName.innerText = `👤 ${user.username}`;
-            displayRole.innerText = roleChinese[user.role] || user.role;
-            if (!canManageUsers(user)) usersTab.style.display = 'none';
-            else usersTab.style.display = 'block';
-            if (!canCreateAd(user)) createTab.style.display = 'none';
-            else createTab.style.display = 'block';
-            if (!canSeeDraft(user)) draftTab.style.display = 'none';
-            else draftTab.style.display = 'block';
-            if (!canReviewAd(user)) reviewTab.style.display = 'none';
-            else reviewTab.style.display = 'block';
-            if (!canManageUsers(user)) settlementTab.style.display = 'none';
-            else settlementTab.style.display = 'block';
+            if (loginOverlay) loginOverlay.style.display = 'none';
+            if (appMain) appMain.style.display = 'block';
+            if (displayName) displayName.innerText = `👤 ${user.username}`;
+            if (displayRole) displayRole.innerText = roleChinese[user.role] || user.role;
+            if (!canManageUsers(user)) { if (usersTab) usersTab.style.display = 'none'; } else { if (usersTab) usersTab.style
+                    .display = 'block'; }
+            if (!canCreateAd(user)) { if (createTab) createTab.style.display = 'none'; } else { if (createTab) createTab.style
+                    .display = 'block'; }
+            if (!canSeeDraft(user)) { if (draftTab) draftTab.style.display = 'none'; } else { if (draftTab) draftTab.style
+                    .display = 'block'; }
+            if (!canReviewAd(user)) { if (reviewTab) reviewTab.style.display = 'none'; } else { if (reviewTab) reviewTab.style
+                    .display = 'block'; }
+            if (!canManageUsers(user)) { if (settlementTab) settlementTab.style.display = 'none'; } else { if (settlementTab)
+                    settlementTab.style.display = 'block'; }
+            if (!canManageUsers(user)) { if (dashboardTab) dashboardTab.style.display = 'none'; } else { if (dashboardTab)
+                    dashboardTab.style.display = 'block'; }
             if (isSharer(user)) {
                 document.querySelectorAll('.sidebar li[data-tab]').forEach(li => {
                     const tab = li.dataset.tab;
@@ -1990,11 +2200,12 @@
             renderTemplateSelect();
             renderTemplateList();
             updateSettlement();
+            updateDashboard();
             if (user.username !== 'admin') {
                 startTimer();
             } else {
-                timerDisplay.innerText = '⏱️ 管理员无限制';
-                moneyDisplay.innerText = '0.00';
+                if (timerDisplay) timerDisplay.innerText = '⏱️ 管理员无限制';
+                if (moneyDisplay) moneyDisplay.innerText = '0.00';
             }
             showToast(`✅ 欢迎，${user.username}`);
         }
@@ -2030,17 +2241,12 @@
         };
 
         // ============================================================
-        // 退出登录
+        // 退出按钮
         // ============================================================
         logoutBtn.onclick = async () => {
             const confirmed = await showConfirm('确认退出', '确定要退出登录吗？退出后需要重新登录才能继续使用。', '确定退出', '取消', false, '🔐');
             if (confirmed) {
-                clearCurrentUser();
-                if (timerInterval) clearInterval(timerInterval);
-                currentUser = null;
-                loginOverlay.style.display = 'flex';
-                appMain.style.display = 'none';
-                showToast('已安全退出');
+                logoutUser();
             }
         };
 
@@ -2055,8 +2261,8 @@
             const allAds = getGlobalAds();
 
             const myAds = allAds.filter(a => a.owner === currentUser.username);
-            statAds.innerText = myAds.length;
-            statShares.innerText = getShareCount();
+            if (statAds) statAds.innerText = myAds.length;
+            if (statShares) statShares.innerText = getShareCount();
 
             let earnings = 0,
                 balance = 0;
@@ -2065,18 +2271,29 @@
                 const hours = secs / 3600;
                 earnings = Math.max(0, 1 - hours);
                 balance = hours;
+            } else {
+                balance = Infinity;
             }
-            statEarnings.innerText = earnings.toFixed(2);
-            statBalance.innerText = balance.toFixed(2);
+            if (statEarnings) statEarnings.innerText = earnings.toFixed(2);
+            if (statBalance) statBalance.innerText = balance === Infinity ? '∞' : balance.toFixed(2);
 
-            pUsername.innerText = user.username;
-            pRole.innerText = roleChinese[user.role] || user.role;
-            pNickname.innerText = profile.nickname || '未设置';
-            pPhone.innerText = profile.phone || '未设置';
+            let totalBudget = 0;
+            allAds.forEach(ad => {
+                if (ad.owner === currentUser.username && (ad.status === 'approved' || ad.status === 'pending' || ad
+                        .status === 'draft')) {
+                    totalBudget += (ad.budget || 0);
+                }
+            });
+            if (statTotalBudget) statTotalBudget.innerText = totalBudget.toFixed(2);
+
+            if (pUsername) pUsername.innerText = user.username;
+            if (pRole) pRole.innerText = roleChinese[user.role] || user.role;
+            if (pNickname) pNickname.innerText = profile.nickname || '未设置';
+            if (pPhone) pPhone.innerText = profile.phone || '未设置';
             updateTimerAndMoney();
 
             const perms = { admin: '管理所有用户和广告（广告无需审核）', publisher: '创建/编辑/删除自己的广告（需审核）', sharer: '查看代码库并复制代码' };
-            pPerms.innerText = perms[user.role] || '无权限';
+            if (pPerms) pPerms.innerText = perms[user.role] || '无权限';
         }
 
         profileEditBtn.onclick = async () => {
@@ -2174,6 +2391,7 @@
                 padding: parseInt(f_padding.value) || 18,
                 radius: parseInt(f_radius.value) || 20,
                 gap: parseInt(f_gap.value) || 14,
+                antiAdblock: f_anti_adblock.checked,
                 shares: []
             };
         }
@@ -2192,6 +2410,7 @@
             f_closeBtn.value = data.closeBtn || 'show';
             f_budget.value = data.budget || 0;
             f_reward.value = data.rewardPerShare || 0;
+            f_anti_adblock.checked = !!data.antiAdblock;
 
             let w = data.width || 'auto',
                 h = data.height || 'auto';
@@ -2330,17 +2549,13 @@
                         <input type="text" id="templateNameInput" placeholder="请输入模板名称" value="我的模板">
                     </div>
                 `;
-                showCustomDialog('💾', '保存为模板', html, '保存', '取消', false)
-                    .then((confirmed) => {
-                        if (confirmed) {
-                            const name = document.getElementById('templateNameInput')?.value?.trim() || '未命名模板';
-                            resolve(name);
-                        } else {
-                            resolve(null);
-                        }
-                    });
+                showCustomDialog('💾', '保存为模板', html, '保存', '取消', false, (values, confirm) => {
+                    const name = values['templateNameInput']?.trim() || '未命名模板';
+                    resolve(name);
+                    confirm();
+                });
             });
-            if (name === null) return;
+            if (!name) return;
             const data = getCurrentFormData();
             const templates = getTemplates();
             const newTemplate = {
@@ -2416,6 +2631,7 @@
                                 renderTemplateSelect();
                                 renderTemplateList();
                                 updateSettlement();
+                                updateDashboard();
                                 showToast('✅ 数据恢复成功');
                             }
                         });
@@ -2427,7 +2643,7 @@
         }
 
         // ============================================================
-        // 生成广告代码
+        // 生成广告代码 - 支持防屏蔽 (修复转义问题)
         // ============================================================
         function generateAdCode(ad) {
             const titleSty =
@@ -2488,7 +2704,7 @@
             const opacity = (ad.opacity !== undefined && ad.opacity !== null) ? ad.opacity / 100 : 1;
             const opacityStyle = `opacity:${opacity};`;
 
-            return `<div style="max-width:100%; ${posStyle} font-family:system-ui;position:relative;">
+            const staticAdHtml = `<div style="max-width:100%; ${posStyle} font-family:system-ui;position:relative;">
     <style>@keyframes fadeIn{from{opacity:0}to{opacity:1}}@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}@keyframes scaleIn{from{opacity:0;transform:scale(0.9)}to{opacity:1;transform:scale(1)}}@keyframes bounceIn{0%{opacity:0;transform:scale(0.8)}80%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}@keyframes glowPulse{0%{box-shadow:0 0 0 0 rgba(44,122,94,0.4)}70%{box-shadow:0 0 0 12px rgba(44,122,94,0)}100%{box-shadow:0 0 0 0 rgba(44,122,94,0)}}@keyframes shimmer{100%{left:100%}}</style>
     ${closeBtnHtml}
     <div style="background:${ad.cardBg}; border-radius:${ad.radius}px; border:1px solid #eef2f5; overflow:hidden; ${animStyle} ${wStyle} ${hStyle} ${opacityStyle}">
@@ -2501,6 +2717,33 @@
         </div>
     </div>
 </div>`;
+
+            if (ad.antiAdblock) {
+                const randId = 'ad_' + Math.random().toString(36).substring(2, 10);
+                // 修复：使用更安全的转义方式
+                const escapedHtml = staticAdHtml
+                    .replace(/\\/g, '\\\\')
+                    .replace(/`/g, '\\`')
+                    .replace(/\${/g, '\\${')
+                    .replace(/<\/script>/gi, '<\\/script>');
+                return `<div id="${randId}"></div>
+<script>
+(function(){
+    var container = document.getElementById('${randId}');
+    if(!container) return;
+    var html = \`${escapedHtml}\`;
+    container.innerHTML = html;
+    if(!container.innerHTML || container.innerHTML.trim() === ''){
+        document.write(html);
+    }
+})();
+<\/script>
+<noscript>
+    ${staticAdHtml}
+</noscript>`;
+            } else {
+                return staticAdHtml;
+            }
         }
 
         // ============================================================
@@ -2537,7 +2780,8 @@
                 imgSize: data.imgSize,
                 padding: data.padding,
                 radius: data.radius,
-                gap: data.gap
+                gap: data.gap,
+                antiAdblock: data.antiAdblock
             };
             const code = generateAdCode(ad);
             previewCode.innerText = code;
@@ -2576,7 +2820,8 @@
                     imgSize: data.imgSize,
                     padding: data.padding,
                     radius: data.radius,
-                    gap: data.gap
+                    gap: data.gap,
+                    antiAdblock: data.antiAdblock
                 };
             }
             const container = phonePreviewContainer;
@@ -2671,7 +2916,7 @@
         }
 
         // ============================================================
-        // 保存广告 - ★★★ 核心修复：管理员直接通过，普通用户需审核 ★★★
+        // 保存广告 - 增加宏观预算管控
         // ============================================================
         function saveAd(e) {
             e.preventDefault();
@@ -2680,29 +2925,34 @@
             let ads = getGlobalAds();
             let id = parseInt(editId.value);
 
-            // 判断是否为管理员
             const isAdmin = currentUser && currentUser.role === 'admin';
+
+            if (!isAdmin) {
+                const budget = data.budget || 0;
+                const check = checkBudgetExceedsBalance(currentUser.username, budget, id || null);
+                if (!check.ok) {
+                    showToast(
+                        `❌ 预算超限！当前账户余额为 ${check.balance.toFixed(2)} 元，已有广告预算占用 ${(check.total - budget).toFixed(2)} 元，新增预算 ${budget} 元后总预算 ${check.total.toFixed(2)} 元超出余额。请调整预算或续时。`);
+                    return;
+                }
+            }
 
             if (id) {
                 const idx = ads.findIndex(a => a.id === id);
                 if (idx === -1) { showToast('广告不存在'); return; }
                 if (!canEditAd(currentUser, ads[idx])) { showToast('无权限编辑'); return; }
-                // 保留原状态，但如果管理员编辑，自动设置为 approved
                 const oldStatus = ads[idx].status;
                 ads[idx] = { ...ads[idx], ...data, shares: ads[idx].shares || [] };
-                // 如果是管理员编辑，自动通过
                 if (isAdmin && oldStatus !== 'approved') {
                     ads[idx].status = 'approved';
                 }
                 saveGlobalAds(ads);
                 showToast(isAdmin ? '✅ 广告已更新（已自动通过审核）' : '广告已更新');
             } else {
-                // 新建广告
                 const newAd = {
                     id: Date.now(),
                     ...data,
                     owner: currentUser.username,
-                    // 管理员直接通过，普通用户为草稿
                     status: isAdmin ? 'approved' : 'draft',
                     createdAt: Date.now(),
                     usedBudget: 0,
@@ -2722,7 +2972,7 @@
             renderLibrary();
             updateProfile();
             updateSettlement();
-            // 重置编辑状态
+            updateDashboard();
             editId.value = '';
             createTitle.innerText = '创建新广告';
             switchTab(isAdmin ? 'library' : 'draft');
@@ -2776,23 +3026,31 @@
                     service: '服务' };
                 const statusLabel = getStatusLabel(ad.status);
                 const statusBadge = getStatusBadgeClass(ad.status);
-                // 如果是管理员创建的，显示特殊标记
                 const isAdminAd = ad.owner === 'admin';
+                const budget = ad.budget || 0;
+                const used = ad.usedBudget || 0;
+                const remaining = budget - used;
+                const budgetExhausted = remaining <= 0 && budget > 0;
+                const budgetStatus = budget > 0 ? (budgetExhausted ? '预算已用完' : `预算剩余 ${remaining.toFixed(2)}元`) : '无预算';
+                const hasAnti = ad.antiAdblock ? ' 🛡️' : '';
+
                 html += `
                     <div class="ad-item">
-                        <div class="ad-title">${escapeHtml(ad.title)} ${isAdminAd ? '<span class="admin-badge">管理员</span>' : ''}</div>
+                        <div class="ad-title">${escapeHtml(ad.title)}${hasAnti} ${isAdminAd ? '<span class="admin-badge">管理员</span>' : ''}</div>
                         <div class="ad-meta">
                             <span>📂 ${typeMap[ad.adType]||ad.adType}</span>
                             <span>👤 ${ad.owner || '未知'}</span>
                             <span>${new Date(ad.createdAt).toLocaleString()}</span>
                             <span class="status-badge ${statusBadge}">${statusLabel}</span>
-                            ${ad.budget ? `<span>💰 预算: ${ad.budget}元</span>` : ''}
+                            ${ad.budget ? `<span>💰 预算: ${ad.budget}元 (已用 ${used.toFixed(2)}元)</span>` : ''}
+                            <span class="budget-status ${budgetExhausted ? 'exhausted' : ''}">${budgetStatus}</span>
                         </div>
                         <div class="ad-desc">${escapeHtml(ad.desc)}</div>
                         <div class="ad-actions">
                             ${canEdit ? `<button class="btn btn-sm" data-edit="${ad.id}">✏️ 编辑</button>` : ''}
                             ${canDel ? `<button class="btn btn-danger btn-sm" data-del="${ad.id}">🗑️ 删除</button>` : ''}
-                            ${canCopy ? `<button class="btn btn-sm btn-outline" data-copy="${ad.id}">📋 复制代码</button>` : ''}
+                            ${canCopy && ad.status === 'approved' && !budgetExhausted ? `<button class="btn btn-sm btn-outline" data-copy="${ad.id}">📋 复制代码</button>` : ''}
+                            ${canCopy && ad.status === 'approved' && budgetExhausted ? `<button class="btn btn-sm btn-outline" disabled title="预算已用完">📋 已失效</button>` : ''}
                             ${canReview && ad.status === 'pending' ? `<button class="btn btn-sm" data-review="${ad.id}">🔍 审核</button>` : ''}
                             ${user.role === 'admin' ? `<button class="btn btn-sm" data-toggle="${ad.id}">${ad.status === 'approved' ? '🔒 下架' : '🔓 发布'}</button>` : ''}
                         </div>
@@ -2846,6 +3104,7 @@
                         renderReviewList();
                         renderLibrary();
                         updateProfile();
+                        updateDashboard();
                         showToast('✅ 已审核通过，广告已加入代码库');
                     } else {
                         ad.status = 'rejected';
@@ -2862,7 +3121,7 @@
         }
 
         // ============================================================
-        // 草稿箱
+        // 草稿箱 - 增加预算检查
         // ============================================================
         function renderDraftBox() {
             if (!canSeeDraft(currentUser)) {
@@ -2893,20 +3152,41 @@
                 const statusLabel = getStatusLabel(ad.status);
                 const statusBadge = getStatusBadgeClass(ad.status);
                 const isAdminAd = ad.owner === 'admin';
+                const budgetOk = (ad.budget || 0) > 0;
+                const balance = getUserBalance(user.username);
+                const enoughBalance = balance >= (ad.budget || 0);
+                let totalCheck = { ok: true, total: 0, balance: balance };
+                if (!isAdminAd) {
+                    totalCheck = checkBudgetExceedsBalance(user.username, ad.budget || 0, ad.id);
+                }
+                const canSubmit = !isAdminAd && (ad.status === 'draft' || ad.status === 'rejected') && budgetOk && enoughBalance &&
+                    totalCheck.ok;
+                let submitLabel = '📤 提交审核';
+                if (!budgetOk) submitLabel = '📤 请填写预算';
+                else if (!enoughBalance) submitLabel = '📤 余额不足';
+                else if (!totalCheck.ok) submitLabel = '📤 总预算超限';
+                else submitLabel = '📤 提交审核';
+
+                const hasAnti = ad.antiAdblock ? ' 🛡️' : '';
+
                 html += `
                     <div class="ad-item" style="border-left-color: ${ad.status === 'rejected' ? '#dc3545' : '#ffc107'};">
-                        <div class="ad-title">${escapeHtml(ad.title)} ${isAdminAd ? '<span class="admin-badge">管理员</span>' : ''}</div>
+                        <div class="ad-title">${escapeHtml(ad.title)}${hasAnti} ${isAdminAd ? '<span class="admin-badge">管理员</span>' : ''}</div>
                         <div class="ad-meta">
                             <span>📂 ${typeMap[ad.adType]||ad.adType}</span>
                             <span>👤 ${ad.owner || '未知'}</span>
                             <span>${new Date(ad.createdAt).toLocaleString()}</span>
                             <span class="status-badge ${statusBadge}">${statusLabel}</span>
+                            ${ad.budget ? `<span>💰 预算: ${ad.budget}元</span>` : '<span style="color:#c0392b;">⚠️ 未填写预算</span>'}
+                            ${!enoughBalance && ad.budget > 0 ? `<span style="color:#c0392b;">❌ 余额不足 (需 ${ad.budget}元，当前 ${balance.toFixed(2)}元)</span>` : ''}
+                            ${!totalCheck.ok ? `<span style="color:#c0392b;">❌ 总预算超限 (总预算 ${totalCheck.total.toFixed(2)}元 > 余额 ${totalCheck.balance.toFixed(2)}元)</span>` : ''}
                         </div>
                         <div class="ad-desc">${escapeHtml(ad.desc)}</div>
                         <div class="ad-actions">
                             ${canEdit ? `<button class="btn btn-sm" data-edit="${ad.id}">✏️ 编辑</button>` : ''}
                             ${canDel ? `<button class="btn btn-danger btn-sm" data-del="${ad.id}">🗑️ 删除</button>` : ''}
-                            ${(ad.status === 'draft' || ad.status === 'rejected') && !isAdminAd ? `<button class="btn btn-sm btn-primary" data-submit="${ad.id}">📤 提交审核</button>` : ''}
+                            ${(ad.status === 'draft' || ad.status === 'rejected') && !isAdminAd ? 
+                                `<button class="btn btn-sm ${canSubmit ? 'btn-primary' : 'btn-outline'}" data-submit="${ad.id}" ${!canSubmit ? 'disabled' : ''}>${submitLabel}</button>` : ''}
                             ${isAdminAd && ad.status === 'draft' ? `<span style="font-size:0.7rem;color:#e67e22;">管理员草稿，可直接发布</span>` : ''}
                         </div>
                     </div>
@@ -2931,7 +3211,25 @@
                     const id = parseInt(el.dataset.submit);
                     const ad = getGlobalAds().find(a => a.id === id);
                     if (!ad) return;
-                    const confirmed = await showConfirm('📤 提交审核', `确定要提交 "${ad.title}" 进行审核吗？\n审核通过后将进入代码库。`,
+
+                    if (!ad.budget || ad.budget <= 0) {
+                        showToast('❌ 请先填写广告预算（必须大于0）才能提交审核');
+                        return;
+                    }
+                    const balance = getUserBalance(currentUser.username);
+                    if (balance < ad.budget) {
+                        showToast(`❌ 账户余额不足 (需 ${ad.budget}元，当前 ${balance.toFixed(2)}元)，请充值或续时`);
+                        return;
+                    }
+                    const check = checkBudgetExceedsBalance(currentUser.username, ad.budget, ad.id);
+                    if (!check.ok) {
+                        showToast(
+                            `❌ 总预算超限！当前账户余额为 ${check.balance.toFixed(2)} 元，已有广告预算占用 ${(check.total - ad.budget).toFixed(2)} 元，新增预算 ${ad.budget} 元后总预算 ${check.total.toFixed(2)} 元超出余额。请调整预算或续时。`
+                            );
+                        return;
+                    }
+
+                    const confirmed = await showConfirm('📤 提交审核', `确定要提交 "${ad.title}" 进行审核吗？\n审核通过后将进入代码库。\n广告预算：${ad.budget}元，当前余额：${balance.toFixed(2)}元`,
                         '确定提交', '取消', false, '📤');
                     if (confirmed) {
                         ad.status = 'pending';
@@ -2954,7 +3252,6 @@
                 return;
             }
             const ads = getGlobalAds();
-            // 只显示非管理员创建的待审核广告
             const pending = ads.filter(a => a.status === 'pending' && a.owner !== 'admin');
             reviewCount.innerText = pending.length;
             if (pending.length === 0) {
@@ -2967,14 +3264,16 @@
                     member: '会员', gift: '赠品', preorder: '预售', video: '视频', testimonial: '口碑', countdown: '倒计时',
                     code: '优惠码', live: '直播', job: '招聘', survey: '问卷', groupbuy: '拼团', news: '资讯', brand: '品牌',
                     service: '服务' };
+                const hasAnti = ad.antiAdblock ? ' 🛡️' : '';
                 html += `
                     <div class="ad-item" style="border-left-color: #f59e0b;">
-                        <div class="ad-title">${escapeHtml(ad.title)}</div>
+                        <div class="ad-title">${escapeHtml(ad.title)}${hasAnti}</div>
                         <div class="ad-meta">
                             <span>📂 ${typeMap[ad.adType]||ad.adType}</span>
                             <span>👤 ${ad.owner || '未知'}</span>
                             <span>${new Date(ad.createdAt).toLocaleString()}</span>
                             <span class="status-badge status-pending">待审核</span>
+                            ${ad.budget ? `<span>💰 预算: ${ad.budget}元</span>` : ''}
                         </div>
                         <div class="ad-desc">${escapeHtml(ad.desc)}</div>
                         <div class="ad-actions">
@@ -3001,6 +3300,7 @@
                         renderAdList();
                         renderDraftBox();
                         renderLibrary();
+                        updateDashboard();
                         showToast('✅ 已审核通过，加入代码库');
                     }
                 };
@@ -3033,7 +3333,7 @@
         }
 
         // ============================================================
-        // 代码库
+        // 代码库 - 显示预算状态和防屏蔽标记
         // ============================================================
         function renderLibrary() {
             const ads = getGlobalAds();
@@ -3061,15 +3361,27 @@
             filtered.forEach(ad => {
                 const adShares = ad.shares ? ad.shares.length : 0;
                 const isAdminAd = ad.owner === 'admin';
+                const budget = ad.budget || 0;
+                const used = ad.usedBudget || 0;
+                const remaining = budget - used;
+                const budgetExhausted = budget > 0 && remaining <= 0;
+                const statusLabel = budgetExhausted ? '预算已用完' : (budget > 0 ? `剩余 ${remaining.toFixed(2)}元` : '无预算');
+                const hasAnti = ad.antiAdblock ? ' 🛡️' : '';
+
                 html += `
                     <div class="code-library-item">
-                        <div class="lib-title">${escapeHtml(ad.title)} ${isAdminAd ? '<span class="admin-badge">管理员</span>' : ''}</div>
+                        <div class="lib-title">${escapeHtml(ad.title)}${hasAnti} ${isAdminAd ? '<span class="admin-badge">管理员</span>' : ''}</div>
                         <div class="lib-meta">类型: ${ad.adType} | 创建者: ${ad.owner} | ${new Date(ad.createdAt).toLocaleString()} | <span class="share-count">📤 分享次数: ${adShares}</span></div>
                         <div class="lib-actions">
                             <button class="btn btn-sm btn-outline" data-preview="${ad.id}">👁️ 预览</button>
-                            ${canCopyCode(currentUser) ? `<button class="btn btn-sm btn-primary" data-libcopy="${ad.id}">📋 复制代码</button>` : ''}
+                            ${canCopyCode(currentUser) && ad.status === 'approved' ? 
+                                (budgetExhausted ? 
+                                    `<button class="btn btn-sm btn-outline" disabled title="预算已用完">📋 已失效</button>` :
+                                    `<button class="btn btn-sm btn-primary" data-libcopy="${ad.id}">📋 复制代码</button>`
+                                ) : ''}
                             ${currentUser && currentUser.role === 'admin' ? `<button class="btn btn-sm btn-danger" data-libdel="${ad.id}">🗑️ 删除</button>` : ''}
                         </div>
+                        <div class="budget-status ${budgetExhausted ? 'exhausted' : ''}">💰 ${statusLabel}</div>
                     </div>
                 `;
             });
@@ -3102,7 +3414,7 @@
         }
 
         // ============================================================
-        // 分享/复制代码
+        // 分享/复制代码 - 每次复制扣减预算
         // ============================================================
         function copyAdCodeById(id, fromLibrary = false) {
             const ads = getGlobalAds();
@@ -3114,12 +3426,18 @@
                 return;
             }
             const budget = ad.budget || 0;
-            const reward = ad.rewardPerShare || 0;
-            const usedBudget = ad.usedBudget || 0;
-            if (usedBudget + reward > budget) {
-                showToast('广告预算已用完，暂时无法复制');
+            const used = ad.usedBudget || 0;
+            const remaining = budget - used;
+            if (remaining <= 0) {
+                showToast('广告预算已用完，无法继续分享');
                 return;
             }
+            const reward = ad.rewardPerShare || 0;
+            if (remaining < reward) {
+                showToast('剩余预算不足以支付本次分享报酬，无法复制');
+                return;
+            }
+
             const shareRecord = {
                 sharer: currentUser.username,
                 timestamp: Date.now(),
@@ -3137,6 +3455,7 @@
                 updateProfile();
                 if (fromLibrary) renderLibrary();
                 updateSettlement();
+                updateDashboard();
                 showToast(`✅ 代码已复制 (分享次数: ${ad.shares.length})`);
             }).catch(() => {
                 const ta = document.createElement('textarea');
@@ -3149,6 +3468,7 @@
                 updateProfile();
                 if (fromLibrary) renderLibrary();
                 updateSettlement();
+                updateDashboard();
                 showToast(`✅ 已复制 (分享次数: ${ad.shares.length})`);
             });
         }
@@ -3169,6 +3489,7 @@
             renderLibrary();
             updateProfile();
             updateSettlement();
+            updateDashboard();
             showToast('已删除广告');
         }
 
@@ -3190,6 +3511,7 @@
             renderDraftBox();
             renderReviewList();
             renderLibrary();
+            updateDashboard();
             showToast(`广告已${ad.status === 'approved' ? '发布' : '下架'}`);
         }
 
@@ -3237,14 +3559,15 @@
                 const isSelf = currentUser && u.username === currentUser.username;
                 const lockedStatus = u.locked ? '🔒 已锁定' : '🔓 正常';
                 const remaining = u.remainingSeconds || 0;
-                const hours = remaining >= Infinity ? 0 : remaining / 3600;
                 const timeStr = remaining >= Infinity ? '∞' : `${Math.floor(remaining/60)}分${Math.floor(remaining%60)}秒`;
                 const roleLabel = roleChinese[u.role] || u.role;
                 const isAdmin = u.username === 'admin';
+                const balance = getUserBalance(u.username);
+                const balanceDisplay = balance === Infinity ? '∞' : balance.toFixed(2);
                 html += `<div class="user-item" data-username="${u.username}">
-                    <span><strong>${u.username}</strong> (${roleLabel}) ${isSelf ? '⭐' : ''} ${lockedStatus} | ⏱️ ${timeStr} | 💰 ${hours.toFixed(2)}元</span>
+                    <span><strong>${u.username}</strong> (${roleLabel}) ${isSelf ? '⭐' : ''} ${lockedStatus} | ⏱️ ${timeStr} | 💰 ${balanceDisplay}元</span>
                     <div class="user-actions">
-                        <button class="btn btn-sm" data-action="edit" data-username="${u.username}" ${isAdmin ? 'disabled title="管理员账户不可编辑"' : ''}>✏️ 编辑</button>
+                        <button class="btn btn-sm" data-action="edit" data-username="${u.username}" ${isAdmin ? '' : ''}>✏️ 编辑</button>
                         <button class="btn btn-sm ${u.locked ? 'btn-primary' : 'btn-outline'}" data-action="lock" data-username="${u.username}" ${isAdmin ? 'disabled title="管理员账户不可锁定"' : ''}>${u.locked ? '🔓 解锁' : '🔒 锁定'}</button>
                         ${!isSelf && !isAdmin ? `<button class="btn btn-sm" data-action="recharge" data-username="${u.username}">⏱️ 续时</button>` : ''}
                         ${!isSelf && !isAdmin ? `<button class="btn btn-danger btn-sm" data-action="del" data-username="${u.username}">🗑️ 删除</button>` : ''}
@@ -3285,7 +3608,6 @@
             const users = getUsers();
             const user = users.find(u => u.username === username);
             if (!user) { showToast('用户不存在'); return; }
-            if (username === 'admin') { showToast('管理员账户不可编辑'); return; }
 
             const html = `
                 <div class="form-group">
@@ -3441,11 +3763,25 @@
                             timestamp: s.timestamp,
                             rewardPerShare: s.rewardPerShare || ad.rewardPerShare || 0,
                             commissionRate: s.commissionRate || commissionRate,
-                            settled: s.settled || false
+                            settled: s.settled || false,
+                            adBudget: ad.budget || 0,
+                            adUsed: ad.usedBudget || 0
                         });
                     });
                 }
             });
+            const adBudgetMap = {};
+            ads.forEach(ad => {
+                if (ad.status === 'approved') {
+                    adBudgetMap[ad.id] = {
+                        title: ad.title,
+                        budget: ad.budget || 0,
+                        used: ad.usedBudget || 0,
+                        remaining: (ad.budget || 0) - (ad.usedBudget || 0)
+                    };
+                }
+            });
+
             const sharerMap = {};
             allShares.forEach(s => {
                 if (!sharerMap[s.sharer]) sharerMap[s.sharer] = [];
@@ -3453,10 +3789,31 @@
             });
             let totalUnsettled = 0;
             let html = '';
-            if (Object.keys(sharerMap).length === 0) {
-                html = '<div style="color:#4a5f72;font-size:0.9rem;">暂无分享记录</div>';
+            html += `<div style="margin-bottom:1rem;"><strong>📊 广告预算使用情况</strong></div>`;
+            if (Object.keys(adBudgetMap).length === 0) {
+                html += '<div style="color:#4a5f72;font-size:0.9rem;">暂无已通过的广告</div>';
             } else {
-                html = `<div style="margin-bottom:1rem;"><strong>当前抽成比例：${(commissionRate*100).toFixed(0)}%</strong></div>`;
+                Object.keys(adBudgetMap).forEach(adId => {
+                    const info = adBudgetMap[adId];
+                    const isExhausted = info.budget > 0 && info.remaining <= 0;
+                    html += `
+                        <div class="settlement-item" style="border-left-color: ${isExhausted ? '#dc3545' : '#2c7a5e'};">
+                            <div class="sharer-name">📢 ${escapeHtml(info.title)}</div>
+                            <div class="details">
+                                总预算: ${info.budget.toFixed(2)} 元<br>
+                                已消耗: ${info.used.toFixed(2)} 元<br>
+                                剩余: ${info.remaining.toFixed(2)} 元 ${isExhausted ? '🔴 已用完' : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            html += `<div style="margin-top:1.5rem;margin-bottom:1rem;"><strong>👤 分享者结算明细</strong></div>`;
+            if (Object.keys(sharerMap).length === 0) {
+                html += '<div style="color:#4a5f72;font-size:0.9rem;">暂无分享记录</div>';
+            } else {
+                html += `<div style="margin-bottom:1rem;"><strong>当前抽成比例：${(commissionRate*100).toFixed(0)}%</strong></div>`;
                 Object.keys(sharerMap).forEach(sharer => {
                     const records = sharerMap[sharer];
                     const totalRaw = records.reduce((sum, r) => sum + r.rewardPerShare, 0);
@@ -3502,6 +3859,7 @@
                         });
                         saveGlobalAds(ads);
                         updateSettlement();
+                        updateDashboard();
                         showToast('✅ 已标记结算');
                     }
                 };
@@ -3519,12 +3877,68 @@
             savePlatformConfig(config);
             commissionDisplay.innerText = (val * 100).toFixed(0);
             updateSettlement();
+            updateDashboard();
             showToast('✅ 抽成比例已更新');
         };
 
+        // ============================================================
+        // 分享统计 - 修复：移除不存在的 #copyStats 引用
+        // ============================================================
         function updateShareStats() {
-            const shareEl = document.getElementById('copyStats');
-            if (shareEl) shareEl.innerText = `分享次数: ${getShareCount()}`;
+            // 分享统计已集成到个人中心和其他位置，无需单独更新
+        }
+
+        // ============================================================
+        // 平台看板
+        // ============================================================
+        function updateDashboard() {
+            if (!currentUser || !canManageUsers(currentUser)) {
+                dashBadge.innerText = '0';
+                return;
+            }
+            const ads = getGlobalAds();
+            const approved = ads.filter(a => a.status === 'approved');
+            const totalAds = approved.length;
+            let totalBudget = 0,
+                usedBudget = 0,
+                totalShares = 0,
+                platformEarnings = 0,
+                unsettled = 0;
+            const config = getPlatformConfig();
+            const commissionRate = config.commissionRate || 0.1;
+
+            approved.forEach(ad => {
+                totalBudget += (ad.budget || 0);
+                usedBudget += (ad.usedBudget || 0);
+                if (ad.shares) {
+                    totalShares += ad.shares.length;
+                    ad.shares.forEach(s => {
+                        const raw = s.rewardPerShare || 0;
+                        const fee = raw * (s.commissionRate || commissionRate);
+                        platformEarnings += fee;
+                        if (!s.settled) unsettled += (raw - fee);
+                    });
+                }
+            });
+
+            dashTotalAds.innerText = totalAds;
+            dashTotalBudget.innerText = totalBudget.toFixed(2);
+            dashUsedBudget.innerText = usedBudget.toFixed(2);
+            dashTotalShares.innerText = totalShares;
+            dashPlatformEarnings.innerText = platformEarnings.toFixed(2);
+            dashUnsettled.innerText = unsettled.toFixed(2);
+            dashBadge.innerText = totalAds;
+
+            const logs = [
+                `📢 平台共有 ${totalAds} 个广告`,
+                `💰 总预算 ${totalBudget.toFixed(2)} 元，已消耗 ${usedBudget.toFixed(2)} 元`,
+                `🔄 总分享 ${totalShares} 次，平台收益 ${platformEarnings.toFixed(2)} 元`,
+                `⏳ 待结算 ${unsettled.toFixed(2)} 元`
+            ];
+            if (totalShares > 0) {
+                logs.push(`📊 平均每次分享收益 ${(platformEarnings/totalShares).toFixed(2)} 元`);
+            }
+            dashLogContainer.innerHTML = logs.map(l => `<div>• ${l}</div>`).join('');
         }
 
         // ============================================================
@@ -3553,6 +3967,10 @@
             }
             if (tabId === 'settlement' && !canManageUsers(currentUser)) {
                 showToast('仅管理员可访问结算管理');
+                return;
+            }
+            if (tabId === 'dashboard' && !canManageUsers(currentUser)) {
+                showToast('仅管理员可访问平台看板');
                 return;
             }
             if (tabId === 'library') {
@@ -3592,97 +4010,97 @@
                     f_imgSizeVal.innerText = '85px';
                     f_padding.value = 18;
                     f_paddingVal.innerText = '18px';
-                    f_radius.value = 20;
+f_radius.value = 20；
                     f_radiusVal.innerText = '20px';
-                    f_gap.value = 14;
+f_gap.value = 14；
                     f_gapVal.innerText = '14px';
-                    f_width_auto.checked = true;
-                    f_height_auto.checked = true;
-                    f_width.value = 'auto';
-                    f_height.value = 'auto';
-                    f_width_slider.value = 80;
-                    f_width_val.innerText = '80%';
-                    f_height_slider.value = 60;
-                    f_height_val.innerText = '60%';
-                    f_opacity.value = 100;
-                    f_opacity_val.innerText = '100%';
-                    f_budget.value = 50;
-                    f_reward.value = 0.1;
-                    createTitle.innerText = '创建新广告';
-                    editId.value = '';
+f_width_auto.checked = true；
+高度自动。检查=真；
+f_width.value = 'auto'；
+f_height.value = '自动'；
+f_宽度滑块.value = 80；
+f_width_val.innerText = '80%'；
+f_高度滑块.value = 60；
+f_height_val.innerText = '60%'；
+f_opacity.value = 100；
+f_opacity_val.innerText = '100%'；
+f_budget.value=10；
+f_reward.value = 0.1；
+f_anti_adblock.checked = false；
+创建新广告；
+editId.value = ''；
                 }
-                generatePreviewCode();
-                renderTemplateSelect();
+生成预览代码（）；
+renderTemplateSelect（）；
             }
-            if (tabId === 'draft') {
-                renderDraftBox();
-            }
-            if (tabId === 'review') {
-                renderReviewList();
-            }
-            if (tabId === 'users') renderUserList();
-            if (tabId === 'profile') {
-                updateProfile();
-                renderTemplateList();
-            }
-            if (tabId === 'settlement') {
-                updateSettlement();
-            }
-        }
-
-        // ============================================================
         // Toast
-        // ============================================================
-        function showToast(msg) {
-            const t = document.getElementById('toastMsg');
-            t.innerText = msg;
-            t.style.opacity = '1';
-            setTimeout(() => t.style.opacity = '0', 2200);
+</html>
+            }
+如果（表===‘审查’）{
+renderReviewList（）；
+            }
+如果用户名为“用户名”，则用户名为“用户名”。
+如果（标签==="配置文件"）{
+updateProfile（）；
+renderTemplateList（）；
+            }
+如果（表===‘结算’）{
+更新结算；
+            }
+如果（表=="仪表板"）{
+更新仪表板（）；
+            }
         }
 
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
+        // ============================================================
+//吐司
+        // ============================================================
+函数showToast（msg） {
+t = document.getElementById（'toastMsg'）；
+t.innerText = msg；
+t.style.opacity = '1'；
+setTimeout（（） => t.style.opacity = '0'， 2200）；
         }
 
         // ============================================================
         // 事件绑定
         // ============================================================
-        tabs.forEach(li => {
+tabs.forEachli={
             li.onclick = () => {
                 const tab = li.dataset.tab;
-                if (tab === 'users' && !canManageUsers(currentUser)) { showToast('仅管理员可访问'); return; }
-                if (tab === 'create' && !canCreateAd(currentUser)) { showToast('您无权限创建广告'); return; }
-                if (tab === 'draft' && !canSeeDraft(currentUser)) { showToast('您无权限查看草稿箱'); return; }
-                if (tab === 'review' && !canReviewAd(currentUser)) { showToast('仅管理员可访问审核列表'); return; }
-                if (tab === 'settlement' && !canManageUsers(currentUser)) { showToast('仅管理员可访问结算管理'); return; }
-                switchTab(tab);
+如果（选项卡===“用户”&&！可以管理用户（当前用户））{显示列表（“仅管理员可访问”）；返回；}
+如果（选项卡==="创建"&&！可以创建广告（当前用户））{显示列表（"您无权限创建广告"）；返回；}
+如果（选项卡==='草稿'&&！可以查看草稿（当前用户））{显示草稿（'您无权限查看草稿箱'）；返回；}
+如果（选项卡===“审核”&&！可以审核（当前用户））{显示列表（“仅管理员可访问审核列表”）；返回；}
+如果（选项卡===‘结算’&&！可以管理用户（当前用户））{显示列表（‘仅管理员可访问结算管理’）；返回；}
+                if (tab === 'dashboard' && !canManageUsers(currentUser)) { showToast('仅管理员可访问平台看板'); return; }
+switchTab（tab）；
             };
         });
 
         adForm.onsubmit = saveAd;
 
-        f_width_slider.oninput = () => {
-            f_width_val.innerText = f_width_slider.value + '%';
-            if (!f_width_auto.checked) { f_width.value = f_width_slider.value + '%';
-                generatePreviewCode(); }
+f_width_slider.oninput = （） => {
+f_width_val.innerText = f_width_2Slider.value + '%'；
+如果 （！f_width_auto.checked） { f_width.value = f_width_slider.value + '%'；
+生成预览代码（）； }
         };
-        f_height_slider.oninput = () => {
-            f_height_val.innerText = f_height_slider.value + '%';
-            if (!f_height_auto.checked) { f_height.value = f_height_slider.value + '%';
-                generatePreviewCode(); }
+f_height_slider.oninput = （） => {
+f_height_val.innerText = f_height_3Slider.value + '%'；
+如果 （！f_height_auto.checked） { f_height.value = f_height_slider.value + '%'；
+生成预览代码（）； }
         };
-        f_width_auto.onchange = () => {
-            f_width.value = f_width_auto.checked ? 'auto' : f_width_slider.value + '%';
-            generatePreviewCode();
+f_width_auto.onchange = （） => {
+f_width.value = f_width_auto.checked？'auto': f_width滑块.value + '%'；
+生成预览代码（）；
         };
-        f_height_auto.onchange = () => {
-            f_height.value = f_height_auto.checked ? 'auto' : f_height_slider.value + '%';
-            generatePreviewCode();
+f_高度_自动.onchange = （） => {
+f_height.value = f_height_auto.checked？'auto': f_height滑块.value + '%'；
+生成预览代码（）；
         };
         f_opacity.oninput = () => {
             f_opacity_val.innerText = f_opacity.value + '%';
-            generatePreviewCode();
+生成预览代码（）；
         };
 
         f_imgSize.oninput = () => { f_imgSizeVal.innerText = f_imgSize.value + 'px';
@@ -3693,11 +4111,12 @@
             generatePreviewCode(); };
         f_gap.oninput = () => { f_gapVal.innerText = f_gap.value + 'px';
             generatePreviewCode(); };
+        f_anti_adblock.onchange = generatePreviewCode;
 
         document.querySelectorAll('.rich-btn').forEach(btn => {
             btn.onclick = () => {
                 btn.classList.toggle('active');
-                generatePreviewCode();
+生成预览代码（）；
             };
         });
 
@@ -3766,27 +4185,35 @@
             showToast('✅ 手动备份完成');
         });
 
-        initColorPickers();
-        startAutoBackup();
+        // ============================================================
+        // 初始化 - 修复：延迟初始化颜色选择器，确保 DOM 已就绪
+        // ============================================================
+        // 使用set Time out确保DOM完全加载
+setTimeout={
+initColorPickers（）；
+        }, 0);
+启动自动备份（）；
 
         // ============================================================
         // 检查当前登录状态
         // ============================================================
-        if (currentUser) {
-            loginOverlay.style.display = 'none';
-            appMain.style.display = 'block';
-            displayName.innerText = `👤 ${currentUser.username}`;
-            displayRole.innerText = roleChinese[currentUser.role] || currentUser.role;
-            if (!canManageUsers(currentUser)) usersTab.style.display = 'none';
-            else usersTab.style.display = 'block';
-            if (!canCreateAd(currentUser)) createTab.style.display = 'none';
-            else createTab.style.display = 'block';
+如果（当前用户） {
+登录Overlay.style.display = 'none'；
+appMain.style.display = 'block'；
+displayName.innerText = `👤 ${currentUser.username}`;
+displayRole.innerText = roleChinese[currentUser.role] || currentUser.role；
+如果（！canManageUsers（currentUser）） usersTab.style.display = 'none'；
+否则 usersTab.style.display = 'block'；
+如果（！canCreateAd（currentUser）） createTab.style.display = 'none'；
+否则 createTab.style.display = 'block'；
             if (!canSeeDraft(currentUser)) draftTab.style.display = 'none';
             else draftTab.style.display = 'block';
             if (!canReviewAd(currentUser)) reviewTab.style.display = 'none';
             else reviewTab.style.display = 'block';
             if (!canManageUsers(currentUser)) settlementTab.style.display = 'none';
             else settlementTab.style.display = 'block';
+            if (!canManageUsers(currentUser)) dashboardTab.style.display = 'none';
+            else dashboardTab.style.display = 'block';
             if (isSharer(currentUser)) {
                 document.querySelectorAll('.sidebar li[data-tab]').forEach(li => {
                     const tab = li.dataset.tab;
@@ -3798,7 +4225,7 @@
                 document.querySelectorAll('.sidebar li[data-tab]').forEach(li => li.style.display = 'flex');
                 switchTab('ads');
             }
-            if (currentUser.username !== 'admin') {
+            showToast('✅ 手动备份完成');
                 startTimer();
             } else {
                 timerDisplay.innerText = '⏱️ 管理员无限制';
@@ -3813,12 +4240,13 @@
             renderTemplateSelect();
             renderTemplateList();
             updateSettlement();
+            updateDashboard();
         } else {
             loginOverlay.style.display = 'flex';
             appMain.style.display = 'none';
         }
 
-        console.log('✅ 悦享广告工坊 v8.4 已启动 (管理员广告自动通过审核)');
+        console.log('✅ 悦享广告工坊 V8.6 已启动 (宏观预算+平台看板+防屏蔽)');
     </script>
 </body>
-    </html>
+</html>
