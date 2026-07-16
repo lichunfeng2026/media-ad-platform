@@ -1090,8 +1090,8 @@
             <div id="loginPanel">
                 <h2>🔐 登录</h2>
                 <div class="sub">悦享广告工坊 V8.6 · 宏观预算 + 平台看板</div>
-                <input type="text" id="loginUsername" placeholder="用户名" value="admin">
-                <input type="password" id="loginPassword" placeholder="密码" value="admin123">
+                <input type="text" id="loginUsername" placeholder="用户名" value="guest">
+                <input type="password" id="loginPassword" placeholder="密码" value="guest123">
                 <div class="form-actions">
                     <button class="btn btn-primary" id="loginSubmitBtn">登录</button>
                 </div>
@@ -1100,7 +1100,8 @@
                     <span id="goToForgot">忘记密码？</span>
                 </div>
                 <div class="guest-info">
-                    🎮 <strong>体验账号</strong> guest / guest123 &nbsp;|&nbsp; ⏱️ 1小时 = 💰 1元
+                    🎮 <strong>体验账号</strong> guest / guest123 &nbsp;|&nbsp; ⏱️ 1小时 = 💰 1元<br>
+                    <span style="font-size:0.65rem;color:#7890a8;">管理员账号已隐藏，请在登录后通过个人中心修改密码</span>
                 </div>
             </div>
             <div id="registerPanel" class="hidden">
@@ -1518,7 +1519,7 @@
 
     <script>
         // ============================================================
-        // 自定义对话框
+        // 自定义对话框 - 修复：确保能正确获取表单数据
         // ============================================================
         function showCustomDialog(icon, title, contentHtml, confirmText = '确定', cancelText = '取消', isDanger = false, onConfirm = null) {
             return new Promise((resolve) => {
@@ -1548,6 +1549,7 @@
 
                 okBtn.addEventListener('click', () => {
                     if (typeof onConfirm === 'function') {
+                        // 修复：在点击确认时，从当前 DOM 中获取所有输入框的值
                         const inputs = overlay.querySelectorAll('input, select, textarea');
                         const values = {};
                         inputs.forEach(input => {
@@ -1555,6 +1557,7 @@
                                 values[input.id] = input.value;
                             }
                         });
+                        // 传递 values 和确认回调
                         onConfirm(values, () => cleanup(true));
                     } else {
                         cleanup(true);
@@ -1775,12 +1778,14 @@
         }
 
         // ============================================================
-        // 初始化数据
+        // 初始化数据 - 移除内置 admin 账号的明文显示，保留体验账号
         // ============================================================
         function initDemoData() {
             let users = getUsers();
             if (users.length === 0) {
+                // 创建体验账号和隐藏的管理员账号
                 users = [
+                    // 管理员账号：不显示在登录界面，但存在
                     { username: 'admin', password: 'admin123', role: 'admin', locked: false, remainingSeconds: Infinity },
                     { username: 'publisher1', password: 'pub123', role: 'publisher', locked: false, remainingSeconds: 3600 },
                     { username: 'sharer1', password: 'share123', role: 'sharer', locked: false, remainingSeconds: 3600 },
@@ -1797,6 +1802,13 @@
                 if (!localStorage.getItem('adAds_global')) saveGlobalAds([]);
                 if (!localStorage.getItem('adPlatformConfig')) savePlatformConfig({ commissionRate: 0.1 });
             } else {
+                // 确保 admin 账号存在且未被删除
+                let hasAdmin = users.some(u => u.username === 'admin');
+                if (!hasAdmin) {
+                    users.push({ username: 'admin', password: 'admin123', role: 'admin', locked: false,
+                        remainingSeconds: Infinity });
+                    saveUsers(users);
+                }
                 users.forEach(u => {
                     const name = u.username;
                     if (!localStorage.getItem(`adTemplates_${name}`)) localStorage.setItem(`adTemplates_${name}`,
@@ -1994,7 +2006,7 @@
         }
 
         // ============================================================
-        // 颜色选择器 - 修复：确保在 DOM 就绪后初始化
+        // 颜色选择器
         // ============================================================
         function createColorPicker(containerId, initialColor, onChange) {
             const container = document.getElementById(containerId);
@@ -2078,20 +2090,19 @@
         }
 
         // ============================================================
-        // 退出登录函数 - 修复：确保正确隐藏/显示登录层
+        // 退出登录函数
         // ============================================================
         function logoutUser() {
             clearCurrentUser();
             if (timerInterval) clearInterval(timerInterval);
             currentUser = null;
-            // 修复：确保 loginOverlay 显示，appMain 隐藏
             if (loginOverlay) loginOverlay.style.display = 'flex';
             if (appMain) appMain.style.display = 'none';
             showToast('已安全退出');
         }
 
         // ============================================================
-        // 计时与余额 - 修复：避免在退出后继续执行
+        // 计时与余额
         // ============================================================
         function updateTimerAndMoney() {
             if (!currentUser) return;
@@ -2251,7 +2262,7 @@
         };
 
         // ============================================================
-        // 个人中心
+        // 个人中心 - 修复修改密码功能
         // ============================================================
         function updateProfile() {
             if (!currentUser) return;
@@ -2319,6 +2330,7 @@
             }
         };
 
+        // 修复：个人中心修改密码 - 使用正确的 values 获取方式
         profileChangePwdBtn.onclick = async () => {
             if (!currentUser) return;
             const html = `
@@ -2331,24 +2343,39 @@
                     <input type="password" id="pwdConfirm" placeholder="请再次输入新密码">
                 </div>
             `;
-            const confirmed = await showCustomDialog('🔑', '修改密码', html, '确定修改', '取消', false);
-            if (confirmed) {
-                const newPwd = document.getElementById('pwdNew')?.value || '';
-                const confirmPwd = document.getElementById('pwdConfirm')?.value || '';
-                if (newPwd.length < 6) { showToast('密码至少6位'); return; }
-                if (newPwd !== confirmPwd) { showToast('两次输入的密码不一致'); return; }
-                let users = getUsers();
-                const user = users.find(u => u.username === currentUser.username);
-                if (user) {
-                    user.password = newPwd;
-                    saveUsers(users);
-                    currentUser.password = newPwd;
-                    setCurrentUser(currentUser);
-                    showToast('✅ 密码修改成功！');
-                } else {
-                    showToast('用户不存在');
-                }
-            }
+            // 使用自定义对话框，通过 onConfirm 回调获取表单数据
+            const confirmed = await new Promise((resolve) => {
+                showCustomDialog('🔑', '修改密码', html, '确定修改', '取消', false, (values, confirm) => {
+                    // values 包含所有输入框的值
+                    const newPwd = values['pwdNew'] || '';
+                    const confirmPwd = values['pwdConfirm'] || '';
+                    
+                    if (newPwd.length < 6) { 
+                        showToast('密码至少6位'); 
+                        return; 
+                    }
+                    if (newPwd !== confirmPwd) { 
+                        showToast('两次输入的密码不一致'); 
+                        return; 
+                    }
+                    
+                    let users = getUsers();
+                    const user = users.find(u => u.username === currentUser.username);
+                    if (user) {
+                        user.password = newPwd;
+                        saveUsers(users);
+                        // 同步更新当前用户的 session
+                        currentUser.password = newPwd;
+                        setCurrentUser(currentUser);
+                        showToast('✅ 密码修改成功！');
+                        resolve(true);
+                        confirm();
+                    } else {
+                        showToast('用户不存在');
+                        resolve(false);
+                    }
+                });
+            });
         };
 
         // ============================================================
@@ -2643,7 +2670,7 @@
         }
 
         // ============================================================
-        // 生成广告代码 - 支持防屏蔽 (修复转义问题)
+        // 生成广告代码 - 支持防屏蔽
         // ============================================================
         function generateAdCode(ad) {
             const titleSty =
@@ -2720,7 +2747,6 @@
 
             if (ad.antiAdblock) {
                 const randId = 'ad_' + Math.random().toString(36).substring(2, 10);
-                // 修复：使用更安全的转义方式
                 const escapedHtml = staticAdHtml
                     .replace(/\\/g, '\\\\')
                     .replace(/`/g, '\\`')
@@ -2916,7 +2942,7 @@
         }
 
         // ============================================================
-        // 保存广告 - 增加宏观预算管控
+        // 保存广告
         // ============================================================
         function saveAd(e) {
             e.preventDefault();
@@ -3121,7 +3147,7 @@
         }
 
         // ============================================================
-        // 草稿箱 - 增加预算检查
+        // 草稿箱
         // ============================================================
         function renderDraftBox() {
             if (!canSeeDraft(currentUser)) {
@@ -3333,7 +3359,7 @@
         }
 
         // ============================================================
-        // 代码库 - 显示预算状态和防屏蔽标记
+        // 代码库
         // ============================================================
         function renderLibrary() {
             const ads = getGlobalAds();
@@ -3414,7 +3440,7 @@
         }
 
         // ============================================================
-        // 分享/复制代码 - 每次复制扣减预算
+        // 分享/复制代码
         // ============================================================
         function copyAdCodeById(id, fromLibrary = false) {
             const ads = getGlobalAds();
@@ -3536,7 +3562,7 @@
         }
 
         // ============================================================
-        // 用户管理
+        // 用户管理 - 修复编辑用户密码功能
         // ============================================================
         function renderUserList() {
             if (!canManageUsers(currentUser)) {
@@ -3603,6 +3629,7 @@
             });
         }
 
+        // 修复：编辑用户功能 - 使用 onConfirm 回调获取表单数据
         async function editUser(username) {
             if (!canManageUsers(currentUser)) { showToast('无权限'); return; }
             const users = getUsers();
@@ -3623,29 +3650,59 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>新密码（留空则不修改）</label>
+                    <label>新密码（留空则不修改，至少6位）</label>
                     <input type="password" id="editUserPwd" placeholder="输入新密码（至少6位）">
                 </div>
+                <div class="form-group">
+                    <label>确认密码</label>
+                    <input type="password" id="editUserPwdConfirm" placeholder="请再次输入新密码">
+                </div>
             `;
-            const confirmed = await showCustomDialog('✏️', `编辑用户: ${username}`, html, '保存', '取消', false);
-            if (!confirmed) return;
+            
+            // 使用自定义对话框，通过 onConfirm 回调获取表单数据
+            const confirmed = await new Promise((resolve) => {
+                showCustomDialog('✏️', `编辑用户: ${username}`, html, '保存', '取消', false, (values, confirm) => {
+                    const newRole = values['editUserRole'];
+                    const newPwd = values['editUserPwd'] || '';
+                    const confirmPwd = values['editUserPwdConfirm'] || '';
 
-            const newRole = document.getElementById('editUserRole')?.value;
-            const newPwd = document.getElementById('editUserPwd')?.value || '';
+                    const users2 = getUsers();
+                    const target = users2.find(u => u.username === username);
+                    if (!target) { 
+                        showToast('用户不存在'); 
+                        resolve(false);
+                        return;
+                    }
 
-            const users2 = getUsers();
-            const target = users2.find(u => u.username === username);
-            if (!target) { showToast('用户不存在'); return; }
+                    // 如果填写了新密码，验证一致性
+                    if (newPwd.length > 0) {
+                        if (newPwd.length < 6) { 
+                            showToast('密码至少6位'); 
+                            return; 
+                        }
+                        if (newPwd !== confirmPwd) { 
+                            showToast('两次输入的密码不一致'); 
+                            return; 
+                        }
+                        target.password = newPwd;
+                        
+                        // 如果编辑的是当前登录用户，同步更新 session
+                        if (currentUser && currentUser.username === username) {
+                            currentUser.password = newPwd;
+                            setCurrentUser(currentUser);
+                        }
+                    }
 
-            if (newRole) target.role = newRole;
-            if (newPwd.length > 0) {
-                if (newPwd.length < 6) { showToast('密码至少6位'); return; }
-                target.password = newPwd;
-            }
-            saveUsers(users2);
-            renderUserList();
-            updateProfile();
-            showToast(`✅ 用户 "${username}" 已更新`);
+                    if (newRole) target.role = newRole;
+                    
+                    saveUsers(users2);
+                    renderUserList();
+                    updateProfile();
+                    showToast(`✅ 用户 "${username}" 已更新`);
+                    resolve(true);
+                    confirm();
+                });
+            });
         }
 
         async function toggleLockUser(username) {
@@ -3711,25 +3768,25 @@
                 </div>
             `;
             const confirmed = await showCustomDialog('⏱️', '续时', html, '确定续时', '取消', false);
-            if (!confirmed) return;
+            if (confirmed) {
+                const hoursInput = document.getElementById('rechargeHours');
+                let hours = parseFloat(hoursInput?.value);
+                if (isNaN(hours) || hours <= 0) { showToast('请输入有效的小时数（正数）'); return; }
 
-            const hoursInput = document.getElementById('rechargeHours');
-            let hours = parseFloat(hoursInput?.value);
-            if (isNaN(hours) || hours <= 0) { showToast('请输入有效的小时数（正数）'); return; }
+                const users2 = getUsers();
+                const target = users2.find(u => u.username === username);
+                if (!target) { showToast('用户不存在'); return; }
 
-            const users2 = getUsers();
-            const target = users2.find(u => u.username === username);
-            if (!target) { showToast('用户不存在'); return; }
-
-            const currentSecs = target.remainingSeconds || 0;
-            target.remainingSeconds = currentSecs + hours * 3600;
-            saveUsers(users2);
-            renderUserList();
-            updateProfile();
-            if (currentUser && currentUser.username === username) {
-                startTimer();
+                const currentSecs = target.remainingSeconds || 0;
+                target.remainingSeconds = currentSecs + hours * 3600;
+                saveUsers(users2);
+                renderUserList();
+                updateProfile();
+                if (currentUser && currentUser.username === username) {
+                    startTimer();
+                }
+                showToast(`✅ 为 "${username}" 增加了 ${hours} 小时`);
             }
-            showToast(`✅ 为 "${username}" 增加了 ${hours} 小时`);
         }
 
         userSearchInput.addEventListener('input', renderUserList);
@@ -3882,7 +3939,7 @@
         };
 
         // ============================================================
-        // 分享统计 - 修复：移除不存在的 #copyStats 引用
+        // 分享统计
         // ============================================================
         function updateShareStats() {
             // 分享统计已集成到个人中心和其他位置，无需单独更新
@@ -4186,16 +4243,15 @@
         });
 
         // ============================================================
-        // 初始化 - 修复：延迟初始化颜色选择器，确保 DOM 已就绪
+        // 初始化
         // ============================================================
-        // 使用 setTimeout 确保 DOM 完全加载
         setTimeout(() => {
             initColorPickers();
         }, 0);
         startAutoBackup();
 
         // ============================================================
-        // 检查当前登录状态
+        // 检查当前登录状态 - 初始界面为登录界面
         // ============================================================
         if (currentUser) {
             loginOverlay.style.display = 'none';
@@ -4244,9 +4300,13 @@
         } else {
             loginOverlay.style.display = 'flex';
             appMain.style.display = 'none';
+            loginUsername.value = 'guest';
+            loginPassword.value = 'guest123';
         }
 
         console.log('✅ 悦享广告工坊 V8.6 已启动 (宏观预算+平台看板+防屏蔽)');
+        console.log('💡 体验账号: guest / guest123');
+        console.log('🔑 管理员账号: admin (密码可在个人中心修改)');
     </script>
 </body>
 </html>
